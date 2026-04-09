@@ -26,21 +26,21 @@ VALUES
 ON CONFLICT (username) DO NOTHING;
 
 -- ── Default device ────────────────────────────────────────────────────────────
-INSERT INTO devices (model, article_number, production_number, serial_no, rto_file, rto_revision)
-VALUES ('REM102-G-G-S-T-W-8-GS-O-000', '5.6602.013/01', '', '21292853', '5.2901.047J01', 'A51')
+INSERT INTO devices (model, article_number, article_revision, production_number, serial_no, rto_file, rto_revision)
+VALUES ('REM102-G-G-S-T-W-8-GS-O-000', '5.6602.013/01', 'A00', '', '21292853', '5.2901.047J01', 'A51')
 ON CONFLICT DO NOTHING;
 
 -- ── Device subsystems ─────────────────────────────────────────────────────────
-INSERT INTO device_subsystems (device_id, serial, article, revision, description, sort_order)
-SELECT d.id, s.serial, s.article, s.revision, s.description, s.ord
+INSERT INTO device_subsystems (device_id, serial, article, revision, description, master, sort_order)
+SELECT d.id, s.serial, s.article, s.revision, s.description, s.master, s.ord
 FROM devices d,
 (VALUES
-  ('19252995','5.6602.316/08','A01','BOARD REM102PCU-108',   0),
-  ('20212865','5.6602.313/01','A02','BOARD REM102CN-401',    1),
-  ('20341058','5.6602.311/20','A00','BOARD REM102DSPW-320',  2),
-  ('21081218','80002900',     'D01','BOARD MPC107-001',      3),
-  ('21202692','80002760',     'D08','BOARD REM102OLED-000',  4)
-) AS s(serial, article, revision, description, ord)
+  ('19252995','5.6602.316/08','A01','BOARD REM102PCU-108',  'REM PCU', 0),
+  ('20212865','5.6602.313/01','A02','BOARD REM102CN-401',   'REM CN',  1),
+  ('20341058','5.6602.311/20','A00','BOARD REM102DSPW-320', 'REM DSP', 2),
+  ('21081218','80002900',     'D01','BOARD MPC107-001',     'MPC',     3),
+  ('21202692','80002760',     'D08','BOARD REM102OLED-000', 'OLED',    4)
+) AS s(serial, article, revision, description, master, ord)
 WHERE d.serial_no = '21292853'
 ON CONFLICT DO NOTHING;
 
