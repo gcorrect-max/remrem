@@ -34,7 +34,7 @@ LabVIEW Application
 │   └── VI 2: WebSocket /ws
 │
 ├── HTTP Client VIs (wywołujące Nitro)
-│   ├── VI 3: Auth Login  ─────────── wywołaj przy starcie RTO
+│   ├── VI 3: Auth Login  ─────────── wywołaj przy starcie aplikacji
 │   ├── VI 4: Start Session ────────── wywołaj gdy test startuje
 │   ├── VI 5: Finish Session ───────── wywołaj gdy test kończy
 │   ├── VI 6: Update Step ──────────── wywołaj przy każdej zmianie kroku
@@ -43,7 +43,7 @@ LabVIEW Application
 │   └── VI 9: Update Instrument ────── wywołaj gdy zmienia się status przyrządu
 │
 └── Startup VI
-    └── VI 10: Upload Drawing ──────── wywołaj jednorazowo przy starcie RTO
+    └── VI 10: Upload Drawing ──────── wywołaj jednorazowo przy starcie aplikacji
 ```
 
 Token JWT uzyskany w VI 3 (Auth Login) musi być przechowywany jako **Global Variable** lub **Functional Global** i przekazywany do wszystkich pozostałych VI HTTP.
@@ -54,7 +54,7 @@ Token JWT uzyskany w VI 3 (Auth Login) musi być przechowywany jako **Global Var
 
 ### VI 1: GET /api/hostname
 
-**Cel:** Udostępnienie informacji o urządzeniu i RTO. Wywoływany przez frontend co 5 sekund do sprawdzenia dostępności serwera.
+**Cel:** Udostępnienie informacji o urządzeniu i aktywnym dokumencie RTO (Routine Test Overview). Wywoływany przez frontend co 5 sekund do sprawdzenia dostępności serwera.
 
 **Typ VI:** HTTP GET Handler (NI Web Service)
 
@@ -80,16 +80,16 @@ Brak parametrów.
 |------|-------------|--------|
 | `hostname` | String | `Get Computer Name.vi` lub ENV variable |
 | `model` | String | Stała w VI lub plik konfiguracyjny |
-| `rtoFile` | String | Nazwa pliku `.rtexe` bieżącego projektu |
-| `rtoRevision` | String | Stała wersja wkompilowana w RTO |
+| `rtoFile` | String | Nazwa aktywnego pliku dokumentu RTO (Routine Test Overview) |
+| `rtoRevision` | String | Rewizja dokumentu RTO pobrana z bazy CINNAMON |
 
 #### Implementacja (G-code pseudokod)
 ```
 1. Buduj JSON string (JSON Build Object):
    - "hostname"    ← Get Computer Name
    - "model"       ← stała "REM102"
-   - "rtoFile"     ← stała "rem102_main.rtexe"
-   - "rtoRevision" ← stała "1.2.3"
+   - "rtoFile"     ← nazwa aktywnego pliku RTO (Routine Test Overview), np. "rem102_main.rtexe"
+   - "rtoRevision" ← rewizja dokumentu RTO pobrana z bazy CINNAMON, np. "A00"
 
 2. HTTP Response:
    - Status Code: 200
@@ -195,7 +195,7 @@ lub konfigurowalny z pliku INI/JSON.
 ### VI 3: Auth Login
 
 **Cel:** Pobranie JWT token używanego przez wszystkie pozostałe VIs.  
-**Wywołaj:** Jednorazowo przy starcie RTO.
+**Wywołaj:** Jednorazowo przy starcie aplikacji.
 
 **HTTP Method:** `POST`  
 **URL:** `http://localhost:3000/api/auth/login`  
@@ -230,11 +230,11 @@ lub konfigurowalny z pliku INI/JSON.
    - Parsuj JSON → pobierz "token"
    - Zapisz token do Global Variable "JWT_TOKEN"
 6. Jeśli StatusCode ≠ 200:
-   - Loguj błąd, zatrzymaj RTO
+   - Loguj błąd, zatrzymaj aplikację
 7. HTTP Client Close Handle
 ```
 
-**Ważne:** Token wygasa po 8 godzinach (konfigurowalne). Zaimplementuj automatyczne odświeżanie lub restart RTO.
+**Ważne:** Token wygasa po 8 godzinach (konfigurowalne). Zaimplementuj automatyczne odświeżanie lub restart aplikacji.
 
 ---
 
@@ -474,7 +474,7 @@ Jeśli pomiar w toku → status = "running"
 
 ### VI 10: Upload Drawing
 
-**Cel:** Wgranie schematu graficznego stacji jako base64 do bazy danych. Wywołać **jednorazowo przy starcie RTO**.
+**Cel:** Wgranie schematu graficznego stacji jako base64 do bazy danych. Wywołać **jednorazowo przy starcie aplikacji**.
 
 **HTTP Method:** `PUT`  
 **URL:** `http://localhost:3000/api/drawings/<drawingId>`
@@ -521,7 +521,7 @@ Headers (globalne dla wszystkich wywołań):
   └── Authorization: Bearer <JWT_TOKEN>  ← z Global Variable
 ```
 
-**Zarządzanie handle:** Otwierać jeden handle na starcie RTO, zamykać przy shutdown. Nie otwierać/zamykać w każdym wywołaniu.
+**Zarządzanie handle:** Otwierać jeden handle przy starcie aplikacji, zamykać przy shutdown. Nie otwierać/zamykać w każdym wywołaniu.
 
 ---
 
@@ -561,7 +561,7 @@ For loop: 3 iteracje
 ## Sugerowana kolejność wywołań
 
 ```
-STARTUP RTO
+STARTUP APLIKACJI
   │
   ├─ 1. VI 3: Auth Login ─────────────── pobierz JWT token
   ├─ 2. VI 10: Upload Drawing ─────────── wgraj schematy (jeśli nowe)
@@ -587,6 +587,6 @@ TEST END
   ├─ 13. VI 5: Finish Session ─────────── zamknij sesję (passed/failed)
   └─ 14. VI 9: Update Instruments ──────── wszystkie → online/offline
 
-SHUTDOWN RTO
+SHUTDOWN APLIKACJI
   └─ 15. VI 9: Update Instruments ──────── wszystkie → offline
 ```

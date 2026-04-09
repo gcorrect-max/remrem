@@ -235,7 +235,7 @@ export const moduleCfgItems: Record<ModuleCfgGroup, ModuleCfgItem[]> = {
       title: 'Data Processing',
       shortLabel: 'DataProc.json',
       sourcePath: 'F:\\04_REMview_v3\\01_LabVIEWcode\\remview_v3\\REMview_v3\\Support\\modules_cfg\\DataProc.json',
-      summary: 'RTO filtering and numeric precision for generated results.',
+      summary: 'RTO (Routine Test Overview) step filtering and numeric precision for generated results.',
       config: {
         'RTO steps filter': [
           {
@@ -303,7 +303,7 @@ export const moduleCfgItems: Record<ModuleCfgGroup, ModuleCfgItem[]> = {
       title: 'File Paths',
       shortLabel: 'File.json',
       sourcePath: 'F:\\04_REMview_v3\\01_LabVIEWcode\\remview_v3\\REMview_v3\\Support\\modules_cfg\\File.json',
-      summary: 'Support, results, logs, calibration and RTO data paths.',
+      summary: 'Support, results, logs, calibration and RTO (Routine Test Overview) document data paths.',
       config: {
         'Support Dir': 'D:\\SVN\\trunk\\REMview3.0\\Support',
         'Results Dir': 'D:\\SVN\\trunk\\REMview3.0\\Support\\Results',

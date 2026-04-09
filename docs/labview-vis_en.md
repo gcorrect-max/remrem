@@ -34,7 +34,7 @@ LabVIEW Application
 │   └── VI 2: WebSocket /ws
 │
 ├── HTTP Client VIs (calling Nitro)
-│   ├── VI 3: Auth Login  ─────────── call at RTO startup
+│   ├── VI 3: Auth Login  ─────────── call at application startup
 │   ├── VI 4: Start Session ────────── call when test starts
 │   ├── VI 5: Finish Session ───────── call when test ends
 │   ├── VI 6: Update Step ──────────── call on every step change
@@ -43,7 +43,7 @@ LabVIEW Application
 │   └── VI 9: Update Instrument ────── call when instrument status changes
 │
 └── Startup VI
-    └── VI 10: Upload Drawing ──────── call once at RTO startup
+    └── VI 10: Upload Drawing ──────── call once at application startup
 ```
 
 The JWT token obtained in VI 3 (Auth Login) must be stored as a **Global Variable** or **Functional Global** and passed to all remaining HTTP VIs.
@@ -54,7 +54,7 @@ The JWT token obtained in VI 3 (Auth Login) must be stored as a **Global Variabl
 
 ### VI 1: GET /api/hostname
 
-**Purpose:** Expose device and RTO information. Called by the frontend every 5 seconds to check server availability.
+**Purpose:** Expose device information and the active RTO (Routine Test Overview) document details. Called by the frontend every 5 seconds to check server availability.
 
 **VI Type:** HTTP GET Handler (NI Web Service)
 
@@ -80,16 +80,16 @@ No parameters.
 |-------|-------------|--------|
 | `hostname` | String | `Get Computer Name.vi` or ENV variable |
 | `model` | String | Constant in VI or configuration file |
-| `rtoFile` | String | Name of the `.rtexe` file of the current project |
-| `rtoRevision` | String | Version constant compiled into the RTO |
+| `rtoFile` | String | Name of the active RTO (Routine Test Overview) document file |
+| `rtoRevision` | String | Revision of the RTO document retrieved from the CINNAMON database |
 
 #### Implementation (G-code pseudocode)
 ```
 1. Build JSON string (JSON Build Object):
    - "hostname"    ← Get Computer Name
    - "model"       ← constant "REM102"
-   - "rtoFile"     ← constant "rem102_main.rtexe"
-   - "rtoRevision" ← constant "1.2.3"
+   - "rtoFile"     ← name of the active RTO (Routine Test Overview) file, e.g. "rem102_main.rtexe"
+   - "rtoRevision" ← revision of the RTO document retrieved from CINNAMON database, e.g. "A00"
 
 2. HTTP Response:
    - Status Code: 200
@@ -195,7 +195,7 @@ or configurable from an INI/JSON file.
 ### VI 3: Auth Login
 
 **Purpose:** Obtain the JWT token used by all other VIs.  
-**Call:** Once at RTO startup.
+**Call:** Once at application startup.
 
 **HTTP Method:** `POST`  
 **URL:** `http://localhost:3000/api/auth/login`  
@@ -230,11 +230,11 @@ or configurable from an INI/JSON file.
    - Parse JSON → get "token"
    - Save token to Global Variable "JWT_TOKEN"
 6. If StatusCode ≠ 200:
-   - Log error, stop RTO
+   - Log error, stop application
 7. HTTP Client Close Handle
 ```
 
-**Important:** Token expires after 8 hours (configurable). Implement automatic refresh or RTO restart.
+**Important:** Token expires after 8 hours (configurable). Implement automatic refresh or application restart.
 
 ---
 
@@ -474,7 +474,7 @@ If measurement in progress → status = "running"
 
 ### VI 10: Upload Drawing
 
-**Purpose:** Upload a station graphic schematic as base64 to the database. Call **once at RTO startup**.
+**Purpose:** Upload a station graphic schematic as base64 to the database. Call **once at application startup**.
 
 **HTTP Method:** `PUT`  
 **URL:** `http://localhost:3000/api/drawings/<drawingId>`
@@ -521,7 +521,7 @@ Headers (global for all calls):
   └── Authorization: Bearer <JWT_TOKEN>  ← from Global Variable
 ```
 
-**Handle management:** Open one handle at RTO startup, close at shutdown. Do not open/close on every call.
+**Handle management:** Open one handle at application startup, close at shutdown. Do not open/close on every call.
 
 ---
 
@@ -561,7 +561,7 @@ For loop: 3 iterations
 ## Suggested Call Order
 
 ```
-STARTUP RTO
+APPLICATION STARTUP
   │
   ├─ 1. VI 3: Auth Login ─────────────── get JWT token
   ├─ 2. VI 10: Upload Drawing ─────────── upload schematics (if new)
@@ -587,6 +587,6 @@ TEST END
   ├─ 13. VI 5: Finish Session ─────────── close session (passed/failed)
   └─ 14. VI 9: Update Instruments ──────── all → online/offline
 
-SHUTDOWN RTO
+APPLICATION SHUTDOWN
   └─ 15. VI 9: Update Instruments ──────── all → offline
 ```

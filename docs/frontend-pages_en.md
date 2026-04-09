@@ -196,7 +196,7 @@ toggleRow(resultId)             // expanded/collapsed in results table
 - Polling `GET /api/hostname` every **5 seconds** — checks LabVIEW server availability
 - LabVIEW Webservice status badge: online / offline
 - Form disabled when server is offline
-- Display server info: hostname, model, RTO version
+- Display server info: hostname, model, RTO (Routine Test Overview) document name and revision
 
 **Data from hostname (displayed below the form):**
 ```

@@ -196,7 +196,7 @@ toggleRow(resultId)             // expanded/collapsed v tabulce výsledků
 - Polling `GET /api/hostname` každých **5 sekund** — kontrola dostupnosti serveru LabVIEW
 - Badge stavu LabVIEW Webservice: 🟢 online / 🔴 offline
 - Blokování formuláře když je server offline
-- Zobrazení informací o serveru: hostname, model, verze RTO
+- Zobrazení informací o serveru: hostname, model, název a revize dokumentu RTO (Routine Test Overview)
 
 **Data z hostname (zobrazená pod formulářem):**
 ```

@@ -115,7 +115,7 @@ INSERT INTO module_configs (id, group_name, title, short_label, summary, config)
  '{"Top visible steps":0}'::jsonb),
 
 ('data-proc', 'software', 'Data Processing', 'DataProc.json',
- 'RTO filtering and numeric precision for generated results.',
+ 'RTO (Routine Test Overview) step filtering and numeric precision for generated results.',
  '{"Results precision":{"Energy ":{"DUT":3,"Reference":3},"Applied Limit ":6,"Error Perc":3}}'::jsonb),
 
 ('lib-bl30', 'software', 'LibBL30', 'LibBL30.json',
@@ -123,7 +123,7 @@ INSERT INTO module_configs (id, group_name, title, short_label, summary, config)
  '{"ConnectREM102":{"IP (192.168.128.1)":"192.168.128.1","portNo (6020)":6020,"TimeOut (5000)":5000}}'::jsonb),
 
 ('file', 'software', 'File Paths', 'File.json',
- 'Support, results, logs, calibration and RTO data paths.',
+ 'Support, results, logs, calibration and RTO (Routine Test Overview) document data paths.',
  '{"Support Dir":"D:\\\\SVN\\\\trunk\\\\REMview3.0\\\\Support","Results Dir":"D:\\\\SVN\\\\trunk\\\\REMview3.0\\\\Support\\\\Results"}'::jsonb),
 
 ('reporting', 'software', 'Reporting', 'Reporting.json',

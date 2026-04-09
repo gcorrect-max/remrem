@@ -34,7 +34,7 @@ LabVIEW Application
 │   └── VI 2: WebSocket /ws
 │
 ├── HTTP Client VIs (volající Nitro)
-│   ├── VI 3: Auth Login  ─────────── volat při startu RTO
+│   ├── VI 3: Auth Login  ─────────── volat při startu aplikace
 │   ├── VI 4: Start Session ────────── volat při spuštění testu
 │   ├── VI 5: Finish Session ───────── volat při ukončení testu
 │   ├── VI 6: Update Step ──────────── volat při každé změně kroku
@@ -43,7 +43,7 @@ LabVIEW Application
 │   └── VI 9: Update Instrument ────── volat při změně stavu přístroje
 │
 └── Startup VI
-    └── VI 10: Upload Drawing ──────── volat jednorázově při startu RTO
+    └── VI 10: Upload Drawing ──────── volat jednorázově při startu aplikace
 ```
 
 JWT token získaný ve VI 3 (Auth Login) musí být uložen jako **Global Variable** nebo **Functional Global** a předáván do všech ostatních HTTP VI.
@@ -54,7 +54,7 @@ JWT token získaný ve VI 3 (Auth Login) musí být uložen jako **Global Variab
 
 ### VI 1: GET /api/hostname
 
-**Účel:** Zpřístupnění informací o zařízení a RTO. Voláno frontendem každých 5 sekund ke kontrole dostupnosti serveru.
+**Účel:** Zpřístupnění informací o zařízení a aktivním dokumentu RTO (Routine Test Overview). Voláno frontendem každých 5 sekund ke kontrole dostupnosti serveru.
 
 **Typ VI:** HTTP GET Handler (NI Web Service)
 
@@ -80,16 +80,16 @@ JWT token získaný ve VI 3 (Auth Login) musí být uložen jako **Global Variab
 |------|-------------|-------|
 | `hostname` | String | `Get Computer Name.vi` nebo ENV proměnná |
 | `model` | String | Konstanta ve VI nebo konfigurační soubor |
-| `rtoFile` | String | Název souboru `.rtexe` aktuálního projektu |
-| `rtoRevision` | String | Konstantní verze zkompilovaná do RTO |
+| `rtoFile` | String | Název aktivního souboru dokumentu RTO (Routine Test Overview) |
+| `rtoRevision` | String | Revize dokumentu RTO získaná z databáze CINNAMON |
 
 #### Implementace (pseudokód G-code)
 ```
 1. Sestavit JSON string (JSON Build Object):
    - "hostname"    ← Get Computer Name
    - "model"       ← konstanta "REM102"
-   - "rtoFile"     ← konstanta "rem102_main.rtexe"
-   - "rtoRevision" ← konstanta "1.2.3"
+   - "rtoFile"     ← název aktivního souboru RTO (Routine Test Overview), např. "rem102_main.rtexe"
+   - "rtoRevision" ← revize dokumentu RTO z databáze CINNAMON, např. "A00"
 
 2. HTTP Response:
    - Status Code: 200
@@ -195,7 +195,7 @@ nebo konfigurovatelný z INI/JSON souboru.
 ### VI 3: Auth Login
 
 **Účel:** Získání JWT tokenu používaného všemi ostatními VIs.  
-**Volat:** Jednorázově při startu RTO.
+**Volat:** Jednorázově při startu aplikace.
 
 **HTTP Method:** `POST`  
 **URL:** `http://localhost:3000/api/auth/login`  
@@ -230,11 +230,11 @@ nebo konfigurovatelný z INI/JSON souboru.
    - Parsovat JSON → načíst "token"
    - Uložit token do Global Variable "JWT_TOKEN"
 6. Pokud StatusCode ≠ 200:
-   - Zalogovat chybu, zastavit RTO
+   - Zalogovat chybu, zastavit aplikaci
 7. HTTP Client Close Handle
 ```
 
-**Důležité:** Token vyprší po 8 hodinách (konfigurovatelné). Implementujte automatické obnovení nebo restart RTO.
+**Důležité:** Token vyprší po 8 hodinách (konfigurovatelné). Implementujte automatické obnovení nebo restart aplikace.
 
 ---
 
@@ -474,7 +474,7 @@ Pokud měření probíhá → status = "running"
 
 ### VI 10: Upload Drawing
 
-**Účel:** Nahrání grafického schématu stanice jako base64 do databáze. Volat **jednorázově při startu RTO**.
+**Účel:** Nahrání grafického schématu stanice jako base64 do databáze. Volat **jednorázově při startu aplikace**.
 
 **HTTP Method:** `PUT`  
 **URL:** `http://localhost:3000/api/drawings/<drawingId>`
@@ -521,7 +521,7 @@ Headers (globální pro všechna volání):
   └── Authorization: Bearer <JWT_TOKEN>  ← z Global Variable
 ```
 
-**Správa handle:** Otevřít jeden handle při startu RTO, zavřít při shutdown. Neotvírat/nezavírat při každém volání.
+**Správa handle:** Otevřít jeden handle při startu aplikace, zavřít při shutdown. Neotvírat/nezavírat při každém volání.
 
 ---
 
@@ -561,7 +561,7 @@ For loop: 3 iterace
 ## Doporučené pořadí volání
 
 ```
-STARTUP RTO
+STARTUP APLIKACE
   │
   ├─ 1. VI 3: Auth Login ─────────────── získat JWT token
   ├─ 2. VI 10: Upload Drawing ─────────── nahrát schémata (pokud jsou nová)
@@ -587,6 +587,6 @@ TEST END
   ├─ 13. VI 5: Finish Session ─────────── uzavřít relaci (passed/failed)
   └─ 14. VI 9: Update Instruments ──────── všechny → online/offline
 
-SHUTDOWN RTO
+SHUTDOWN APLIKACE
   └─ 15. VI 9: Update Instruments ──────── všechny → offline
 ```
