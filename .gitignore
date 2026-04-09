@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Nuxt build output
+.nuxt/
+.output/
+dist/
+
+# Environment variables (contain secrets!)
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# Docker volumes
+postgres_data/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Backup folders created during development
+backup_*/
+
+# One-off fix / patch scripts
+*.ps1
+
+# Backup file variants
+*.bak
+
+# Postman environments (may contain tokens)
+postman/environments/

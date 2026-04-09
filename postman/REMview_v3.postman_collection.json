@@ -1,0 +1,456 @@
+{
+  "info": {
+    "name": "REMview v3 – Full API",
+    "_postman_id": "remview-v3-api-collection",
+    "description": "Complete REST API collection for REMview v3 Nuxt/Nitro backend.\n\nVariables:\n- `baseUrl`  – e.g. http://localhost:3000\n- `token`    – JWT Bearer token (set automatically by Login request)\n- `userId`   – target user id\n- `sessionId`– test session id\n- `stepId`   – test step id\n- `resultId` – test result id\n- `drawingId`– drawing id\n- `moduleId` – module-config id\n- `instrId`  – instrument id",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",   "value": "http://localhost:3000", "type": "string" },
+    { "key": "token",     "value": "",                      "type": "string" },
+    { "key": "userId",    "value": "2",                     "type": "string" },
+    { "key": "sessionId", "value": "1",                     "type": "string" },
+    { "key": "stepId",    "value": "1",                     "type": "string" },
+    { "key": "resultId",  "value": "1",                     "type": "string" },
+    { "key": "drawingId", "value": "1",                     "type": "string" },
+    { "key": "moduleId",  "value": "1",                     "type": "string" },
+    { "key": "instrId",   "value": "1",                     "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) pm.collectionVariables.set('token', res.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET All Users",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api","users"] }
+          }
+        },
+        {
+          "name": "POST Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api","users"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newuser\",\n  \"password\": \"pass1234\",\n  \"displayName\": \"New User\",\n  \"role\": \"viewer\",\n  \"active\": true,\n  \"permissions\": {\n    \"overview\": true,\n    \"results\": true,\n    \"config\": false,\n    \"deviceStatus\": false,\n    \"stationSchema\": false,\n    \"settings\": false,\n    \"help\": true,\n    \"authorization\": false\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api","users","{{userId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Updated Name\",\n  \"role\": \"operator\",\n  \"active\": true,\n  \"password\": \"newpassword\",\n  \"permissions\": {\n    \"overview\": true,\n    \"results\": true,\n    \"config\": true,\n    \"deviceStatus\": true,\n    \"stationSchema\": false,\n    \"settings\": false,\n    \"help\": true,\n    \"authorization\": false\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE User",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api","users","{{userId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Device",
+      "item": [
+        {
+          "name": "GET Device Info",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/device", "host": ["{{baseUrl}}"], "path": ["api","device"] }
+          }
+        },
+        {
+          "name": "PUT Update Device",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/device", "host": ["{{baseUrl}}"], "path": ["api","device"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"REM102\",\n  \"articleNumber\": \"ART-001\",\n  \"productionNumber\": \"PROD-2024-001\",\n  \"serialNo\": \"SN-12345\",\n  \"rtoFile\": \"rem102_main.rtexe\",\n  \"rtoRevision\": \"1.2.3\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Device Subsystems",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/device/subsystems", "host": ["{{baseUrl}}"], "path": ["api","device","subsystems"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Instruments",
+      "item": [
+        {
+          "name": "GET All Instruments",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/instruments", "host": ["{{baseUrl}}"], "path": ["api","instruments"] }
+          }
+        },
+        {
+          "name": "PUT Update Instrument",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/instruments/{{instrId}}", "host": ["{{baseUrl}}"], "path": ["api","instruments","{{instrId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"online\",\n  \"firmware\": \"2.1.0\",\n  \"lastSeen\": \"2024-01-15T10:30:00.000Z\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Session (current)",
+      "item": [
+        {
+          "name": "GET Current Running Session",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/session", "host": ["{{baseUrl}}"], "path": ["api","session"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Sessions",
+      "item": [
+        {
+          "name": "GET All Sessions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/test-sessions?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","test-sessions"],
+              "query": [
+                { "key": "limit",  "value": "20" },
+                { "key": "offset", "value": "0" },
+                { "key": "status", "value": "passed", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Start Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.id) pm.collectionVariables.set('sessionId', res.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/test-sessions", "host": ["{{baseUrl}}"], "path": ["api","test-sessions"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": 1,\n  \"operator\": \"jsmith\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Session by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/test-sessions/{{sessionId}}", "host": ["{{baseUrl}}"], "path": ["api","test-sessions","{{sessionId}}"] }
+          }
+        },
+        {
+          "name": "PUT Finish Session",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/test-sessions/{{sessionId}}", "host": ["{{baseUrl}}"], "path": ["api","test-sessions","{{sessionId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"passed\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Steps",
+      "item": [
+        {
+          "name": "GET Steps for Session",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/test-steps?sessionId={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","test-steps"],
+              "query": [{ "key": "sessionId", "value": "{{sessionId}}" }]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Step Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/test-steps/{{stepId}}", "host": ["{{baseUrl}}"], "path": ["api","test-steps","{{stepId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ok\",\n  \"message\": \"Step completed successfully\",\n  \"startedAt\": \"2024-01-15T10:00:00.000Z\",\n  \"finishedAt\": \"2024-01-15T10:05:00.000Z\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Results",
+      "item": [
+        {
+          "name": "GET Results (by session)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/test-results?sessionId={{sessionId}}&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","test-results"],
+              "query": [
+                { "key": "sessionId", "value": "{{sessionId}}" },
+                { "key": "limit",     "value": "100" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Add Result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.id) pm.collectionVariables.set('resultId', res.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/test-results", "host": ["{{baseUrl}}"], "path": ["api","test-results"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": {{sessionId}},\n  \"testName\": \"Voltage Check\",\n  \"status\": \"ok\",\n  \"measuredAt\": \"2024-01-15T10:10:00.000Z\",\n  \"params\": [\n    {\n      \"name\": \"V_in\",\n      \"value\": \"24.1\",\n      \"unit\": \"V\",\n      \"lowLimit\": 23.0,\n      \"highLimit\": 25.0,\n      \"status\": \"ok\"\n    },\n    {\n      \"name\": \"V_out\",\n      \"value\": \"12.05\",\n      \"unit\": \"V\",\n      \"lowLimit\": 11.8,\n      \"highLimit\": 12.2,\n      \"status\": \"ok\"\n    }\n  ],\n  \"logs\": [\n    { \"level\": \"info\",  \"message\": \"Measurement started\" },\n    { \"level\": \"info\",  \"message\": \"V_in = 24.1 V – within limits\" },\n    { \"level\": \"info\",  \"message\": \"V_out = 12.05 V – within limits\" },\n    { \"level\": \"info\",  \"message\": \"PASS\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Result by ID (with logs)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/test-results/{{resultId}}", "host": ["{{baseUrl}}"], "path": ["api","test-results","{{resultId}}"] }
+          }
+        },
+        {
+          "name": "PUT Append Log to Result",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/test-results/{{resultId}}", "host": ["{{baseUrl}}"], "path": ["api","test-results","{{resultId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"log\": {\n    \"level\": \"warn\",\n    \"message\": \"Retry attempt 2\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT Update Result Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/test-results/{{resultId}}", "host": ["{{baseUrl}}"], "path": ["api","test-results","{{resultId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"fail\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Drawings",
+      "item": [
+        {
+          "name": "GET All Drawings (list, no blob)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/drawings", "host": ["{{baseUrl}}"], "path": ["api","drawings"] }
+          }
+        },
+        {
+          "name": "GET Drawing by ID (with base64)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/drawings/{{drawingId}}", "host": ["{{baseUrl}}"], "path": ["api","drawings","{{drawingId}}"] }
+          }
+        },
+        {
+          "name": "PUT Upload Drawing (base64)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/drawings/{{drawingId}}", "host": ["{{baseUrl}}"], "path": ["api","drawings","{{drawingId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Station Overview\",\n  \"description\": \"Main station layout diagram\",\n  \"mimeType\": \"image/svg+xml\",\n  \"imageBase64\": \"PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJz48cmVjdCB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgZmlsbD0nIzAwNzBmZicvPjwvc3ZnPg==\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Module Configs",
+      "item": [
+        {
+          "name": "GET All Module Configs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/module-configs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","module-configs"],
+              "query": [
+                { "key": "type", "value": "hardware", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Hardware Modules Only",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/module-configs?type=hardware",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","module-configs"],
+              "query": [{ "key": "type", "value": "hardware" }]
+            }
+          }
+        },
+        {
+          "name": "GET Software Modules Only",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/module-configs?type=software",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","module-configs"],
+              "query": [{ "key": "type", "value": "software" }]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Module Config",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/module-configs/{{moduleId}}", "host": ["{{baseUrl}}"], "path": ["api","module-configs","{{moduleId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NI-9205 Analog Input\",\n  \"slotIndex\": 1,\n  \"config\": {\n    \"channels\": 32,\n    \"sampleRate\": 250000,\n    \"range\": \"-10 to +10 V\",\n    \"enabled\": true\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "GET All Settings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/settings", "host": ["{{baseUrl}}"], "path": ["api","settings"] }
+          }
+        },
+        {
+          "name": "PUT Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/settings", "host": ["{{baseUrl}}"], "path": ["api","settings"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"en\",\n  \"theme\": \"dark\",\n  \"timezone\": \"Europe/Warsaw\",\n  \"sessionTimeout\": \"28800\",\n  \"autoLogout\": \"true\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hostname (public)",
+      "item": [
+        {
+          "name": "GET Hostname (no auth)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/hostname", "host": ["{{baseUrl}}"], "path": ["api","hostname"] }
+          }
+        }
+      ]
+    }
+  ]
+}

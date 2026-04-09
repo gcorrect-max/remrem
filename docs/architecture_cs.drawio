@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- PAGE TITLE -->
+    <mxCell id="title" value="REMview v3 – Architektura systému"
+      style="text;html=1;align=center;fontSize=20;fontStyle=1;strokeColor=none;fillColor=none;"
+      vertex="1" parent="1">
+      <mxGeometry x="300" y="1090" width="750" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         PROHLÍŽEČ
+         ======================================== -->
+    <mxCell id="B" value="PROHLÍŽEČ (Browser)"
+      style="swimlane;startSize=32;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="20" width="310" height="640" as="geometry" />
+    </mxCell>
+
+    <mxCell id="B1" value="Vue 3 / Nuxt 3 Frontend"
+      style="text;html=1;align=center;fontSize=11;fontStyle=1;"
+      vertex="1" parent="B">
+      <mxGeometry x="5" y="37" width="300" height="22" as="geometry" />
+    </mxCell>
+
+    <!-- Stránky -->
+    <mxCell id="B_pages" value="Stránky (Pages)"
+      style="swimlane;startSize=22;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;arcSize=6;"
+      vertex="1" parent="B">
+      <mxGeometry x="10" y="68" width="290" height="200" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p1" value="login.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="8" y="28" width="128" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p2" value="index.vue (Dashboard)" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="152" y="28" width="130" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p3" value="test-results.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="8" y="62" width="128" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p4" value="device-status.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="152" y="62" width="130" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p5" value="config.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="8" y="96" width="128" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p6" value="authorization.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="152" y="96" width="130" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p7" value="drawings.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="8" y="130" width="128" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_p8" value="help.vue" style="rounded=1;fillColor=#fffde7;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="B_pages">
+      <mxGeometry x="152" y="130" width="130" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_mw" value="middleware/auth.global.ts  (route guard + JWT kontrola)"
+      style="text;html=1;align=center;fontSize=8;fontColor=#888888;"
+      vertex="1" parent="B_pages">
+      <mxGeometry x="5" y="165" width="280" height="22" as="geometry" />
+    </mxCell>
+
+    <!-- Pinia Stores -->
+    <mxCell id="B_stores" value="Pinia Stores"
+      style="swimlane;startSize=22;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;arcSize=6;"
+      vertex="1" parent="B">
+      <mxGeometry x="10" y="280" width="290" height="100" as="geometry" />
+    </mxCell>
+    <mxCell id="B_s1" value="auth" style="rounded=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=9;" vertex="1" parent="B_stores">
+      <mxGeometry x="8" y="28" width="82" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_s2" value="ws" style="rounded=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=9;" vertex="1" parent="B_stores">
+      <mxGeometry x="104" y="28" width="82" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_s3" value="dashboard" style="rounded=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=9;" vertex="1" parent="B_stores">
+      <mxGeometry x="200" y="28" width="82" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="B_s4" value="JWT v cookie: hasler-auth"
+      style="text;html=1;align=center;fontSize=8;fontColor=#666666;"
+      vertex="1" parent="B_stores">
+      <mxGeometry x="5" y="65" width="280" height="22" as="geometry" />
+    </mxCell>
+
+    <!-- Plugin -->
+    <mxCell id="B_plugin" value="plugins/labview.client.ts"
+      style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;"
+      vertex="1" parent="B">
+      <mxGeometry x="10" y="395" width="290" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="B_plugin2" value="Připojuje WS po přihlášení · směruje zprávy do stores"
+      style="text;html=1;align=center;fontSize=8;fontColor=#888888;"
+      vertex="1" parent="B">
+      <mxGeometry x="10" y="430" width="290" height="20" as="geometry" />
+    </mxCell>
+
+    <!-- WS status -->
+    <mxCell id="B_ws_nav" value="NavLeft: ● WS status (connected/disconnected) + latence [ms]"
+      style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=8;"
+      vertex="1" parent="B">
+      <mxGeometry x="10" y="462" width="290" height="28" as="geometry" />
+    </mxCell>
+
+    <!-- Config -->
+    <mxCell id="B_cfg" value="nuxt.config.ts / .env&#xa;NUXT_PUBLIC_LABVIEW_BASE_URL  |  NUXT_PUBLIC_WS_URL"
+      style="rounded=1;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=8;fontColor=#666666;"
+      vertex="1" parent="B">
+      <mxGeometry x="10" y="505" width="290" height="44" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         LABVIEW RT WEBSERVICE
+         ======================================== -->
+    <mxCell id="LV" value="LABVIEW RT WEBSERVICE"
+      style="swimlane;startSize=32;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=13;fontStyle=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="410" y="20" width="380" height="440" as="geometry" />
+    </mxCell>
+
+    <mxCell id="LV_static" value="Servíruje statický build Nuxt  (HTML / JS / CSS)"
+      style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;"
+      vertex="1" parent="LV">
+      <mxGeometry x="10" y="44" width="360" height="32" as="geometry" />
+    </mxCell>
+
+    <mxCell id="LV_host" value="VI: GET /api/hostname  [VEŘEJNÉ – bez autentizace]"
+      style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;"
+      vertex="1" parent="LV">
+      <mxGeometry x="10" y="86" width="360" height="32" as="geometry" />
+    </mxCell>
+
+    <mxCell id="LV_ws" value="VI: WebSocket /ws?token=&lt;jwt&gt;  [real-time push]"
+      style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;"
+      vertex="1" parent="LV">
+      <mxGeometry x="10" y="128" width="360" height="32" as="geometry" />
+    </mxCell>
+
+    <!-- LabVIEW App -->
+    <mxCell id="LV_app" value="LabVIEW Application (G-kód)"
+      style="swimlane;startSize=24;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;fontSize=11;fontStyle=1;arcSize=6;"
+      vertex="1" parent="LV">
+      <mxGeometry x="10" y="178" width="360" height="245" as="geometry" />
+    </mxCell>
+    <mxCell id="LV_a1" value="Test Sequencer  (sekvence testovacích kroků)"
+      style="rounded=1;fillColor=#fff8e1;strokeColor=#BD7000;fontSize=9;"
+      vertex="1" parent="LV_app">
+      <mxGeometry x="8" y="28" width="344" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="LV_a2" value="NI-DAQmx / VISA / GPIB / LAN / USB  – ovládání přístrojů"
+      style="rounded=1;fillColor=#fff8e1;strokeColor=#BD7000;fontSize=9;"
+      vertex="1" parent="LV_app">
+      <mxGeometry x="8" y="64" width="344" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="LV_a3" value="HTTP Client  →  volá Nitro REST API  (ukládá do DB)"
+      style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;"
+      vertex="1" parent="LV_app">
+      <mxGeometry x="8" y="100" width="344" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="LV_a4" value="WebSocket Server  →  push stavů do frontendu"
+      style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;"
+      vertex="1" parent="LV_app">
+      <mxGeometry x="8" y="136" width="344" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="LV_a5"
+      value="WS zprávy: session.update · test-step.update · test-result.add&#xa;instruments.update · test-result.log · session.started · ping/pong"
+      style="text;html=1;align=center;fontSize=8;fontColor=#555555;"
+      vertex="1" parent="LV_app">
+      <mxGeometry x="8" y="172" width="344" height="32" as="geometry" />
+    </mxCell>
+    <mxCell id="LV_a6"
+      value="instruments.update → device-status.vue aktualizován v reálném čase"
+      style="text;html=1;align=center;fontSize=8;fontColor=#b85450;fontStyle=1;"
+      vertex="1" parent="LV_app">
+      <mxGeometry x="8" y="210" width="344" height="22" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         NITRO SERVER
+         ======================================== -->
+    <mxCell id="N" value="NUXT NITRO SERVER  (Node.js)"
+      style="swimlane;startSize=32;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="410" y="480" width="380" height="580" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_mw" value="server/middleware/01.auth.ts  –  ověření JWT Bearer token (vše /api/* kromě /api/auth/login a /api/hostname)"
+      style="rounded=1;fillColor=#4d7a3a;fontColor=#ffffff;strokeColor=#2d5a1e;fontSize=8;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="42" width="360" height="36" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_auth" value="Auth"
+      style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=9;arcSize=6;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="90" width="360" height="46" as="geometry" />
+    </mxCell>
+    <mxCell id="N_auth1" value="POST /api/auth/login  →  bcrypt ověření  →  JWT 8h  →  cookie hasler-auth"
+      style="text;html=1;fontSize=8;"
+      vertex="1" parent="N_auth">
+      <mxGeometry x="6" y="22" width="348" height="18" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_users" value="Uživatelé (Users)"
+      style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=9;arcSize=6;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="148" width="360" height="46" as="geometry" />
+    </mxCell>
+    <mxCell id="N_users1" value="GET /api/users  |  POST /api/users  |  PUT /api/users/:id  |  DELETE /api/users/:id"
+      style="text;html=1;fontSize=8;"
+      vertex="1" parent="N_users">
+      <mxGeometry x="6" y="22" width="348" height="18" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_device" value="Zařízení &amp; Subsystémy"
+      style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=9;arcSize=6;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="206" width="360" height="46" as="geometry" />
+    </mxCell>
+    <mxCell id="N_device1" value="GET /api/device  |  PUT /api/device  |  GET /api/device/subsystems"
+      style="text;html=1;fontSize=8;"
+      vertex="1" parent="N_device">
+      <mxGeometry x="6" y="22" width="348" height="18" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_instr" value="Přístroje &amp; Relace"
+      style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=9;arcSize=6;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="264" width="360" height="46" as="geometry" />
+    </mxCell>
+    <mxCell id="N_instr1" value="GET /api/instruments  |  PUT /api/instruments/:id  |  GET /api/session"
+      style="text;html=1;fontSize=8;"
+      vertex="1" parent="N_instr">
+      <mxGeometry x="6" y="22" width="348" height="18" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_test" value="Testovací relace / Kroky / Výsledky"
+      style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=9;arcSize=6;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="322" width="360" height="66" as="geometry" />
+    </mxCell>
+    <mxCell id="N_test1"
+      value="GET/POST /api/test-sessions  |  GET/PUT /api/test-sessions/:id&#xa;GET/PUT /api/test-steps/:id  |  GET/POST /api/test-results  |  GET/PUT /api/test-results/:id"
+      style="text;html=1;fontSize=8;"
+      vertex="1" parent="N_test">
+      <mxGeometry x="6" y="22" width="348" height="38" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_draw" value="Výkresy / Konfig. modulů / Nastavení"
+      style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=9;arcSize=6;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="400" width="360" height="66" as="geometry" />
+    </mxCell>
+    <mxCell id="N_draw1"
+      value="GET /api/drawings  |  GET/PUT /api/drawings/:id  (base64 PNG/SVG)&#xa;GET/PUT /api/module-configs  |  GET/PUT /api/settings"
+      style="text;html=1;fontSize=8;"
+      vertex="1" parent="N_draw">
+      <mxGeometry x="6" y="22" width="348" height="38" as="geometry" />
+    </mxCell>
+
+    <mxCell id="N_db" value="server/db/client.ts  (postgres driver · pool max=10 · localhost:5432)"
+      style="rounded=1;fillColor=#1e4d72;fontColor=#ffffff;strokeColor=#1e4d72;fontSize=8;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="482" width="360" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="N_auth_u" value="server/utils/auth.ts  (signToken · verifyToken · hashPassword · checkPassword)"
+      style="rounded=1;fillColor=#23445D;fontColor=#ffffff;strokeColor=#23445D;fontSize=8;"
+      vertex="1" parent="N">
+      <mxGeometry x="10" y="520" width="360" height="30" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         DOCKER
+         ======================================== -->
+    <mxCell id="D" value="DOCKER"
+      style="swimlane;startSize=32;fillColor=#f5f5f5;strokeColor=#555555;fontColor=#333333;fontSize=13;fontStyle=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="870" y="20" width="380" height="680" as="geometry" />
+    </mxCell>
+
+    <mxCell id="D_pg" value="PostgreSQL 16 (alpine)"
+      style="swimlane;startSize=26;fillColor=#336791;fontColor=#ffffff;strokeColor=#1e4d72;fontSize=11;fontStyle=1;arcSize=4;"
+      vertex="1" parent="D">
+      <mxGeometry x="10" y="44" width="360" height="450" as="geometry" />
+    </mxCell>
+
+    <mxCell id="D_pg1" value="users" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="32" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg2" value="devices" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="186" y="32" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg3" value="device_subsystems" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="66" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg4" value="instruments" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="186" y="66" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg5" value="test_sessions" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="100" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg6" value="test_steps" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="186" y="100" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg7" value="test_results" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="134" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg8" value="test_result_params" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="186" y="134" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg9" value="test_result_logs" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="168" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg10" value="drawings  (TEXT base64)" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="186" y="168" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg11" value="module_configs  (JSONB)" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="202" width="166" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg12" value="app_settings" style="rounded=1;fillColor=#ffffff;strokeColor=#336791;fontSize=9;" vertex="1" parent="D_pg">
+      <mxGeometry x="186" y="202" width="166" height="26" as="geometry" />
+    </mxCell>
+
+    <mxCell id="D_pg_info" value="Port: 5432  |  Volume: postgres_data&#xa;Init: schema.sql + seed.sql  |  npm run db:seed&#xa;Extensions: pgcrypto  |  Hesla: bcryptjs cost=10"
+      style="text;html=1;align=center;fontSize=8;fillColor=#d4e1f5;strokeColor=#336791;"
+      vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="244" width="344" height="52" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg_docker" value="docker-compose up -d"
+      style="rounded=1;fillColor=#000000;fontColor=#00ff00;strokeColor=#000000;fontSize=9;fontFamily=Courier New;"
+      vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="310" width="344" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg_seed" value="npm run db:seed  (tsx server/db/seed.ts)"
+      style="rounded=1;fillColor=#000000;fontColor=#00ff00;strokeColor=#000000;fontSize=9;fontFamily=Courier New;"
+      vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="346" width="344" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pg_vol" value="Perzistentní data – přenášena spolu s docker-compose.yml + .env"
+      style="text;html=1;align=center;fontSize=8;fontColor=#aaaaaa;"
+      vertex="1" parent="D_pg">
+      <mxGeometry x="8" y="382" width="344" height="22" as="geometry" />
+    </mxCell>
+
+    <mxCell id="D_pga" value="pgAdmin 4"
+      style="swimlane;startSize=24;fillColor=#e8a838;fontColor=#000000;strokeColor=#ae7a00;fontSize=11;fontStyle=1;arcSize=4;"
+      vertex="1" parent="D">
+      <mxGeometry x="10" y="510" width="360" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="D_pga1" value="http://localhost:5050&#xa;Správce databáze přes GUI&#xa;(port 5432 interně)"
+      style="text;html=1;align=center;fontSize=9;"
+      vertex="1" parent="D_pga">
+      <mxGeometry x="5" y="26" width="350" height="54" as="geometry" />
+    </mxCell>
+
+    <mxCell id="D_env" value=".env  (POSTGRES_HOST · PORT · DB · USER · PASSWORD&#xa;JWT_SECRET · JWT_EXPIRES_IN · PGADMIN_EMAIL · PGADMIN_PASSWORD · NUXT_PUBLIC_*)"
+      style="rounded=1;fillColor=#eeeeee;strokeColor=#999999;fontSize=8;fontColor=#555555;"
+      vertex="1" parent="D">
+      <mxGeometry x="10" y="616" width="360" height="46" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         MĚŘICÍ PŘÍSTROJE
+         ======================================== -->
+    <mxCell id="I" value="MĚŘICÍ PŘÍSTROJE"
+      style="swimlane;startSize=28;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="870" y="720" width="380" height="210" as="geometry" />
+    </mxCell>
+    <mxCell id="I1" value="Multimetr  (GPIB / USB)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="I">
+      <mxGeometry x="8" y="36" width="174" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="I2" value="Osciloskop  (LAN / USB)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="I">
+      <mxGeometry x="198" y="36" width="174" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="I3" value="Napájecí zdroj  (GPIB / USB)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="I">
+      <mxGeometry x="8" y="72" width="174" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="I4" value="NI cDAQ / cRIO  (DAQmx)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;" vertex="1" parent="I">
+      <mxGeometry x="198" y="72" width="174" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="I5" value="Kalibrátory, Generátory signálů, LCR, ..."
+      style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;"
+      vertex="1" parent="I">
+      <mxGeometry x="8" y="108" width="364" height="28" as="geometry" />
+    </mxCell>
+    <mxCell id="I6" value="Ovládání přes VISA / NI-DAQmx / IVI Drivers"
+      style="text;html=1;align=center;fontSize=8;fontColor=#888888;"
+      vertex="1" parent="I">
+      <mxGeometry x="8" y="143" width="364" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="I_dut" value="DUT  (Testované zařízení = REM102)"
+      style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;fontStyle=1;"
+      vertex="1" parent="I">
+      <mxGeometry x="8" y="170" width="364" height="28" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         LEGENDA
+         ======================================== -->
+    <mxCell id="LEG" value="LEGENDA"
+      style="swimlane;startSize=22;fillColor=#f5f5f5;strokeColor=#aaaaaa;fontSize=10;fontStyle=1;arcSize=4;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="700" width="370" height="200" as="geometry" />
+    </mxCell>
+    <mxCell id="L1c" value="" style="fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="32" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L1t" value="HTTP  (statické soubory HTML/JS/CSS, polling hostname)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="32" width="310" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L2c" value="" style="fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="56" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L2t" value="WebSocket  (real-time, obousměrný, JWT auth)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="56" width="310" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L3c" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="80" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L3t" value="REST API s Bearer JWT  (frontend → Nitro Server)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="80" width="310" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L4c" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="104" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L4t" value="HTTP Client LabVIEW → Nitro  (uložení výsledků testů do DB)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="104" width="310" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L5c" value="" style="fillColor=#1e4d72;strokeColor=#1e4d72;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="128" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L5t" value="SQL  (postgres driver, pool max=10, port 5432)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="128" width="310" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L6c" value="" style="fillColor=#d79b00;strokeColor=#d79b00;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="152" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L6t" value="VISA / NI-DAQmx / IVI  (ovládání měřicích přístrojů)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="152" width="310" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L7c" value="" style="fillColor=#e8a838;strokeColor=#ae7a00;" vertex="1" parent="LEG">
+      <mxGeometry x="10" y="176" width="28" height="16" as="geometry" />
+    </mxCell>
+    <mxCell id="L7t" value="port 5432  (pgAdmin → PostgreSQL, uvnitř Docker)" style="text;fontSize=9;" vertex="1" parent="LEG">
+      <mxGeometry x="45" y="176" width="310" height="16" as="geometry" />
+    </mxCell>
+
+    <!-- ========================================
+         ŠIPKY
+         ======================================== -->
+    <mxCell id="A_static" value="Servíruje HTML/JS/CSS"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=0;exitY=0.12;entryX=1;entryY=0.12;endArrow=open;endFill=0;dashed=1;strokeColor=#d6b656;"
+      edge="1" source="LV" target="B" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_host" value="GET /api/hostname (každých 5s)"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=1;exitY=0.25;entryX=0;entryY=0.25;endArrow=block;endFill=1;strokeColor=#d6b656;"
+      edge="1" source="B" target="LV" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_ws" value="WebSocket /ws (JWT)"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=1;exitY=0.42;entryX=0;entryY=0.42;endArrow=block;endFill=1;startArrow=block;startFill=1;strokeColor=#6c8ebf;strokeWidth=2;"
+      edge="1" source="B" target="LV" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_rest" value="REST API (Bearer JWT)"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=1;exitY=0.78;entryX=0;entryY=0.08;endArrow=block;endFill=1;strokeColor=#82b366;strokeWidth=2;"
+      edge="1" source="B" target="N" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_lv_nitro" value="POST session/steps/results  |  PUT instruments"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=block;endFill=1;strokeColor=#b85450;strokeWidth=2;"
+      edge="1" source="LV" target="N" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_sql" value="SQL dotazy (port 5432)"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=1;exitY=0.5;entryX=0;entryY=0.4;endArrow=block;endFill=1;strokeColor=#1e4d72;strokeWidth=2;"
+      edge="1" source="N" target="D" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_visa" value="VISA / DAQmx / IVI"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=1;exitY=0.95;entryX=0;entryY=0.3;endArrow=block;endFill=1;strokeColor=#d79b00;strokeWidth=2;"
+      edge="1" source="LV" target="I" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="A_pga" value="port 5432"
+      style="edgeStyle=orthogonalEdgeStyle;fontSize=8;exitX=0.5;exitY=0;entryX=0.5;entryY=1;endArrow=block;endFill=1;strokeColor=#ae7a00;"
+      edge="1" source="D_pga" target="D_pg" parent="D">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

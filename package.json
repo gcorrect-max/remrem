@@ -1,0 +1,35 @@
+{
+  "name": "hasler-rail-dashboard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "db:seed": "tsx server/db/seed.ts"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "6.10.3",
+    "@pinia/nuxt": "0.5.1",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "nuxt": "3.9.3",
+    "pinia": "2.1.4",
+    "postgres": "^3.4.9",
+    "tailwindcss": "3.4.1",
+    "vue": "3.4.15"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "autoprefixer": "10.4.17",
+    "dotenv": "^16.4.5",
+    "postcss": "8.4.35",
+    "tsx": "^4.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
