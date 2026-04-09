@@ -123,7 +123,8 @@ async function logout() {
 
 const allItems = reactive([
   { to: '/',             icon: '📋', label: 'Overview',       sub: 'Summary & drawings',   perm: 'overview' },
-  { to: '/test-results', icon: '📊', label: 'Results',        sub: 'Detailed step log',    perm: 'results' },
+  { to: '/test-results', icon: '📊', label: 'Results',        sub: 'Live session log',     perm: 'results' },
+  { to: '/results-db',  icon: '🗂️', label: 'Results DB',     sub: 'Historical search',    perm: 'results' },
   {
     id: 'config', icon: '⚙️', label: 'Config', sub: 'Device configuration', perm: 'config', open: false,
     children: [
