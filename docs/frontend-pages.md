@@ -15,6 +15,7 @@ Opis wszystkich stron Vue 3 w aplikacji REMview v3, ich stores, flow danych i za
   - [login.vue](#loginvue)
   - [index.vue – Dashboard](#indexvue--dashboard)
   - [test-results.vue](#test-resultsvue)
+  - [results-db.vue](#results-dbvue)
   - [device-status.vue](#device-statusvue)
   - [authorization.vue](#authorizationvue)
   - [station-schema.vue](#station-schemavue)
@@ -38,6 +39,7 @@ app.vue
             ├── login.vue           /login
             ├── index.vue           /               (dashboard)
             ├── test-results.vue    /test-results
+            ├── results-db.vue      /results-db
             ├── device-status.vue   /device-status
             ├── authorization.vue   /authorization
             ├── station-schema.vue  /station-schema
@@ -283,7 +285,7 @@ Computed:
 **Uprawnienie:** `permissions.results`
 
 **Funkcje:**
-- Tabela wyników wszystkich pomiarów aktualnej sesji
+- Tabela wyników wszystkich kroków **bieżącej sesji** (live view)
 - Filtr: All / PASS / FAIL / Running / Skip
 - Rozwijane wiersze z parametrami i logami
 - Log z kodowaniem kolorów (info=szary, warn=żółty, error=czerwony)
@@ -335,6 +337,86 @@ exportCsv():
 ```
 
 **Stores używane:** `dashboard`, `auth`
+
+---
+
+### results-db.vue
+
+**Ścieżka:** `/results-db`  
+**Auth:** ✅ wymagana  
+**Uprawnienie:** `permissions.results`
+
+**Funkcje:**
+- Przeszukiwanie historycznych sesji testowych z bazy danych
+- Panel filtrów z 11 polami kryteriów
+- Tabela sesji z expandowalymi wierszami (kroki ładowane on-demand)
+- Paginacja (20 sesji / strona, max 100)
+- Eksport widocznych sesji do CSV
+
+**Pola filtrów:**
+
+| Pole | Typ | Kolumna DB |
+|------|-----|------------|
+| Model | tekst ILIKE | `devices.model` |
+| Article No. | tekst ILIKE | `devices.article_number` |
+| Art. Revision | tekst dokładny | `devices.article_revision` |
+| Article Name | tekst ILIKE | `devices.article_name` |
+| Serial No. | tekst ILIKE | `devices.serial_no` |
+| Operator | tekst ILIKE | `test_sessions.operator` |
+| RTO Document | tekst ILIKE | `rto_documents.name` |
+| Session Status | select | `test_sessions.overall_status` |
+| Has Step Result | select (OK/FAIL/SKIP) | EXISTS subquery na `test_results` |
+| Date From | date | `test_sessions.start_time >=` |
+| Date To | date | `test_sessions.start_time <=` |
+
+**Struktura tabeli sesji:**
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ Date/Time  │ Device Model   │ Art.No/Rev │ S/N   │ RTO  │ Op │ Steps│ Status │
+├────────────────────────────────────────────────────────────────────────┤
+│ ▶ 09/04/26 │ REM102-G-G-S-T │ 5.6602/A00 │ 21292 │ J01  │ op │ 4/1/ │ FAIL   │
+│   10:35:22 │                │            │       │      │    │  5   │        │
+├────────────────────────────────────────────────────────────────────────┤
+│  ↳ Expanded: device detail strip + kroki testu                         │
+│    Step │ Nazwa VI               │ Start    │ Stop     │ Result │
+│    4.7  │ 4.7_AC_16Hz_Cal.vi    │ 12:53:22 │ 12:55:34 │ OK     │
+│    4.8  │ 4.8_DC_Accuracy.vi    │ 12:55:40 │ 12:59:11 │ FAIL   │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+**Pasek kroków (mini progress bar):**
+- Zielony segment = kroki OK
+- Czerwony segment = kroki FAIL
+- Tekst: `<ok>/<fail>/<total>`
+
+**Format CSV eksportu:**
+```csv
+Session ID,Date,Time,Device Model,Article No.,Art. Rev.,Article Name,Serial No.,RTO Doc,RTO Rev,Operator,Status,Steps Total,Steps OK,Steps FAIL,Steps SKIP
+42,09/04/2026,10:35:22,REM102-G-G-S-T-W-8-GS-O-000,5.6602.013/01,A00,...,21292853,5.2901.047J01,A51,operator,FAIL,5,4,1,0
+```
+
+**Flow danych:**
+```
+onMounted:
+  └── fetch('/api/test-sessions/search?limit=20&offset=0')
+        └── sessions = data.items, total = data.total
+
+applyFilters():
+  └── snapshot applied = form
+      offset = 0
+      fetch() z nowymi parametrami
+
+toggleSession(id):
+  └── expanded[id] = !expanded[id]
+      └── jeśli true: fetch('/api/test-results?sessionId=<id>&limit=200')
+                        └── sessionResults[id] = data
+
+goOffset(n):
+  └── offset = n → fetch()
+```
+
+**API:** `GET /api/test-sessions/search` — dynamiczne WHERE z fragmentami `sql\`\``  
+**Stores używane:** brak (bezpośrednie `$fetch`)
 
 ---
 
@@ -568,14 +650,15 @@ Kolor kropki zależy od `ws.statusColor` (reaktywny).
 
 **Strony w menu (zależne od uprawnień):**
 ```
-if permissions.overview      → Dashboard
-if permissions.results       → Wyniki Testów
-if permissions.deviceStatus  → Status Przyrządów
-if permissions.config        → Konfiguracja
-if permissions.stationSchema → Schemat Stacji
-if permissions.settings      → Ustawienia
-if permissions.help          → Pomoc
-if permissions.authorization → Autoryzacja
+if permissions.overview      → Overview        /
+if permissions.results       → Results         /test-results
+if permissions.results       → Results DB      /results-db
+if permissions.config        → Config          /device-config (expandowalny)
+if permissions.deviceStatus  → Device Status   /device-status
+if permissions.stationSchema → Station Schema  /station-schema
+if permissions.settings      → Settings        /settings
+if permissions.help          → Help            /help
+if permissions.authorization → Authorization   /authorization
 ```
 
 **Stores używane:** `auth`, `ws`
@@ -606,6 +689,20 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 })
 ```
+
+**Mapowanie ścieżek → uprawnienia:**
+
+| Ścieżka | Uprawnienie wymagane |
+|---------|----------------------|
+| `/` | `overview` |
+| `/test-results` | `results` |
+| `/results-db` | `results` |
+| `/device-config*` | `config` |
+| `/device-status` | `deviceStatus` |
+| `/station-schema` | `stationSchema` |
+| `/settings` | `settings` |
+| `/help` | `help` |
+| `/authorization` | `authorization` |
 
 ---
 

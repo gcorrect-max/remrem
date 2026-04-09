@@ -15,6 +15,7 @@ Description of all Vue 3 pages in the REMview v3 application, their stores, data
   - [login.vue](#loginvue)
   - [index.vue – Dashboard](#indexvue--dashboard)
   - [test-results.vue](#test-resultsvue)
+  - [results-db.vue](#results-dbvue)
   - [device-status.vue](#device-statusvue)
   - [authorization.vue](#authorizationvue)
   - [station-schema.vue](#station-schemavue)
@@ -38,6 +39,7 @@ app.vue
             ├── login.vue           /login
             ├── index.vue           /               (dashboard)
             ├── test-results.vue    /test-results
+            ├── results-db.vue      /results-db
             ├── device-status.vue   /device-status
             ├── authorization.vue   /authorization
             ├── station-schema.vue  /station-schema
@@ -283,7 +285,7 @@ Computed:
 **Permission:** `permissions.results`
 
 **Features:**
-- Table of all measurement results for the current session
+- Table of all step results for the **current session** (live view)
 - Filter: All / PASS / FAIL / Running / Skip
 - Expandable rows with parameters and logs
 - Color-coded logs (info=gray, warn=yellow, error=red)
@@ -335,6 +337,83 @@ exportCsv():
 ```
 
 **Stores used:** `dashboard`, `auth`
+
+---
+
+### results-db.vue
+
+**Path:** `/results-db`  
+**Auth:** required  
+**Permission:** `permissions.results`
+
+**Features:**
+- Search through all historical test sessions stored in the database
+- Filter panel with 11 criteria fields
+- Sessions table with expandable rows (steps loaded on demand)
+- Pagination (20 sessions / page, max 100)
+- CSV export of the currently visible sessions
+
+**Filter fields:**
+
+| Field | Type | DB column |
+|-------|------|-----------|
+| Model | text ILIKE | `devices.model` |
+| Article No. | text ILIKE | `devices.article_number` |
+| Art. Revision | exact text | `devices.article_revision` |
+| Article Name | text ILIKE | `devices.article_name` |
+| Serial No. | text ILIKE | `devices.serial_no` |
+| Operator | text ILIKE | `test_sessions.operator` |
+| RTO Document | text ILIKE | `rto_documents.name` |
+| Session Status | select | `test_sessions.overall_status` |
+| Has Step Result | select (OK/FAIL/SKIP) | EXISTS sub-query on `test_results` |
+| Date From | date | `test_sessions.start_time >=` |
+| Date To | date | `test_sessions.start_time <=` |
+
+**Session table structure:**
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ Date/Time  │ Device Model   │ Art.No/Rev │ S/N   │ RTO  │ Op │ Steps │ Status │
+├──────────────────────────────────────────────────────────────────────┤
+│ ▶ 09/04/26 │ REM102-G-G-S-T │ 5.6602/A00 │ 21292 │ J01  │ op │  4/1/5 │ FAIL   │
+├──────────────────────────────────────────────────────────────────────┤
+│  ↳ Expanded: device detail strip + test steps                        │
+│    Step │ VI Name                │ Start    │ Stop     │ Result   │
+│    4.7  │ 4.7_AC_16Hz_Cal.vi    │ 12:53:22 │ 12:55:34 │ OK       │
+│    4.8  │ 4.8_DC_Accuracy.vi    │ 12:55:40 │ 12:59:11 │ FAIL     │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+**Steps bar (mini progress bar):**
+- Green segment = OK steps
+- Red segment = FAIL steps
+- Text: `<ok>/<fail>/<total>`
+
+**CSV export format:**
+```csv
+Session ID,Date,Time,Device Model,Article No.,Art. Rev.,Article Name,Serial No.,RTO Doc,RTO Rev,Operator,Status,Steps Total,Steps OK,Steps FAIL,Steps SKIP
+42,09/04/2026,10:35:22,REM102-G-G-S-T-W-8-GS-O-000,5.6602.013/01,A00,...,21292853,5.2901.047J01,A51,operator,FAIL,5,4,1,0
+```
+
+**Data flow:**
+```
+onMounted:
+  └── fetch('/api/test-sessions/search?limit=20&offset=0')
+        └── sessions = data.items, total = data.total
+
+applyFilters():
+  └── applied = form, offset = 0 → fetch()
+
+toggleSession(id):
+  └── expanded[id] = !expanded[id]
+      └── if true: fetch('/api/test-results?sessionId=<id>&limit=200')
+                     └── sessionResults[id] = data
+
+goOffset(n):
+  └── offset = n → fetch()
+```
+
+**API:** `GET /api/test-sessions/search` — dynamic WHERE built from `sql\`\`` fragments  
+**Stores used:** none (direct `$fetch` calls)
 
 ---
 
@@ -568,14 +647,15 @@ Dot color depends on `ws.statusColor` (reactive).
 
 **Menu pages (permission-dependent):**
 ```
-if permissions.overview      → Dashboard
-if permissions.results       → Test Results
-if permissions.deviceStatus  → Device Status
-if permissions.config        → Configuration
-if permissions.stationSchema → Station Schema
-if permissions.settings      → Settings
-if permissions.help          → Help
-if permissions.authorization → Authorization
+if permissions.overview      → Overview        /
+if permissions.results       → Results         /test-results
+if permissions.results       → Results DB      /results-db
+if permissions.config        → Config          /device-config (expandable group)
+if permissions.deviceStatus  → Device Status   /device-status
+if permissions.stationSchema → Station Schema  /station-schema
+if permissions.settings      → Settings        /settings
+if permissions.help          → Help            /help
+if permissions.authorization → Authorization   /authorization
 ```
 
 **Stores used:** `auth`, `ws`
@@ -606,6 +686,20 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 })
 ```
+
+**Path → permission mapping:**
+
+| Path | Required permission |
+|------|---------------------|
+| `/` | `overview` |
+| `/test-results` | `results` |
+| `/results-db` | `results` |
+| `/device-config*` | `config` |
+| `/device-status` | `deviceStatus` |
+| `/station-schema` | `stationSchema` |
+| `/settings` | `settings` |
+| `/help` | `help` |
+| `/authorization` | `authorization` |
 
 ---
 

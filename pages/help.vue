@@ -118,8 +118,12 @@ const sections = reactive([
     ]
   },
   {
-    id: 'results', icon: '📊', title: 'Test Results (Page 2)', open: false,
+    id: 'results', icon: '📊', title: 'Results – Live Session (Page 2)', open: false,
     items: [
+      {
+        q: 'What is shown on the Test Results page?',
+        a: 'The Results page shows every executed test step for the currently active (or most recent) session in real time. It updates live via WebSocket as LabVIEW runs the test sequence.'
+      },
       {
         q: 'How do I see the details of a test step?',
         a: 'Click on any row in the Test Results table. The row expands downward to reveal the input parameters used for that test and a full chronological test log showing each measurement or action performed.'
@@ -128,10 +132,47 @@ const sections = reactive([
         q: 'Why does step 4.7.8.2 show FAIL?',
         a: 'The AC channel 50Hz accuracy test failed because 0 of 15 measurement points were within tolerance. The log indicates no signal was detected on CH1 — check the cable connection between YKGS820 output and the TB1_TS terminal block on the DUT.'
       },
+      {
+        q: 'How do I export the current session results?',
+        a: 'Click the "↓ Export CSV" button in the top-right corner. A CSV file named test-results-<serialNo>-<date>.csv will be downloaded containing all step results for the current session.'
+      },
     ]
   },
   {
-    id: 'config', icon: '⚙️', title: 'Device Configuration (Page 3)', open: false,
+    id: 'results-db', icon: '🗂️', title: 'Results DB – Historical Search (Page 3)', open: false,
+    items: [
+      {
+        q: 'What is the Results DB page?',
+        a: 'Results DB lets you search through all historical test sessions stored in the database. Unlike the Test Results page (which shows only the live session), Results DB gives you a full searchable archive filtered by device data, date range, test type, and outcome.'
+      },
+      {
+        q: 'How do I filter by device?',
+        a: 'Open the filter panel with the "⚙ Filters" button. Fill in any combination of: Model (partial match), Article No., Article Revision, Article Name, or Serial No. — all fields support partial text search. Press Search or Enter to apply.'
+      },
+      {
+        q: 'How do I filter by date?',
+        a: 'Use the "Date From" and "Date To" date pickers in the filter panel to limit results to sessions that started within a specific period. Both fields are optional — fill only one to set an open-ended range.'
+      },
+      {
+        q: 'What does "Has Step Result" filter do?',
+        a: 'It narrows the session list to sessions that contain at least one step with the selected outcome: OK, FAIL, or SKIP. Useful for quickly finding all sessions with at least one failing step.'
+      },
+      {
+        q: 'How do I see the test steps for a session?',
+        a: 'Click any session row to expand it. A sub-table appears showing all recorded test steps for that session: step number, VI name, start time, stop time, and result. Steps are loaded on demand from the database.'
+      },
+      {
+        q: 'How do I filter by RTO document?',
+        a: 'Enter part of the RTO document name (e.g. "5.2901.046") in the "RTO Document" field. The search matches against the document name stored in the database from the CINNAMON system.'
+      },
+      {
+        q: 'How do I export filtered results?',
+        a: 'Click "↓ Export CSV" in the page header. The export includes all sessions on the current page (up to 20 rows) with columns: Session ID, Date, Time, Device Model, Article No., Art. Rev., Article Name, Serial No., RTO Doc, Operator, Status, and step counts (OK/FAIL/SKIP/Total).'
+      },
+    ]
+  },
+  {
+    id: 'config', icon: '⚙️', title: 'Device Configuration (Page 4)', open: false,
     items: [
       {
         q: 'What does the Device Configuration page show?',
@@ -140,7 +181,7 @@ const sections = reactive([
     ]
   },
   {
-    id: 'status', icon: '🔌', title: 'Device Status (Page 4)', open: false,
+    id: 'status', icon: '🔌', title: 'Device Status (Page 5)', open: false,
     items: [
       {
         q: 'What do the instrument status cards show?',
@@ -153,7 +194,7 @@ const sections = reactive([
     ]
   },
   {
-    id: 'station', icon: '🗺️', title: 'Station Schema (Page 5)', open: false,
+    id: 'station', icon: '🗺️', title: 'Station Schema (Page 6)', open: false,
     items: [
       {
         q: 'What does the Station Schema show?',
@@ -162,7 +203,7 @@ const sections = reactive([
     ]
   },
   {
-    id: 'settings', icon: '🛠️', title: 'Configuration (Page 6)', open: false,
+    id: 'settings', icon: '🛠️', title: 'Configuration (Page 7)', open: false,
     items: [
       {
         q: 'How do I change the GPIB address of an instrument?',
