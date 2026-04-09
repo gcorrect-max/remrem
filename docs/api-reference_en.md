@@ -20,6 +20,8 @@ Authorization: Bearer <jwt_token>
 - [Test Sessions](#test-sessions)
 - [Test Steps](#test-steps)
 - [Test Results](#test-results)
+- [RTO Documents](#rto-documents)
+- [Accuracy Tests](#accuracy-tests)
 - [Drawings](#drawings)
 - [Module Configs](#module-configs)
 - [Settings](#settings)
@@ -368,6 +370,56 @@ null
 
 ## Test Sessions
 
+### `GET /api/test-sessions/search`
+Advanced search for historical test sessions (used by the Results DB page).
+
+**Query params:**
+
+| Param | Type | DB Column | Description |
+|-------|------|-----------|-------------|
+| `model` | string (ILIKE) | `devices.model` | Filter by device model |
+| `articleNo` | string (ILIKE) | `devices.article_number` | Filter by article number |
+| `articleRev` | string (exact) | `devices.article_revision` | Filter by article revision |
+| `articleName` | string (ILIKE) | `devices.article_name` | Filter by article name |
+| `serialNo` | string (ILIKE) | `devices.serial_no` | Filter by serial number |
+| `operator` | string (ILIKE) | `test_sessions.operator` | Filter by operator |
+| `rtoName` | string (ILIKE) | `rto_documents.name` | Filter by RTO document name |
+| `status` | string | `test_sessions.overall_status` | Filter by status: `running\|passed\|failed\|aborted` |
+| `stepResult` | string | EXISTS on `test_results` | Filter by step result: `ok\|fail\|skip` |
+| `dateFrom` | ISO date | `test_sessions.start_time >=` | Start date |
+| `dateTo` | ISO date | `test_sessions.start_time <=` | End date |
+| `limit` | number | 20 | Results per page (max 100) |
+| `offset` | number | 0 | Pagination offset |
+
+**Response `200`:**
+```json
+{
+  "total": 87,
+  "items": [
+    {
+      "id": "42",
+      "startTime": "2026-04-09T10:35:22.000Z",
+      "finishedAt": "2026-04-09T11:05:44.000Z",
+      "operator": "operator",
+      "overallStatus": "failed",
+      "model": "REM102-G-G-S-T-W-8-GS-O-000",
+      "articleNumber": "5.6602.013/01",
+      "articleRevision": "A00",
+      "articleName": "REM102 Main Controller",
+      "serialNo": "21292853",
+      "rtoName": "5.2901.047J01",
+      "rtoRevision": "A51",
+      "stepsOk": 4,
+      "stepsFail": 1,
+      "stepsSkip": 0,
+      "stepsTotal": 5
+    }
+  ]
+}
+```
+
+---
+
 ### `GET /api/test-sessions`
 List of test sessions with pagination.
 
@@ -637,6 +689,204 @@ Update status or append a live log.
 **Response `200`:**
 ```json
 { "success": true }
+```
+
+---
+
+## RTO Documents
+
+RTO (Routine Test Overview) documents — test procedure definitions sent from LabVIEW.
+
+### `GET /api/rto-documents`
+List of all RTO documents (without raw JSON blob).
+
+**Response `200`:**
+```json
+[
+  {
+    "id": "1",
+    "name": "5.2901.047J01",
+    "revision": "A51",
+    "description": "REMview Routine Test",
+    "metrics": { "frequency": "16Hz", "voltage": "230V" },
+    "createdAt": "2026-04-09T10:00:00.000Z",
+    "updatedAt": "2026-04-09T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### `POST /api/rto-documents`
+Upsert an RTO document from LabVIEW (creates or updates by name + revision).  
+Re-seeds identifiers and steps (delete + insert).
+
+**Request (raw LabVIEW format):**
+```json
+{
+  "DocumentName": "5.2901.047J01",
+  "Revision": "A51",
+  "Description": "REMview Routine Test",
+  "Metrics": { "frequency": "16Hz" },
+  "REM102": {
+    "Identifier": [
+      { "Key": "ArticleNumber", "Value": "5.6602.013/01" }
+    ],
+    "Steps": [
+      {
+        "StepID": "4.7",
+        "StepLabel": "4.7_AC_16Hz_Cal.vi",
+        "StepName": "AC 16 Hz Calibration",
+        "StepDetails": "...",
+        "RTP100Index": 3
+      }
+    ]
+  }
+}
+```
+
+**Response `200`:**
+```json
+{
+  "id": "1",
+  "name": "5.2901.047J01",
+  "revision": "A51",
+  "identifiersCount": 5,
+  "stepsCount": 12
+}
+```
+
+---
+
+### `GET /api/rto-documents/:id`
+Document details with identifiers and steps.  
+`?raw=1` includes the raw LabVIEW JSON blob.
+
+**Response `200`:**
+```json
+{
+  "id": "1",
+  "name": "5.2901.047J01",
+  "revision": "A51",
+  "description": "REMview Routine Test",
+  "metrics": { "frequency": "16Hz" },
+  "identifiers": [
+    { "id": "1", "key": "ArticleNumber", "value": "5.6602.013/01" }
+  ],
+  "steps": [
+    {
+      "id": "1",
+      "stepId": "4.7",
+      "stepLabel": "4.7_AC_16Hz_Cal.vi",
+      "stepName": "AC 16 Hz Calibration",
+      "stepDetails": "...",
+      "rtp100Index": 3,
+      "stepOrder": 1
+    }
+  ],
+  "rawJson": null
+}
+```
+
+---
+
+## Accuracy Tests
+
+Accuracy test results linked to test results, sent from LabVIEW.
+
+### `POST /api/accuracy-tests`
+Add a full accuracy test with measurement points (called by LabVIEW).
+
+**Request:**
+```json
+{
+  "testResultId": 13,
+  "deviceUnderTest": {
+    "ArticleNumber": "5.6602.013/01",
+    "SerialNumber": "21292853",
+    "Revision": "A00"
+  },
+  "interfaceDetails": {
+    "InterfaceType": "MVB",
+    "Address": "0x10"
+  },
+  "referenceInstrument": {
+    "Model": "Norma 5000",
+    "SerialNumber": "N5K-12345",
+    "CalibrationDate": "2025-12-01"
+  },
+  "testInformation": {
+    "EnergyType": "EA",
+    "MeasurementType": "DC",
+    "ReadingID": "CEBD",
+    "Frequency": 16,
+    "Voltage": 230.0
+  },
+  "testResults": [
+    {
+      "NominalValue": 1000.0,
+      "ReferenceValue": 999.8,
+      "DUTReading": 999.5,
+      "DUTError_pct": -0.03,
+      "AppliedLimit_pct": 0.5,
+      "ErrorLimit_pct": 2.0,
+      "Status": "ok"
+    }
+  ],
+  "testNotes": "Conditions: 20°C, humidity 55%"
+}
+```
+
+**Response `200`:**
+```json
+{
+  "id": "5",
+  "testResultId": "13",
+  "energyType": "EA",
+  "measurementType": "DC",
+  "pointsCount": 12
+}
+```
+
+---
+
+### `GET /api/accuracy-tests/:id`
+Full accuracy test data with all measurement points.
+
+**Response `200`:**
+```json
+{
+  "id": "5",
+  "testResultId": "13",
+  "energyType": "EA",
+  "measurementType": "DC",
+  "readingId": "CEBD",
+  "frequency": 16,
+  "voltage": 230.0,
+  "dutArticleNumber": "5.6602.013/01",
+  "dutSerialNumber": "21292853",
+  "dutRevision": "A00",
+  "refModel": "Norma 5000",
+  "refSerialNumber": "N5K-12345",
+  "refCalibrationDate": "2025-12-01",
+  "interfaceType": "MVB",
+  "interfaceAddress": "0x10",
+  "testNotes": "Conditions: 20°C, humidity 55%",
+  "createdAt": "2026-04-09T12:58:00.000Z",
+  "points": [
+    {
+      "id": "101",
+      "nominalValue": 1000.0,
+      "referenceValue": 999.8,
+      "dutReading": 999.5,
+      "dutError": -0.03,
+      "appliedLimit": 0.5,
+      "errorLimit": 2.0,
+      "pointStatus": "ok",
+      "pointOrder": 1
+    }
+  ]
+}
 ```
 
 ---

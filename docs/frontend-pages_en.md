@@ -648,9 +648,10 @@ Dot color depends on `ws.statusColor` (reactive).
 **Menu pages (permission-dependent):**
 ```
 if permissions.overview      → Overview        /
-if permissions.results       → Results         /test-results
-if permissions.results       → Results DB      /results-db
-if permissions.config        → Config          /device-config (expandable group)
+if permissions.results       → Results ▶ (expandable group)
+                                  ├── Test DUT   /test-results   (live session log)
+                                  └── DB         /results-db     (historical search)
+if permissions.config        → Config ▶ (expandable group)   /device-config
 if permissions.deviceStatus  → Device Status   /device-status
 if permissions.stationSchema → Station Schema  /station-schema
 if permissions.settings      → Settings        /settings

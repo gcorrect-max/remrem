@@ -65,7 +65,10 @@
                 active-class="nav-link-active"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-rail-dim/50 flex-shrink-0"></span>
-                <span class="text-[13px] font-sans truncate">{{ child.label }}</span>
+                <div class="min-w-0">
+                  <div class="text-[13px] font-sans truncate">{{ child.label }}</div>
+                  <div v-if="child.sub" class="text-[10px] font-mono text-rail-dim truncate">{{ child.sub }}</div>
+                </div>
               </NuxtLink>
             </div>
           </Transition>
@@ -123,8 +126,13 @@ async function logout() {
 
 const allItems = reactive([
   { to: '/',             icon: '📋', label: 'Overview',       sub: 'Summary & drawings',   perm: 'overview' },
-  { to: '/test-results', icon: '📊', label: 'Results',        sub: 'Live session log',     perm: 'results' },
-  { to: '/results-db',  icon: '🗂️', label: 'Results DB',     sub: 'Historical search',    perm: 'results' },
+  {
+    id: 'results', icon: '📊', label: 'Results', sub: 'Test & history', perm: 'results', open: false,
+    children: [
+      { to: '/test-results', label: 'Test DUT', sub: 'Live session log' },
+      { to: '/results-db',   label: 'DB',       sub: 'Historical search' },
+    ],
+  },
   {
     id: 'config', icon: '⚙️', label: 'Config', sub: 'Device configuration', perm: 'config', open: false,
     children: [

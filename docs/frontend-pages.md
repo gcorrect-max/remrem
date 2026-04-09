@@ -651,9 +651,10 @@ Kolor kropki zależy od `ws.statusColor` (reaktywny).
 **Strony w menu (zależne od uprawnień):**
 ```
 if permissions.overview      → Overview        /
-if permissions.results       → Results         /test-results
-if permissions.results       → Results DB      /results-db
-if permissions.config        → Config          /device-config (expandowalny)
+if permissions.results       → Results ▶ (rozwijany)
+                                  ├── Test DUT   /test-results   (live session log)
+                                  └── DB         /results-db     (historical search)
+if permissions.config        → Config ▶ (rozwijany)  /device-config
 if permissions.deviceStatus  → Device Status   /device-status
 if permissions.stationSchema → Station Schema  /station-schema
 if permissions.settings      → Settings        /settings

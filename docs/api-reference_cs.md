@@ -20,6 +20,8 @@ Authorization: Bearer <jwt_token>
 - [Test Sessions](#test-sessions)
 - [Test Steps](#test-steps)
 - [Test Results](#test-results)
+- [RTO Documents](#rto-documents)
+- [Accuracy Tests](#accuracy-tests)
 - [Drawings](#drawings)
 - [Module Configs](#module-configs)
 - [Settings](#settings)
@@ -368,6 +370,56 @@ null
 
 ## Test Sessions
 
+### `GET /api/test-sessions/search`
+Rozšířené vyhledávání historických testovacích relací (používá stránka Results DB).
+
+**Query params:**
+
+| Param | Typ | Sloupec DB | Popis |
+|-------|-----|------------|-------|
+| `model` | string (ILIKE) | `devices.model` | Filtr podle modelu zařízení |
+| `articleNo` | string (ILIKE) | `devices.article_number` | Filtr podle čísla artiklu |
+| `articleRev` | string (přesný) | `devices.article_revision` | Filtr podle revize artiklu |
+| `articleName` | string (ILIKE) | `devices.article_name` | Filtr podle názvu artiklu |
+| `serialNo` | string (ILIKE) | `devices.serial_no` | Filtr podle sériového čísla |
+| `operator` | string (ILIKE) | `test_sessions.operator` | Filtr podle operátora |
+| `rtoName` | string (ILIKE) | `rto_documents.name` | Filtr podle názvu RTO dokumentu |
+| `status` | string | `test_sessions.overall_status` | Filtr podle stavu: `running\|passed\|failed\|aborted` |
+| `stepResult` | string | EXISTS na `test_results` | Filtr podle výsledku kroku: `ok\|fail\|skip` |
+| `dateFrom` | ISO date | `test_sessions.start_time >=` | Datum od |
+| `dateTo` | ISO date | `test_sessions.start_time <=` | Datum do |
+| `limit` | number | 20 | Výsledků na stránku (max 100) |
+| `offset` | number | 0 | Offset stránkování |
+
+**Response `200`:**
+```json
+{
+  "total": 87,
+  "items": [
+    {
+      "id": "42",
+      "startTime": "2026-04-09T10:35:22.000Z",
+      "finishedAt": "2026-04-09T11:05:44.000Z",
+      "operator": "operator",
+      "overallStatus": "failed",
+      "model": "REM102-G-G-S-T-W-8-GS-O-000",
+      "articleNumber": "5.6602.013/01",
+      "articleRevision": "A00",
+      "articleName": "REM102 Main Controller",
+      "serialNo": "21292853",
+      "rtoName": "5.2901.047J01",
+      "rtoRevision": "A51",
+      "stepsOk": 4,
+      "stepsFail": 1,
+      "stepsSkip": 0,
+      "stepsTotal": 5
+    }
+  ]
+}
+```
+
+---
+
 ### `GET /api/test-sessions`
 Seznam testovacích relací se stránkováním.
 
@@ -637,6 +689,204 @@ Aktualizace stavu nebo připojení logu za běhu.
 **Response `200`:**
 ```json
 { "success": true }
+```
+
+---
+
+## RTO Documents
+
+RTO (Routine Test Overview) dokumenty — definice testovacích postupů odesílané z LabVIEW.
+
+### `GET /api/rto-documents`
+Seznam všech RTO dokumentů (bez surového JSON).
+
+**Response `200`:**
+```json
+[
+  {
+    "id": "1",
+    "name": "5.2901.047J01",
+    "revision": "A51",
+    "description": "REMview Routine Test",
+    "metrics": { "frequency": "16Hz", "voltage": "230V" },
+    "createdAt": "2026-04-09T10:00:00.000Z",
+    "updatedAt": "2026-04-09T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### `POST /api/rto-documents`
+Upsert RTO dokumentu z LabVIEW (vytvoří nebo aktualizuje podle name + revision).  
+Znovu zakládá identifikátory a kroky (delete + insert).
+
+**Request (surový formát LabVIEW):**
+```json
+{
+  "DocumentName": "5.2901.047J01",
+  "Revision": "A51",
+  "Description": "REMview Routine Test",
+  "Metrics": { "frequency": "16Hz" },
+  "REM102": {
+    "Identifier": [
+      { "Key": "ArticleNumber", "Value": "5.6602.013/01" }
+    ],
+    "Steps": [
+      {
+        "StepID": "4.7",
+        "StepLabel": "4.7_AC_16Hz_Cal.vi",
+        "StepName": "Kalibrace AC 16 Hz",
+        "StepDetails": "...",
+        "RTP100Index": 3
+      }
+    ]
+  }
+}
+```
+
+**Response `200`:**
+```json
+{
+  "id": "1",
+  "name": "5.2901.047J01",
+  "revision": "A51",
+  "identifiersCount": 5,
+  "stepsCount": 12
+}
+```
+
+---
+
+### `GET /api/rto-documents/:id`
+Detail dokumentu s identifikátory a kroky.  
+`?raw=1` vrátí i surový JSON z LabVIEW.
+
+**Response `200`:**
+```json
+{
+  "id": "1",
+  "name": "5.2901.047J01",
+  "revision": "A51",
+  "description": "REMview Routine Test",
+  "metrics": { "frequency": "16Hz" },
+  "identifiers": [
+    { "id": "1", "key": "ArticleNumber", "value": "5.6602.013/01" }
+  ],
+  "steps": [
+    {
+      "id": "1",
+      "stepId": "4.7",
+      "stepLabel": "4.7_AC_16Hz_Cal.vi",
+      "stepName": "Kalibrace AC 16 Hz",
+      "stepDetails": "...",
+      "rtp100Index": 3,
+      "stepOrder": 1
+    }
+  ],
+  "rawJson": null
+}
+```
+
+---
+
+## Accuracy Tests
+
+Výsledky testů přesnosti propojené s výsledky testů, odesílané z LabVIEW.
+
+### `POST /api/accuracy-tests`
+Přidání kompletního testu přesnosti s měřicími body (voláno z LabVIEW).
+
+**Request:**
+```json
+{
+  "testResultId": 13,
+  "deviceUnderTest": {
+    "ArticleNumber": "5.6602.013/01",
+    "SerialNumber": "21292853",
+    "Revision": "A00"
+  },
+  "interfaceDetails": {
+    "InterfaceType": "MVB",
+    "Address": "0x10"
+  },
+  "referenceInstrument": {
+    "Model": "Norma 5000",
+    "SerialNumber": "N5K-12345",
+    "CalibrationDate": "2025-12-01"
+  },
+  "testInformation": {
+    "EnergyType": "EA",
+    "MeasurementType": "DC",
+    "ReadingID": "CEBD",
+    "Frequency": 16,
+    "Voltage": 230.0
+  },
+  "testResults": [
+    {
+      "NominalValue": 1000.0,
+      "ReferenceValue": 999.8,
+      "DUTReading": 999.5,
+      "DUTError_pct": -0.03,
+      "AppliedLimit_pct": 0.5,
+      "ErrorLimit_pct": 2.0,
+      "Status": "ok"
+    }
+  ],
+  "testNotes": "Podmínky: 20°C, vlhkost 55%"
+}
+```
+
+**Response `200`:**
+```json
+{
+  "id": "5",
+  "testResultId": "13",
+  "energyType": "EA",
+  "measurementType": "DC",
+  "pointsCount": 12
+}
+```
+
+---
+
+### `GET /api/accuracy-tests/:id`
+Úplná data testu přesnosti se všemi měřicími body.
+
+**Response `200`:**
+```json
+{
+  "id": "5",
+  "testResultId": "13",
+  "energyType": "EA",
+  "measurementType": "DC",
+  "readingId": "CEBD",
+  "frequency": 16,
+  "voltage": 230.0,
+  "dutArticleNumber": "5.6602.013/01",
+  "dutSerialNumber": "21292853",
+  "dutRevision": "A00",
+  "refModel": "Norma 5000",
+  "refSerialNumber": "N5K-12345",
+  "refCalibrationDate": "2025-12-01",
+  "interfaceType": "MVB",
+  "interfaceAddress": "0x10",
+  "testNotes": "Podmínky: 20°C, vlhkost 55%",
+  "createdAt": "2026-04-09T12:58:00.000Z",
+  "points": [
+    {
+      "id": "101",
+      "nominalValue": 1000.0,
+      "referenceValue": 999.8,
+      "dutReading": 999.5,
+      "dutError": -0.03,
+      "appliedLimit": 0.5,
+      "errorLimit": 2.0,
+      "pointStatus": "ok",
+      "pointOrder": 1
+    }
+  ]
+}
 ```
 
 ---

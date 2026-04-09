@@ -20,6 +20,8 @@ Authorization: Bearer <jwt_token>
 - [Test Sessions](#test-sessions)
 - [Test Steps](#test-steps)
 - [Test Results](#test-results)
+- [RTO Documents](#rto-documents)
+- [Accuracy Tests](#accuracy-tests)
 - [Drawings](#drawings)
 - [Module Configs](#module-configs)
 - [Settings](#settings)
@@ -368,6 +370,56 @@ null
 
 ## Test Sessions
 
+### `GET /api/test-sessions/search`
+Zaawansowane wyszukiwanie historycznych sesji testowych (używane przez stronę Results DB).
+
+**Query params:**
+
+| Param | Typ | Kolumna DB | Opis |
+|-------|-----|------------|------|
+| `model` | string (ILIKE) | `devices.model` | Filtr po modelu urządzenia |
+| `articleNo` | string (ILIKE) | `devices.article_number` | Filtr po numerze artykułu |
+| `articleRev` | string (dokładny) | `devices.article_revision` | Filtr po rewizji artykułu |
+| `articleName` | string (ILIKE) | `devices.article_name` | Filtr po nazwie artykułu |
+| `serialNo` | string (ILIKE) | `devices.serial_no` | Filtr po numerze seryjnym |
+| `operator` | string (ILIKE) | `test_sessions.operator` | Filtr po operatorze |
+| `rtoName` | string (ILIKE) | `rto_documents.name` | Filtr po nazwie dokumentu RTO |
+| `status` | string | `test_sessions.overall_status` | Filtr po statusie: `running\|passed\|failed\|aborted` |
+| `stepResult` | string | EXISTS na `test_results` | Filtr po wyniku kroku: `ok\|fail\|skip` |
+| `dateFrom` | ISO date | `test_sessions.start_time >=` | Data początkowa |
+| `dateTo` | ISO date | `test_sessions.start_time <=` | Data końcowa |
+| `limit` | number | 20 | Liczba wyników na stronę (max 100) |
+| `offset` | number | 0 | Offset paginacji |
+
+**Response `200`:**
+```json
+{
+  "total": 87,
+  "items": [
+    {
+      "id": "42",
+      "startTime": "2026-04-09T10:35:22.000Z",
+      "finishedAt": "2026-04-09T11:05:44.000Z",
+      "operator": "operator",
+      "overallStatus": "failed",
+      "model": "REM102-G-G-S-T-W-8-GS-O-000",
+      "articleNumber": "5.6602.013/01",
+      "articleRevision": "A00",
+      "articleName": "REM102 Main Controller",
+      "serialNo": "21292853",
+      "rtoName": "5.2901.047J01",
+      "rtoRevision": "A51",
+      "stepsOk": 4,
+      "stepsFail": 1,
+      "stepsSkip": 0,
+      "stepsTotal": 5
+    }
+  ]
+}
+```
+
+---
+
 ### `GET /api/test-sessions`
 Lista sesji testowych z paginacją.
 
@@ -545,12 +597,15 @@ Lista wyników z parametrami.
   {
     "id": "12",
     "sessionId": "7",
-    "testName": "Voltage Check",
-    "status": "ok",
-    "measuredAt": "2024-01-15T10:05:00.000Z",
+    "stepId": "4.7",
+    "stepLabel": "4.7_AC_16Hz_Cal.vi",
+    "stepName": "Kalibracja AC 16 Hz",
+    "stepStart": "2026-04-09T12:53:22.000Z",
+    "stepStop":  "2026-04-09T12:55:34.000Z",
+    "result": "ok",
+    "finished": true,
     "params": [
-      { "name": "V_in",  "value": "24.1",  "unit": "V", "lowLimit": 23.0, "highLimit": 25.0, "status": "ok" },
-      { "name": "V_out", "value": "12.05", "unit": "V", "lowLimit": 11.8, "highLimit": 12.2, "status": "ok" }
+      { "name": "V_in", "value": "24.1", "unit": "V", "lowLimit": 23.0, "highLimit": 25.0, "status": "ok" }
     ]
   }
 ]
@@ -564,18 +619,25 @@ Dodanie wyniku pomiaru z parametrami i logami (wywoływane przez LabVIEW).
 **Request:**
 ```json
 {
-  "sessionId": 7,
-  "testName": "Current Measurement",
-  "status": "fail",
-  "measuredAt": "2024-01-15T10:10:00.000Z",
+  "sessionId":      7,
+  "stepId":         "4.7",
+  "stepLabel":      "4.7_AC_16Hz_Cal.vi",
+  "stepName":       "Kalibracja AC 16 Hz",
+  "stepDetails":    "Pomiar napięcia wejściowego",
+  "stepStart":      "2026-04-09T12:53:22.000Z",
+  "stepStop":       "2026-04-09T12:55:34.000Z",
+  "result":         "ok",
+  "finished":       true,
+  "rtp100Index":    3,
+  "bookmarkValues": { "U_in": 24.1, "I_out": 2.5 },
+  "actions":        [{ "type": "relay", "id": "K1", "state": true }],
+  "jsonReport":     { "raw": "..." },
   "params": [
-    { "name": "I_out", "value": "2.85", "unit": "A", "lowLimit": 1.0, "highLimit": 2.5, "status": "fail" },
-    { "name": "P_out", "value": "34.2", "unit": "W", "lowLimit": 0.0, "highLimit": 30.0, "status": "fail" }
+    { "name": "V_in", "value": "24.1", "unit": "V", "lowLimit": 23.0, "highLimit": 25.0, "status": "ok" }
   ],
   "logs": [
-    { "level": "info",  "message": "Pomiar prądu wyjściowego" },
-    { "level": "warn",  "message": "I_out = 2.85 A – powyżej limitu 2.5 A" },
-    { "level": "error", "message": "FAIL – przekroczony limit prądu" }
+    { "level": "info",  "message": "Pomiar napięcia wejściowego" },
+    { "level": "warn",  "message": "V_in = 24.1 V – w normie" }
   ]
 }
 ```
@@ -584,31 +646,42 @@ Dodanie wyniku pomiaru z parametrami i logami (wywoływane przez LabVIEW).
 ```json
 {
   "id": "13",
-  "status": "fail",
-  "measuredAt": "2024-01-15T10:10:00.000Z"
+  "result": "ok",
+  "createdAt": "2026-04-09T12:55:34.000Z"
 }
 ```
 
 ---
 
 ### `GET /api/test-results/:id`
-Szczegóły wyniku z pełnymi logami.
+Szczegóły wyniku z pełnymi logami, wartościami zakładek i raportami.
 
 **Response `200`:**
 ```json
 {
   "id": "13",
   "sessionId": "7",
-  "testName": "Current Measurement",
-  "status": "fail",
-  "measuredAt": "2024-01-15T10:10:00.000Z",
+  "stepId": "4.8",
+  "stepLabel": "4.8_DC_Accuracy.vi",
+  "stepName": "Test dokładności DC",
+  "stepDetails": "Pomiar błędu wskazania",
+  "stepStart": "2026-04-09T12:55:40.000Z",
+  "stepStop":  "2026-04-09T12:59:11.000Z",
+  "result": "fail",
+  "finished": true,
+  "rtp100Index": 4,
+  "bookmarkValues": { "U_ref": 230.0, "U_dut": 229.5, "error_pct": -0.22 },
+  "actions": [],
+  "jsonReport": { "raw": "..." },
   "params": [
-    { "name": "I_out", "value": "2.85", "unit": "A", "lowLimit": 1.0, "highLimit": 2.5, "status": "fail" }
+    { "name": "Error_%", "value": "-0.22", "unit": "%", "lowLimit": -0.5, "highLimit": 0.5, "status": "ok" }
   ],
   "logs": [
-    { "level": "info",  "message": "Pomiar prądu wyjściowego",     "ts": "2024-01-15T10:10:00.100Z" },
-    { "level": "warn",  "message": "I_out = 2.85 A – powyżej limitu", "ts": "2024-01-15T10:10:01.200Z" },
-    { "level": "error", "message": "FAIL – przekroczony limit",    "ts": "2024-01-15T10:10:01.500Z" }
+    { "level": "info",  "message": "Start pomiaru", "ts": "2026-04-09T12:55:40.100Z" },
+    { "level": "error", "message": "Błąd przekroczony", "ts": "2026-04-09T12:59:10.500Z" }
+  ],
+  "accuracyTests": [
+    { "id": "5", "energyType": "EA", "measurementType": "DC", "createdAt": "2026-04-09T12:58:00Z" }
   ]
 }
 ```
@@ -620,7 +693,7 @@ Aktualizacja statusu lub dołączenie logu na żywo.
 
 **Request — zmiana statusu:**
 ```json
-{ "status": "ok" }
+{ "result": "ok", "finished": true, "rtp100Index": 5 }
 ```
 
 **Request — dołączenie logu:**
@@ -629,7 +702,7 @@ Aktualizacja statusu lub dołączenie logu na żywo.
   "log": {
     "level": "info",
     "message": "Retry #2 – pomiar ponowiony",
-    "ts": "2024-01-15T10:10:05.000Z"
+    "ts": "2026-04-09T12:59:05.000Z"
   }
 }
 ```
@@ -637,6 +710,204 @@ Aktualizacja statusu lub dołączenie logu na żywo.
 **Response `200`:**
 ```json
 { "success": true }
+```
+
+---
+
+## RTO Documents
+
+Dokumenty RTO (Routine Test Overview) — definicje procedur testowych przesyłane z LabVIEW.
+
+### `GET /api/rto-documents`
+Lista dokumentów RTO (bez surowego JSON).
+
+**Response `200`:**
+```json
+[
+  {
+    "id": "1",
+    "name": "5.2901.047J01",
+    "revision": "A51",
+    "description": "REMview Routine Test",
+    "metrics": { "frequency": "16Hz", "voltage": "230V" },
+    "createdAt": "2026-04-09T10:00:00.000Z",
+    "updatedAt": "2026-04-09T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### `POST /api/rto-documents`
+Upsert dokumentu RTO z LabVIEW (tworzy lub aktualizuje po nazwie + rewizji).  
+Re-seeduje identyfikatory i kroki (delete + insert).
+
+**Request (surowy format LabVIEW):**
+```json
+{
+  "DocumentName": "5.2901.047J01",
+  "Revision": "A51",
+  "Description": "REMview Routine Test",
+  "Metrics": { "frequency": "16Hz" },
+  "REM102": {
+    "Identifier": [
+      { "Key": "ArticleNumber", "Value": "5.6602.013/01" }
+    ],
+    "Steps": [
+      {
+        "StepID": "4.7",
+        "StepLabel": "4.7_AC_16Hz_Cal.vi",
+        "StepName": "Kalibracja AC 16 Hz",
+        "StepDetails": "...",
+        "RTP100Index": 3
+      }
+    ]
+  }
+}
+```
+
+**Response `200`:**
+```json
+{
+  "id": "1",
+  "name": "5.2901.047J01",
+  "revision": "A51",
+  "identifiersCount": 5,
+  "stepsCount": 12
+}
+```
+
+---
+
+### `GET /api/rto-documents/:id`
+Szczegóły dokumentu z identyfikatorami i krokami.  
+Parametr `?raw=1` dołącza surowy JSON z LabVIEW.
+
+**Response `200`:**
+```json
+{
+  "id": "1",
+  "name": "5.2901.047J01",
+  "revision": "A51",
+  "description": "REMview Routine Test",
+  "metrics": { "frequency": "16Hz" },
+  "identifiers": [
+    { "id": "1", "key": "ArticleNumber", "value": "5.6602.013/01" }
+  ],
+  "steps": [
+    {
+      "id": "1",
+      "stepId": "4.7",
+      "stepLabel": "4.7_AC_16Hz_Cal.vi",
+      "stepName": "Kalibracja AC 16 Hz",
+      "stepDetails": "...",
+      "rtp100Index": 3,
+      "stepOrder": 1
+    }
+  ],
+  "rawJson": null
+}
+```
+
+---
+
+## Accuracy Tests
+
+Wyniki testów dokładności (z LabVIEW, powiązane z wynikami testów).
+
+### `POST /api/accuracy-tests`
+Dodanie pełnego testu dokładności z punktami pomiarowymi (wywoływane przez LabVIEW).
+
+**Request:**
+```json
+{
+  "testResultId": 13,
+  "deviceUnderTest": {
+    "ArticleNumber": "5.6602.013/01",
+    "SerialNumber": "21292853",
+    "Revision": "A00"
+  },
+  "interfaceDetails": {
+    "InterfaceType": "MVB",
+    "Address": "0x10"
+  },
+  "referenceInstrument": {
+    "Model": "Norma 5000",
+    "SerialNumber": "N5K-12345",
+    "CalibrationDate": "2025-12-01"
+  },
+  "testInformation": {
+    "EnergyType": "EA",
+    "MeasurementType": "DC",
+    "ReadingID": "CEBD",
+    "Frequency": 16,
+    "Voltage": 230.0
+  },
+  "testResults": [
+    {
+      "NominalValue": 1000.0,
+      "ReferenceValue": 999.8,
+      "DUTReading": 999.5,
+      "DUTError_pct": -0.03,
+      "AppliedLimit_pct": 0.5,
+      "ErrorLimit_pct": 2.0,
+      "Status": "ok"
+    }
+  ],
+  "testNotes": "Warunki: 20°C, wilgotność 55%"
+}
+```
+
+**Response `200`:**
+```json
+{
+  "id": "5",
+  "testResultId": "13",
+  "energyType": "EA",
+  "measurementType": "DC",
+  "pointsCount": 12
+}
+```
+
+---
+
+### `GET /api/accuracy-tests/:id`
+Pełne dane testu dokładności z punktami pomiarowymi.
+
+**Response `200`:**
+```json
+{
+  "id": "5",
+  "testResultId": "13",
+  "energyType": "EA",
+  "measurementType": "DC",
+  "readingId": "CEBD",
+  "frequency": 16,
+  "voltage": 230.0,
+  "dutArticleNumber": "5.6602.013/01",
+  "dutSerialNumber": "21292853",
+  "dutRevision": "A00",
+  "refModel": "Norma 5000",
+  "refSerialNumber": "N5K-12345",
+  "refCalibrationDate": "2025-12-01",
+  "interfaceType": "MVB",
+  "interfaceAddress": "0x10",
+  "testNotes": "Warunki: 20°C, wilgotność 55%",
+  "createdAt": "2026-04-09T12:58:00.000Z",
+  "points": [
+    {
+      "id": "101",
+      "nominalValue": 1000.0,
+      "referenceValue": 999.8,
+      "dutReading": 999.5,
+      "dutError": -0.03,
+      "appliedLimit": 0.5,
+      "errorLimit": 2.0,
+      "pointStatus": "ok",
+      "pointOrder": 1
+    }
+  ]
+}
 ```
 
 ---

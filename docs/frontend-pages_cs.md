@@ -634,9 +634,10 @@ Barva tečky závisí na `ws.statusColor` (reaktivní).
 **Stránky v menu (závislé na oprávněních):**
 ```
 if permissions.overview      → Overview        /
-if permissions.results       → Results         /test-results
-if permissions.results       → Results DB      /results-db
-if permissions.config        → Config          /device-config (rozbalovací)
+if permissions.results       → Results ▶ (rozbalovací skupina)
+                                  ├── Test DUT   /test-results   (live session log)
+                                  └── DB         /results-db     (historické vyhledávání)
+if permissions.config        → Config ▶ (rozbalovací skupina)   /device-config
 if permissions.deviceStatus  → Device Status   /device-status
 if permissions.stationSchema → Station Schema  /station-schema
 if permissions.settings      → Settings        /settings
