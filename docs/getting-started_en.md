@@ -143,10 +143,10 @@ Done.
 
 | Username | Password | Role |
 |----------|----------|------|
-| `admin` | `admin123` | Administrator |
-| `operator` | `oper456` | Operator |
-| `viewer` | `view789` | Viewer |
-| `tech` | `tech321` | Operator |
+| `rem_admin` | `rem_REMATE` | Administrator |
+| `rem_operator` | `rem_testoperator` | Operator |
+| `rem_viewer` | `rem_view1` | Viewer |
+| `rem_guest` | *(empty)* | Guest |
 
 ---
 
@@ -186,7 +186,7 @@ Nuxt 3.9.3 with Nitro
 
 Open your browser: **http://localhost:3000**
 
-Log in with: `admin` / `admin123`
+Log in with: `rem_admin` / `rem_REMATE`
 
 ---
 
@@ -201,7 +201,7 @@ curl http://localhost:3000/api/hostname
 # Test login
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d "{\"username\":\"admin\",\"password\":\"admin123\"}"
+  -d "{\"username\":\"rem_admin\",\"password\":\"rem_REMATE\"}"
 ```
 
 ### Check the Database
@@ -223,7 +223,7 @@ SELECT username, role, active FROM users;
 ### Check pgAdmin (GUI)
 
 Open: **http://localhost:5050**  
-Login: `admin@remview.local` / `admin123`
+Login: `admin@remview.local` / `rem_REMATE`
 
 Add a server (if not added automatically):
 - Host: `postgres` ← not `localhost`!

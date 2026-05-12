@@ -327,7 +327,7 @@ curl http://localhost:8080/api/hostname
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d "{\"username\":\"admin\",\"password\":\"admin123\"}"
+  -d "{\"username\":\"rem_admin\",\"password\":\"rem_REMATE\"}"
 # Oczekiwana odpowiedź: {"success":true,"token":"..."}
 ```
 

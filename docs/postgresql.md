@@ -557,19 +557,19 @@ Skrypt seed.ts:
 
 ### Domyślni użytkownicy (seed.sql)
 
-| Username   | Hasło      | Rola     |
-|------------|------------|----------|
-| `admin`    | `admin123` | admin    |
-| `operator` | `oper456`  | operator |
-| `viewer`   | `view789`  | viewer   |
-| `tech`     | `tech321`  | operator |
+| Username        | Hasło              | Rola     |
+|-----------------|--------------------|----------|
+| `rem_admin`     | `rem_REMATE`       | admin    |
+| `rem_operator`  | `rem_testoperator` | operator |
+| `rem_viewer`    | `rem_view1`        | viewer   |
+| `rem_guest`     | *(puste)*          | guest    |
 
 Hasła są hashowane funkcją pgcrypto bezpośrednio w SQL:
 ```sql
 INSERT INTO users (username, password_hash, display_name, role)
 VALUES (
-  'admin',
-  crypt('admin123', gen_salt('bf', 10)),
+  'rem_admin',
+  crypt('rem_REMATE', gen_salt('bf', 10)),
   'Administrator',
   'admin'
 );

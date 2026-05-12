@@ -1,9 +1,9 @@
 -- ============================================================
 -- REMview v3 – Seed data
 -- bcrypt hashes for passwords (cost 10):
---   admin    → 'REMATE'
---   operator → 'testoperator'
---   viewer   → 'view1'
+--   rem_admin    → 'rem_REMATE'
+--   rem_operator → 'rem_testoperator'
+--   rem_viewer   → 'rem_view1'
 -- ============================================================
 
 -- ── Users ─────────────────────────────────────────────────────────────────────
@@ -11,16 +11,16 @@ INSERT INTO users (username, password_hash, display_name, role, active,
   perm_overview, perm_results, perm_config, perm_device_status,
   perm_station_schema, perm_settings, perm_help, perm_authorization)
 VALUES
-  ('admin',    crypt('REMATE',       gen_salt('bf', 10)),
+  ('rem_admin',    crypt('rem_REMATE',       gen_salt('bf', 10)),
    'Administrator', 'admin', true,
    true, true, true, true, true, true, true, true),
-  ('operator', crypt('testoperator', gen_salt('bf', 10)),
+  ('rem_operator', crypt('rem_testoperator', gen_salt('bf', 10)),
    'Test Operator', 'operator', true,
    true, true, true, true, true, false, true, false),
-  ('viewer',   crypt('view1',        gen_salt('bf', 10)),
+  ('rem_viewer',   crypt('rem_view1',        gen_salt('bf', 10)),
    'Read-Only Viewer', 'viewer', true,
    true, true, false, true, true, false, true, false),
-  ('guest',    crypt('',             gen_salt('bf', 10)),
+  ('rem_guest',    crypt('',                 gen_salt('bf', 10)),
    'Guest', 'guest', true,
    true, false, false, false, false, false, true, false)
 ON CONFLICT (username) DO NOTHING;

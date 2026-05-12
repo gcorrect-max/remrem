@@ -95,12 +95,12 @@ This runs `server/db/seed.ts` which applies:
 
 ### Default users after seed
 
-| Username  | Password   | Role    |
-|-----------|------------|---------|
-| `admin`   | `admin123` | admin   |
-| `operator`| `oper456`  | operator|
-| `viewer`  | `view789`  | viewer  |
-| `tech`    | `tech321`  | operator|
+| Username        | Password           | Role     |
+|-----------------|--------------------|----------|
+| `rem_admin`     | `rem_REMATE`       | admin    |
+| `rem_operator`  | `rem_testoperator` | operator |
+| `rem_viewer`    | `rem_view1`        | viewer   |
+| `rem_guest`     | *(empty)*          | guest    |
 
 > **Change all passwords immediately in production!**
 

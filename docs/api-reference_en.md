@@ -37,8 +37,8 @@ User login. Returns a JWT token.
 **Request:**
 ```json
 {
-  "username": "admin",
-  "password": "admin123"
+  "username": "rem_admin",
+  "password": "rem_REMATE"
 }
 ```
 
@@ -49,7 +49,7 @@ User login. Returns a JWT token.
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "1",
-    "username": "admin",
+    "username": "rem_admin",
     "displayName": "Administrator",
     "role": "admin",
     "permissions": {
@@ -93,7 +93,7 @@ List of all users.
 [
   {
     "id": "1",
-    "username": "admin",
+    "username": "rem_admin",
     "displayName": "Administrator",
     "role": "admin",
     "active": true,
@@ -102,7 +102,7 @@ List of all users.
   },
   {
     "id": "2",
-    "username": "operator",
+    "username": "rem_operator",
     "displayName": "Jan Kowalski",
     "role": "operator",
     "active": true,
@@ -187,7 +187,7 @@ Update user data. All fields are optional.
 ```json
 {
   "id": "2",
-  "username": "operator",
+  "username": "rem_operator",
   "displayName": "Jan Nowak",
   "role": "operator",
   "active": true

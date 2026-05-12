@@ -37,8 +37,8 @@ Přihlášení uživatele. Vrací JWT token.
 **Request:**
 ```json
 {
-  "username": "admin",
-  "password": "admin123"
+  "username": "rem_admin",
+  "password": "rem_REMATE"
 }
 ```
 
@@ -49,7 +49,7 @@ Přihlášení uživatele. Vrací JWT token.
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "1",
-    "username": "admin",
+    "username": "rem_admin",
     "displayName": "Administrator",
     "role": "admin",
     "permissions": {
@@ -93,7 +93,7 @@ Seznam všech uživatelů.
 [
   {
     "id": "1",
-    "username": "admin",
+    "username": "rem_admin",
     "displayName": "Administrator",
     "role": "admin",
     "active": true,
@@ -102,7 +102,7 @@ Seznam všech uživatelů.
   },
   {
     "id": "2",
-    "username": "operator",
+    "username": "rem_operator",
     "displayName": "Jan Kowalski",
     "role": "operator",
     "active": true,
@@ -187,7 +187,7 @@ Aktualizace údajů uživatele. Všechna pole jsou volitelná.
 ```json
 {
   "id": "2",
-  "username": "operator",
+  "username": "rem_operator",
   "displayName": "Jan Novák",
   "role": "operator",
   "active": true

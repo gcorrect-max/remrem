@@ -37,8 +37,8 @@ Logowanie użytkownika. Zwraca JWT token.
 **Request:**
 ```json
 {
-  "username": "admin",
-  "password": "admin123"
+  "username": "rem_admin",
+  "password": "rem_REMATE"
 }
 ```
 
@@ -49,7 +49,7 @@ Logowanie użytkownika. Zwraca JWT token.
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "1",
-    "username": "admin",
+    "username": "rem_admin",
     "displayName": "Administrator",
     "role": "admin",
     "permissions": {
@@ -93,7 +93,7 @@ Lista wszystkich użytkowników.
 [
   {
     "id": "1",
-    "username": "admin",
+    "username": "rem_admin",
     "displayName": "Administrator",
     "role": "admin",
     "active": true,
@@ -102,7 +102,7 @@ Lista wszystkich użytkowników.
   },
   {
     "id": "2",
-    "username": "operator",
+    "username": "rem_operator",
     "displayName": "Jan Kowalski",
     "role": "operator",
     "active": true,
@@ -187,7 +187,7 @@ Aktualizacja danych użytkownika. Wszystkie pola opcjonalne.
 ```json
 {
   "id": "2",
-  "username": "operator",
+  "username": "rem_operator",
   "displayName": "Jan Nowak",
   "role": "operator",
   "active": true

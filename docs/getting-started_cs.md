@@ -143,10 +143,10 @@ Done.
 
 | Username | Heslo | Role |
 |----------|-------|------|
-| `admin` | `admin123` | Administrator |
-| `operator` | `oper456` | Operátor |
-| `viewer` | `view789` | Prohlížeč |
-| `tech` | `tech321` | Operátor |
+| `rem_admin` | `rem_REMATE` | Administrator |
+| `rem_operator` | `rem_testoperator` | Operátor |
+| `rem_viewer` | `rem_view1` | Prohlížeč |
+| `rem_guest` | *(prázdné)* | Host |
 
 ---
 
@@ -186,7 +186,7 @@ Nuxt 3.9.3 with Nitro
 
 Otevřete prohlížeč: **http://localhost:3000**
 
-Přihlaste se: `admin` / `admin123`
+Přihlaste se: `rem_admin` / `rem_REMATE`
 
 ---
 
@@ -201,7 +201,7 @@ curl http://localhost:3000/api/hostname
 # Test přihlášení
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d "{\"username\":\"admin\",\"password\":\"admin123\"}"
+  -d "{\"username\":\"rem_admin\",\"password\":\"rem_REMATE\"}"
 ```
 
 ### Otestujte databázi
@@ -223,7 +223,7 @@ SELECT username, role, active FROM users;
 ### Otestujte pgAdmin (GUI)
 
 Otevřete: **http://localhost:5050**  
-Přihlášení: `admin@remview.local` / `admin123`
+Přihlášení: `admin@remview.local` / `rem_REMATE`
 
 Přidejte server (pokud není automaticky přidán):
 - Host: `postgres` ← ne `localhost`!
