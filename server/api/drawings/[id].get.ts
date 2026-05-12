@@ -1,7 +1,7 @@
 import { useDb } from '~/server/db/client'
 
 export default defineEventHandler(async (event) => {
-  const id  = Number(getRouterParam(event, 'id'))
+  const id  = getRouterParam(event, 'id')
   const sql = useDb()
 
   const [d] = await sql`SELECT * FROM drawings WHERE id = ${id}`
@@ -9,10 +9,10 @@ export default defineEventHandler(async (event) => {
 
   return {
     id:          String(d.id),
-    name:        d.name,
-    description: d.description,
+    label:       d.label,
     mimeType:    d.mime_type,
     imageBase64: d.image_base64 ?? '',
+    sortOrder:   d.sort_order,
     updatedAt:   d.updated_at,
   }
 })
