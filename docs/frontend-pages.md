@@ -16,6 +16,7 @@ Opis wszystkich stron Vue 3 w aplikacji REMview v3, ich stores, flow danych i za
   - [index.vue – Dashboard](#indexvue--dashboard)
   - [test-results.vue](#test-resultsvue)
   - [results-db.vue](#results-dbvue)
+  - [queue-log.vue](#queue-logvue)
   - [device-status.vue](#device-statusvue)
   - [authorization.vue](#authorizationvue)
   - [station-schema.vue](#station-schemavue)
@@ -40,6 +41,7 @@ app.vue
             ├── index.vue           /               (dashboard)
             ├── test-results.vue    /test-results
             ├── results-db.vue      /results-db
+            ├── queue-log.vue       /queue-log
             ├── device-status.vue   /device-status
             ├── authorization.vue   /authorization
             ├── station-schema.vue  /station-schema
@@ -420,6 +422,48 @@ goOffset(n):
 
 ---
 
+### queue-log.vue
+
+**Ścieżka:** `/queue-log`  
+**Auth:** wymagana  
+**Uprawnienie:** `permissions.results`
+
+**Funkcje:**
+- Drag & drop lub wybór plików — ładowanie jednego lub wielu plików NDJSON logu kolejki (`.json`)
+- Parser newline-delimited JSON — każda linia to jedna wiadomość kolejki
+- Rozpoznawane kolejki: `YKGS820` (błękit), `YKG3000` (fiolet), `DataProc` (zieleń); nieznane kolejki otrzymują automatycznie przydzielony kolor
+- Pasek statystyk per kolejka: łączna liczba wpisów + liczniki Read / Write / Response
+- Pasek filtrów:
+  - Przyciski-przełączniki kolejek (wielokrotny wybór)
+  - Przełączniki typów akcji: Read / Write / Response / Started
+  - Wyszukiwanie tekstowe po nazwie komendy i zawartości payloadu
+- Tabela timeline posortowana po timestamp z rozwijalnymi wierszami pokazującymi pełny JSON payload
+- Inline podsumowania dla popularnych typów wpisów (dane kalibracyjne, wartości CH napięcie/prąd, odczyty WT3000, wiadomości statusowe)
+- Wiele plików można ładować przyrostowo (upuszczenie na tabelę dodaje dane)
+- Przycisk „Clear" resetuje wszystkie załadowane dane
+
+**Nie wymaga backendu** — całość parsowana i renderowana po stronie klienta.
+
+**Przepływ danych:**
+```
+Upuszczenie pliku / wybór pliku
+  └── FileReader.text()
+        └── split('\n') → JSON.parse każdej linii
+              └── normalizacja: queueName, action, command, payload
+                    └── sortowanie po Timestamp → entries[]
+
+Interakcje z paskiem filtrów:
+  selectedQueues / selectedActions / searchText (reaktywne refs)
+    └── filteredEntries = computed(entries filtrowane przez wszystkie trzy)
+
+Klik w wiersz:
+  └── entry._expanded = !entry._expanded → pokazuje payload <pre>
+```
+
+**Stores używane:** brak (w pełni lokalny stan)
+
+---
+
 ### device-status.vue
 
 **Ścieżka:** `/device-status`  
@@ -653,6 +697,7 @@ Kolor kropki zależy od `ws.statusColor` (reaktywny).
 if permissions.overview      → Overview        /
 if permissions.results       → Results         /test-results
 if permissions.results       → Results DB      /results-db
+if permissions.results       → Queue Log       /queue-log
 if permissions.config        → Config          /device-config (expandowalny)
 if permissions.deviceStatus  → Device Status   /device-status
 if permissions.stationSchema → Station Schema  /station-schema
@@ -697,6 +742,7 @@ export default defineNuxtRouteMiddleware((to) => {
 | `/` | `overview` |
 | `/test-results` | `results` |
 | `/results-db` | `results` |
+| `/queue-log` | `results` |
 | `/device-config*` | `config` |
 | `/device-status` | `deviceStatus` |
 | `/station-schema` | `stationSchema` |

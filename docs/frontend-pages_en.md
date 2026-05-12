@@ -16,6 +16,7 @@ Description of all Vue 3 pages in the REMview v3 application, their stores, data
   - [index.vue – Dashboard](#indexvue--dashboard)
   - [test-results.vue](#test-resultsvue)
   - [results-db.vue](#results-dbvue)
+  - [queue-log.vue](#queue-logvue)
   - [device-status.vue](#device-statusvue)
   - [authorization.vue](#authorizationvue)
   - [station-schema.vue](#station-schemavue)
@@ -40,6 +41,7 @@ app.vue
             ├── index.vue           /               (dashboard)
             ├── test-results.vue    /test-results
             ├── results-db.vue      /results-db
+            ├── queue-log.vue       /queue-log
             ├── device-status.vue   /device-status
             ├── authorization.vue   /authorization
             ├── station-schema.vue  /station-schema
@@ -417,6 +419,61 @@ goOffset(n):
 
 ---
 
+### queue-log.vue
+
+**Path:** `/queue-log`  
+**Auth:** required  
+**Permission:** `permissions.results`
+
+**Features:**
+- Drag & drop or file picker for loading one or more NDJSON queue log files (`.json`)
+- Parses newline-delimited JSON — each line is one queue message
+- Recognized queue names: `YKGS820` (sky-blue), `YKG3000` (violet), `DataProc` (green); unknown queues receive auto-assigned colors
+- Per-queue statistics strip: total entries + Read / Write / Response counts
+- Filter bar:
+  - Queue toggle buttons (multi-select)
+  - Action-type toggles: Read / Write / Response / Started
+  - Free-text search across command names and payload content
+- Timeline table sorted by timestamp with expandable rows showing full JSON payload
+- Inline summaries for common entry types (calibration data, CH voltage/current values, WT3000 readings, status messages)
+- Multiple files can be loaded incrementally (drop on top of the table to add)
+- "Clear" button resets all loaded data
+
+**No backend required** — everything is parsed and rendered entirely client-side.
+
+**Supported log entry shapes:**
+
+```jsonc
+// Startup entry
+{ "Timestamp": "...", "Queue name": "YKGS820", "": "STARTED" }
+
+// Command entry
+{ "Timestamp": "...", "Q Name": "YKGS820", "action": "Read", "Command": "3.0_INIT AC_CH1", ... }
+
+// Response entry
+{ "Timestamp": "...", "Q Name": "YKGS820", "action": "Response", "Queue Command": "3.0_INIT AC_CH1", "Status": {"Msg": "50Hz_100Rms_10%.csv", "OK": true} }
+```
+
+**Data Flow:**
+```
+File drop / file input
+  └── FileReader.text()
+        └── split('\n') → JSON.parse each line
+              └── normalize: queueName, action, command, payload
+                    └── sort by Timestamp → entries[]
+
+Filter bar interactions:
+  selectedQueues / selectedActions / searchText (reactive refs)
+    └── filteredEntries = computed(entries filtered by all three)
+
+Row click:
+  └── entry._expanded = !entry._expanded → shows payload <pre>
+```
+
+**Stores used:** none (fully local state)
+
+---
+
 ### device-status.vue
 
 **Path:** `/device-status`  
@@ -650,6 +707,7 @@ Dot color depends on `ws.statusColor` (reactive).
 if permissions.overview      → Overview        /
 if permissions.results       → Results         /test-results
 if permissions.results       → Results DB      /results-db
+if permissions.results       → Queue Log       /queue-log
 if permissions.config        → Config          /device-config (expandable group)
 if permissions.deviceStatus  → Device Status   /device-status
 if permissions.stationSchema → Station Schema  /station-schema
@@ -694,6 +752,7 @@ export default defineNuxtRouteMiddleware((to) => {
 | `/` | `overview` |
 | `/test-results` | `results` |
 | `/results-db` | `results` |
+| `/queue-log` | `results` |
 | `/device-config*` | `config` |
 | `/device-status` | `deviceStatus` |
 | `/station-schema` | `stationSchema` |

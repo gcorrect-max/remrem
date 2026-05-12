@@ -16,6 +16,7 @@ Popis všech stránek Vue 3 v aplikaci REMview v3, jejich stores, datových tok�
   - [index.vue – Dashboard](#indexvue--dashboard)
   - [test-results.vue](#test-resultsvue)
   - [results-db.vue](#results-dbvue)
+  - [queue-log.vue](#queue-logvue)
   - [device-status.vue](#device-statusvue)
   - [authorization.vue](#authorizationvue)
   - [station-schema.vue](#station-schemavue)
@@ -40,6 +41,7 @@ app.vue
             ├── index.vue           /               (dashboard)
             ├── test-results.vue    /test-results
             ├── results-db.vue      /results-db
+            ├── queue-log.vue       /queue-log
             ├── device-status.vue   /device-status
             ├── authorization.vue   /authorization
             ├── station-schema.vue  /station-schema
@@ -403,6 +405,48 @@ toggleSession(id):
 
 ---
 
+### queue-log.vue
+
+**Cesta:** `/queue-log`  
+**Auth:** vyžadována  
+**Oprávnění:** `permissions.results`
+
+**Funkce:**
+- Drag & drop nebo výběr souborů pro načtení jednoho nebo více NDJSON souborů fronty (`.json`)
+- Parsování newline-delimited JSON — každý řádek je jedna zpráva fronty
+- Rozpoznávané fronty: `YKGS820` (modř), `YKG3000` (fialová), `DataProc` (zelená); neznámé fronty dostanou automaticky přiřazenou barvu
+- Statistický pruh pro každou frontu: celkový počet záznamů + počty Read / Write / Response
+- Lišta filtrů:
+  - Přepínací tlačítka front (výběr více hodnot)
+  - Přepínače typu akce: Read / Write / Response / Started
+  - Textové vyhledávání v názvech příkazů i obsahu payloadu
+- Tabulka timeline seřazená podle timestampu s rozkliknutelnými řádky zobrazujícími celý JSON payload
+- Inline souhrny pro běžné typy záznamů (kalibrační data, hodnoty CH napětí/proudu, odečty WT3000, stavové zprávy)
+- Více souborů lze načítat postupně (přetáhnout na tabulku)
+- Tlačítko „Clear" resetuje všechna načtená data
+
+**Backend není potřeba** — vše je parsováno a zobrazováno čistě na straně klienta.
+
+**Datový tok:**
+```
+Přetažení souboru / výběr souboru
+  └── FileReader.text()
+        └── split('\n') → JSON.parse každého řádku
+              └── normalizace: queueName, action, command, payload
+                    └── řazení podle Timestamp → entries[]
+
+Interakce s lištou filtrů:
+  selectedQueues / selectedActions / searchText (reaktivní refs)
+    └── filteredEntries = computed(entries filtrované všemi třemi)
+
+Klik na řádek:
+  └── entry._expanded = !entry._expanded → zobrazí payload <pre>
+```
+
+**Používané stores:** žádné (plně lokální stav)
+
+---
+
 ### device-status.vue
 
 **Cesta:** `/device-status`  
@@ -636,6 +680,7 @@ Barva tečky závisí na `ws.statusColor` (reaktivní).
 if permissions.overview      → Overview        /
 if permissions.results       → Results         /test-results
 if permissions.results       → Results DB      /results-db
+if permissions.results       → Queue Log       /queue-log
 if permissions.config        → Config          /device-config (rozbalovací)
 if permissions.deviceStatus  → Device Status   /device-status
 if permissions.stationSchema → Station Schema  /station-schema
@@ -680,6 +725,7 @@ export default defineNuxtRouteMiddleware((to) => {
 | `/` | `overview` |
 | `/test-results` | `results` |
 | `/results-db` | `results` |
+| `/queue-log` | `results` |
 | `/device-config*` | `config` |
 | `/device-status` | `deviceStatus` |
 | `/station-schema` | `stationSchema` |
