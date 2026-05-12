@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Queue Log Viewer – Preview</title>
+<style>
+  :root {
+    --bg:      #0a0c10;
+    --surface: #111520;
+    --card:    #181d28;
+    --border:  #232a38;
+    --muted:   #2b3347;
+    --text:    #dce4f0;
+    --dim:     #7f8faa;
+    --accent:  #f59e0b;
+    --ok:      #22c55e;
+    --fail:    #ef4444;
+    --warn:    #f97316;
+    --info:    #38bdf8;
+    --header:  #f0f4ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    font-size: 13px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  code, .mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+
+  /* ── Top bar ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .topbar h1 { font-size: 13px; font-weight: 600; color: var(--header); }
+  .topbar .sub { font-family: monospace; font-size: 10px; color: var(--dim); margin-top: 2px; }
+  .btn {
+    padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--card); color: var(--dim); font-family: monospace;
+    font-size: 11px; cursor: pointer; transition: all .15s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--accent); }
+  .btn-primary { border-color: var(--accent); color: var(--accent); }
+  .btn-primary:hover { background: rgba(245,158,11,.1); }
+
+  /* ── Summary strip ── */
+  .summary {
+    display: flex; align-items: stretch;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .q-stat {
+    display: flex; flex-direction: column;
+    padding: 8px 18px;
+    border-right: 1px solid var(--border);
+    min-width: 130px;
+  }
+  .q-stat .q-name { font-family: monospace; font-size: 10px; font-weight: 700; }
+  .q-stat .q-count { font-family: monospace; font-size: 11px; color: var(--text); margin-top: 2px; }
+  .q-stat .q-breakdown { display: flex; gap: 8px; margin-top: 3px; }
+  .q-stat .q-breakdown span { font-family: monospace; font-size: 9px; }
+  .r { color: var(--info); }
+  .w { color: var(--warn); }
+  .rs { color: var(--ok); }
+  .q-total { margin-left: auto; }
+
+  /* ── Filter bar ── */
+  .filters {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 8px 16px; padding: 8px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(24,29,40,.5);
+    flex-shrink: 0;
+  }
+  .filter-label { font-family: monospace; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
+  .chip {
+    padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border);
+    font-family: monospace; font-size: 10px; color: var(--dim); cursor: pointer;
+    transition: all .15s;
+  }
+  .chip:hover { border-color: var(--muted); color: var(--text); }
+  .chip.on-q { border: none; color: #0a0c10; font-weight: 700; }
+  .chip.on-r { background: rgba(56,189,248,.15); color: var(--info); border-color: transparent; }
+  .chip.on-w { background: rgba(249,115,22,.15); color: var(--warn); border-color: transparent; }
+  .chip.on-rs { background: rgba(34,197,94,.15); color: var(--ok); border-color: transparent; }
+  .chip.on-st { background: var(--muted); color: var(--text); border-color: transparent; }
+  .search-input {
+    padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-family: monospace;
+    font-size: 11px; width: 200px; transition: border .15s;
+  }
+  .search-input:focus { outline: none; border-color: var(--accent); }
+  .search-input::placeholder { color: rgba(127,143,170,.4); }
+
+  /* ── Table ── */
+  .table-wrap { flex: 1; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  thead { position: sticky; top: 0; z-index: 10; }
+  thead tr { background: var(--card); border-bottom: 1px solid var(--border); }
+  thead th {
+    text-align: left; padding: 8px 12px;
+    font-family: monospace; font-size: 10px; color: var(--dim);
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  }
+  tbody tr { border-bottom: 1px solid rgba(35,42,56,.5); cursor: pointer; transition: background .1s; }
+  tbody tr:hover { background: rgba(24,29,40,.5); }
+  tbody tr.exp-row { background: rgba(10,12,16,.6); cursor: default; }
+  tbody tr.exp-row:hover { background: rgba(10,12,16,.6); }
+  td { padding: 6px 12px; vertical-align: middle; }
+  td.ts { font-family: monospace; color: var(--dim); white-space: nowrap; }
+  td.chev { text-align: center; width: 24px; }
+  .chev-icon { color: rgba(127,143,170,.5); font-size: 9px; transition: transform .15s; }
+  .chev-icon.open { transform: rotate(90deg); }
+
+  /* Queue badge */
+  .q-badge {
+    display: inline-block; padding: 2px 7px; border-radius: 3px;
+    font-family: monospace; font-size: 10px; font-weight: 700;
+  }
+  /* Action badge */
+  .a-badge {
+    display: inline-block; padding: 2px 7px; border-radius: 3px;
+    font-family: monospace; font-size: 10px; font-weight: 600;
+  }
+  .a-read     { background: rgba(56,189,248,.15);  color: var(--info); }
+  .a-write    { background: rgba(249,115,22,.15);  color: var(--warn); }
+  .a-response { background: rgba(34,197,94,.15);   color: var(--ok); }
+  .a-started  { background: rgba(43,51,71,.6);     color: var(--dim); }
+  /* Command cell */
+  .cmd-name { font-family: monospace; font-weight: 600; color: var(--text); }
+  .cmd-sub  { font-family: monospace; font-size: 10px; color: var(--dim); margin-left: 12px; }
+  /* Expanded payload */
+  .payload-wrap { padding: 8px 10px 12px 36px; }
+  .payload-label { font-family: monospace; font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .payload-pre {
+    background: var(--card); border: 1px solid var(--border); border-radius: 4px;
+    padding: 10px 12px; font-family: monospace; font-size: 10px; color: var(--text);
+    overflow: auto; max-height: 220px; line-height: 1.6; white-space: pre-wrap; word-break: break-all;
+  }
+  /* File short name */
+  td.file-col { text-align: right; font-family: monospace; font-size: 9px; color: rgba(127,143,170,.5); }
+
+  /* ── Upload overlay ── */
+  .drop-zone {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 16px; margin: 20px;
+    border: 2px dashed var(--muted); border-radius: 8px;
+  }
+  .drop-icon { font-size: 52px; opacity: .3; }
+  .drop-title { font-size: 14px; color: var(--text); }
+  .drop-sub { font-family: monospace; font-size: 11px; color: var(--dim); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <div>
+    <h1>Queue Log Viewer</h1>
+    <div class="sub">
+      26 / 88 entries &nbsp;|&nbsp; 3 files &nbsp;|&nbsp; 3 queues &nbsp;|&nbsp; 17:02:54.873 → 17:04:21.118
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn">✕ Clear</button>
+    <button class="btn btn-primary">+ Load files</button>
+  </div>
+</div>
+
+<!-- ── Summary strip ── -->
+<div class="summary">
+  <div class="q-stat">
+    <span class="q-name mono" style="color:#38bdf8">YKGS820</span>
+    <span class="q-count mono">27 entries</span>
+    <div class="q-breakdown">
+      <span class="r">R:16</span>
+      <span class="w">W:0</span>
+      <span class="rs">→:8</span>
+    </div>
+  </div>
+  <div class="q-stat">
+    <span class="q-name mono" style="color:#a78bfa">YKG3000</span>
+    <span class="q-count mono">22 entries</span>
+    <div class="q-breakdown">
+      <span class="r">R:14</span>
+      <span class="w">W:0</span>
+      <span class="rs">→:6</span>
+    </div>
+  </div>
+  <div class="q-stat">
+    <span class="q-name mono" style="color:#4ade80">DataProc</span>
+    <span class="q-count mono">38 entries</span>
+    <div class="q-breakdown">
+      <span class="r">R:19</span>
+      <span class="w">W:19</span>
+      <span class="rs">→:0</span>
+    </div>
+  </div>
+  <div class="q-stat q-total">
+    <span class="mono" style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Total</span>
+    <span class="q-count mono">88</span>
+    <div class="q-breakdown">
+      <span class="r">R:49</span>
+      <span class="w">W:19</span>
+      <span class="rs">→:14</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Filter bar ── -->
+<div class="filters">
+  <span class="filter-label">Queue:</span>
+  <span class="chip">All</span>
+  <span class="chip on-q" style="background:#38bdf8">YKGS820</span>
+  <span class="chip on-q" style="background:#a78bfa">YKG3000</span>
+  <span class="chip">DataProc</span>
+
+  <span class="filter-label">Action:</span>
+  <span class="chip on-r">Read</span>
+  <span class="chip on-w">Write</span>
+  <span class="chip on-rs">Response</span>
+  <span class="chip on-st">Started</span>
+
+  <span class="filter-label" style="margin-left:auto">Search:</span>
+  <input class="search-input" placeholder="command or payload…" value="3.0" />
+</div>
+
+<!-- ── Table ── -->
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th style="width:24px"></th>
+      <th style="width:110px">Timestamp</th>
+      <th style="width:130px">Queue</th>
+      <th style="width:100px">Action</th>
+      <th>Command / Summary</th>
+      <th style="width:80px;text-align:right">File</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- Row 1 expanded -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon open">▶</span></td>
+      <td class="ts mono">17:02:54.873</td>
+      <td><span class="q-badge" style="color:#38bdf8;background:rgba(56,189,248,.1)">YKGS820</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0_INIT AC_CH1</span><span class="cmd-sub">✓ 50Hz_100Rms_10%.csv</span></td>
+      <td class="file-col">YKGS820</td>
+    </tr>
+    <tr class="exp-row">
+      <td colspan="6" style="padding:0">
+        <div class="payload-wrap">
+          <div class="payload-label">Payload</div>
+          <pre class="payload-pre">{
+  "Status": {
+    "Msg": "50Hz_100Rms_10%.csv",
+    "OK": true
+  },
+  "CH1": {
+    "Value (DC)": 10,
+    "type": "Voltage",
+    "percent": 10
+  }
+}</pre>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Row 2 -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon">▶</span></td>
+      <td class="ts mono">17:02:55.887</td>
+      <td><span class="q-badge" style="color:#38bdf8;background:rgba(56,189,248,.1)">YKGS820</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0_INIT AC_CH2</span><span class="cmd-sub">✓ 50Hz_800mRms_10%.csv</span></td>
+      <td class="file-col">YKGS820</td>
+    </tr>
+
+    <!-- Row 3 -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon">▶</span></td>
+      <td class="ts mono">17:03:09.889</td>
+      <td><span class="q-badge" style="color:#a78bfa;background:rgba(167,139,250,.1)">YKG3000</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0 Read CH1 WT3k</span><span class="cmd-sub">→ 8.5235</span></td>
+      <td class="file-col">YKG3000</td>
+    </tr>
+
+    <!-- Row 4 -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon">▶</span></td>
+      <td class="ts mono">17:03:22.697</td>
+      <td><span class="q-badge" style="color:#38bdf8;background:rgba(56,189,248,.1)">YKGS820</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0_INIT AC_CH1</span><span class="cmd-sub">✓ 50Hz_100Rms_10%.csv</span></td>
+      <td class="file-col">YKGS820</td>
+    </tr>
+
+    <!-- Row 5 -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon">▶</span></td>
+      <td class="ts mono">17:03:37.995</td>
+      <td><span class="q-badge" style="color:#a78bfa;background:rgba(167,139,250,.1)">YKG3000</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0 Read CH1 WT3k</span><span class="cmd-sub">→ 9.8018</span></td>
+      <td class="file-col">YKG3000</td>
+    </tr>
+
+    <!-- Row 6 -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon">▶</span></td>
+      <td class="ts mono">17:03:50.034</td>
+      <td><span class="q-badge" style="color:#38bdf8;background:rgba(56,189,248,.1)">YKGS820</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0_INIT AC_CH1</span><span class="cmd-sub">✓ 50Hz_100Rms_10%.csv</span></td>
+      <td class="file-col">YKGS820</td>
+    </tr>
+
+    <!-- Row 7 -->
+    <tr onclick="toggleRow(this)">
+      <td class="chev"><span class="chev-icon">▶</span></td>
+      <td class="ts mono">17:04:05.420</td>
+      <td><span class="q-badge" style="color:#a78bfa;background:rgba(167,139,250,.1)">YKG3000</span></td>
+      <td><span class="a-badge a-response">Response</span></td>
+      <td><span class="cmd-name">3.0 Read CH1 WT3k</span><span class="cmd-sub">→ 9.8191</span></td>
+      <td class="file-col">YKG3000</td>
+    </tr>
+
+    <!-- Separator label -->
+    <tr style="background:rgba(43,51,71,.25)">
+      <td colspan="6" style="padding:4px 14px;font-family:monospace;font-size:9px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase">
+        — remaining 81 entries hidden by search filter —
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<script>
+function toggleRow(tr) {
+  const chev = tr.querySelector('.chev-icon');
+  const next = tr.nextElementSibling;
+  if (!next || !next.classList.contains('exp-row')) {
+    // No existing expansion — create one dynamically
+    const newRow = document.createElement('tr');
+    newRow.className = 'exp-row';
+    newRow.innerHTML = `<td colspan="6" style="padding:0">
+      <div class="payload-wrap">
+        <div class="payload-label">Payload</div>
+        <pre class="payload-pre">(payload data)</pre>
+      </div></td>`;
+    tr.insertAdjacentElement('afterend', newRow);
+    chev.classList.add('open');
+    return;
+  }
+  const isOpen = chev.classList.contains('open');
+  if (isOpen) {
+    next.remove();
+    chev.classList.remove('open');
+  } else {
+    // shouldn't happen in this demo
+    chev.classList.add('open');
+  }
+}
+</script>
+</body>
+</html>
