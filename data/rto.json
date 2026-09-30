@@ -1,0 +1,4153 @@
+{
+ "updated": "Tuesday, September 29, 2026 23:11",
+ "documents": [
+  {
+   "id": "046",
+   "name": "5.2901.046J01",
+   "revision": "A17",
+   "releaser": "J. Dobiáš",
+   "released": "2026-08-24",
+   "file": "5.2901.046J01_REM102_RTO_A17.xlsx",
+   "models": [
+    {
+     "name": "REM102-G-G-AC1-W-8-4GS-O-000",
+     "art": [
+      "5.6602.022/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-G-G-AC1-W-8-4GS-O-000",
+     "art": [
+      "5.6602.026/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-AC1-W-000",
+     "art": [
+      "5.6602.006/04"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-DC2-AC2-W-4GS-000",
+     "art": [
+      "5.6602.007/03"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-AC1-AC1-W-000",
+     "art": [
+      "5.6602.006/07"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-DC2-AC2-W-4GS-000",
+     "art": [
+      "5.6602.023/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-G-G-W-4GS-000",
+     "art": [
+      "5.6602.024/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-DC2-AC2-W-4GS-O-000",
+     "art": [
+      "5.6602.006/09"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-DC2-AC2-W-4GS-000",
+     "art": [
+      "5.6602.025/01"
+     ],
+     "accuracyClass": null
+    }
+   ],
+   "steps": [
+    {
+     "id": "4.1",
+     "label": "Initial Visual Inspection",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.2",
+     "label": "Pre-test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.3.3",
+     "label": "FW Installation",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.3.4",
+     "label": "Field Engine Installation",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "0"
+     ]
+    },
+    {
+     "id": "4.3.5",
+     "label": "Test Configuration",
+     "values": [
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.sic",
+      "rem102_accuracy_test.A01.sic",
+      "rem102_accuracy_test.sic"
+     ]
+    },
+    {
+     "id": "4.4.1",
+     "label": "Insulation (test groups)",
+     "values": [
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G4,G5,G11,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13"
+     ]
+    },
+    {
+     "id": "4.4.2",
+     "label": "Additional Tests",
+     "values": [
+      "See \"5.2901.260_02JEN_REM102 High-current Earth Continuity Test Specification\" document",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.5",
+     "label": "Burn-in",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.6",
+     "label": "Power supply tests",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.6.1",
+     "label": "Current measurement",
+     "values": [
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V",
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V",
+      "Max 0.38A@24V; 0.09A@110V; 0.08A@137.5V; 0.58A@16.8V",
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V",
+      "Max 0.38A@24V; 0.09A@110V; 0.08A@137.5V; 0.58A@16.8V",
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V",
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V",
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V",
+      "Max 0.5A@24V; 0.1A@110V; 0.08A@137.5V; 0.71A@16.8V"
+     ]
+    },
+    {
+     "id": "4.6.2",
+     "label": "Over-undervoltage",
+     "values": [
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V",
+      "110V;137.5V;24V;16.8V"
+     ]
+    },
+    {
+     "id": "4.7.1",
+     "label": "Serial interface test",
+     "values": [
+      "RS485",
+      "RS485",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.2",
+     "label": "GPS test",
+     "values": [
+      "1",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.3",
+     "label": "UPD time from WEB page test",
+     "values": [
+      "0",
+      "0",
+      "1",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.4",
+     "label": "RTC/Backup battery test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.5",
+     "label": "Mobile test",
+     "values": [
+      "1",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6",
+     "label": "Ethernet tests",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6.1",
+     "label": "Eth 0",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6.2",
+     "label": "Eth 1",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.7",
+     "label": "MVB test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8",
+     "label": "I/O tests",
+     "values": [
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8.1",
+     "label": "I/O test",
+     "values": [
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8.2",
+     "label": "24Vdc test",
+     "values": [
+      "Min: 22.8V; Max: 25.2V",
+      "Min: 22.8V; Max: 25.2V",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Min: 22.8V; Max: 25.2V",
+      "0"
+     ]
+    },
+    {
+     "id": "4.8",
+     "label": "Calibration",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.8.1.1",
+     "label": "AC 50Hz",
+     "values": [
+      "B1 25mA - B2 625mA (TB1/10R)",
+      "B1 25mA - B2 625mA (TB1/10R)",
+      "B1 25mA - B2 625mA (TB1/10R)",
+      "B1 100V - B2 800mA (TB3/3R33)",
+      "A1 25mA - A2 625mA (TB1/10R\nB1 25mA - B2 625mA (TB1/10R)",
+      "B1 100V - B2 800mA (TB3/3R33)",
+      "0",
+      "B1 100V - B2 800mA (TB3/3R33)",
+      "B1 100V - B2 800mA (TB3/3R33)"
+     ]
+    },
+    {
+     "id": "4.8.1.2",
+     "label": "AC 16,7Hz",
+     "values": [
+      "B1 25mA - B2 625mA (TB1/10R)",
+      "B1 25mA - B2 625mA (TB1/10R)",
+      "B1 25mA - B2 625mA (TB1/10R)",
+      "B1 100V - B2 800mA (TB3/3R33)",
+      "A1 25mA - A2 625mA (TB1/10R\nB1 25mA - B2 625mA (TB1/10R)",
+      "B1 100V - B2 800mA (TB3/3R33)",
+      "0",
+      "B1 100V - B2 800mA (TB3/3R33)",
+      "B1 100V - B2 800mA (TB3/3R33)"
+     ]
+    },
+    {
+     "id": "4.8.1.3",
+     "label": "DC",
+     "values": [
+      "A1 20mA - A2 20mA (TB5)",
+      "A1 20mA - A2 20mA (TB5)",
+      "0",
+      "A1 20mA - A2 1A (TB5)",
+      "0",
+      "0",
+      "B1 20mA - B2 20mA (TB5)",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.9",
+     "label": "Accuracy tests",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.9.1",
+     "label": "Protocol Converter xml",
+     "values": [
+      "REM102-G-G-AC1-W-8-4GS-O-000_test.xml",
+      "REM102_56602_026_01_test.xml",
+      "REM102-0-0-AC1-W-000_test.xml",
+      "REM102-DC2-AC2-W-4GS-000_test.xml",
+      "REM102-AC1-AC1-W-000_test.xml",
+      "REM102-DC2-AC2-W-4GS-000_test.xml",
+      "REM102_56602_024_01_test.xml",
+      "REM102_5.6602.006_09_test.xml",
+      "REM102_5.6602.025_01_test.xml"
+     ]
+    },
+    {
+     "id": "4.9.2",
+     "label": "AC 50Hz",
+     "values": [
+      "B1 25mA - B2 312.5mA (TB1/10R)",
+      "0",
+      "B1 25mA - B2 375mA (TB1/10R)",
+      "B1 166.67V - B2 1A (TB3/3R33)",
+      "A1 25mA - A2 250mA (TB1/10R)\nB1 25mA - B2 250mA (TB1/10R)",
+      "0",
+      "0",
+      "B1 166.7V - B2 1A (ref. 0.8) (TB3/3R33)",
+      "0"
+     ]
+    },
+    {
+     "id": "4.9.3",
+     "label": "AC 16,7Hz",
+     "values": [
+      "0",
+      "0",
+      "B1 15mA - B2 625mA (TB1/3R33)",
+      "B1 100V (ref. 166.67) - B2 1A (TB3/3R33)",
+      "0",
+      "B1 100V - B2 1A (TB3/3R33)",
+      "0",
+      "0",
+      "B1 100V - B2 1A (TB3/3R33)"
+     ]
+    },
+    {
+     "id": "4.9.4",
+     "label": "DC",
+     "values": [
+      "A1 20mA - A2 ±20mA (TB5)",
+      "A1 20mA - A2 ±20mA (TB5)",
+      "0",
+      "A1 35.714mA - A2 1.2A (TB5)",
+      "0",
+      "0",
+      "B1 20mA - B2 20mA (TB5)",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.10",
+     "label": "Display and LED test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.11",
+     "label": "Configuration Update",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.12",
+     "label": "Final Visual Inspection",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    }
+   ],
+   "history": [
+    {
+     "rev": "A00",
+     "author": "M. Elico",
+     "date": "2024-04-18",
+     "text": "First issue"
+    },
+    {
+     "rev": "A01",
+     "author": "Z. Sobków",
+     "date": "2024-05-29",
+     "text": "Updated parameters for step 4.7.1: \"RS485\""
+    },
+    {
+     "rev": "A02",
+     "author": "Z. Sobków",
+     "date": "2024-06-07",
+     "text": "Updated parameters for steps: \n4.9.2 \"CHB/(CH1_25mA - CH2_312.5mA)/TB1/10R\" to \"B1 25mA - B2 312.5mA (TB1/10R)\"\n4.9.4 \"CHA/(CH1_20mA - CH2_±20mA)/TB5\" to \"A1 20mA - A2 ±20mA (TB5)\""
+    },
+    {
+     "rev": "A03",
+     "author": "Z. Sobków",
+     "date": "2024-06-17",
+     "text": "Updated parameters for step: 4.6.1, 4.6.2, 4.7.8.2"
+    },
+    {
+     "rev": "A04",
+     "author": "J. Hrstka",
+     "date": "2024-08-13",
+     "text": "Updated parameters for step: 4.7.8.2"
+    },
+    {
+     "rev": "A05",
+     "author": "F.Commisso",
+     "date": "2024-08-20",
+     "text": "Added the model REM102-0-0-AC1-W-000 (5.6602.006/04)"
+    },
+    {
+     "rev": "A06",
+     "author": "F.Commisso",
+     "date": "2024-09-04",
+     "text": "Corrected the current absorption@16.8V for model 5.6602.022/01."
+    },
+    {
+     "rev": "A07",
+     "author": "F.Commisso",
+     "date": "2024-11-27",
+     "text": "Document aligned with Routine Test Procedure:\n- deleted the “4.3 DUT Configuration” row;\n- delete the “4.3.2 Keys Installation” row;\n- corrected  “4.3.1 FW Installation” to “4.3.3 FW Installation.”;\n- corrected “4.3.3 Field Engine Installation” to “4.3.4 Field Engine Installation.”;\n- corrected “4.3.4 Test Configuration” to “4.3.5 Test Configuration.”\n- Moved the Display and LED Test section to follow the Accuracy Tests.\n-  Set 4.7.3 UPD time from WEB page test for model 5.6602.006/04\n\nAdded the models:\n- REM102-DC2-AC2-W-4GS-000 (5.6602.007/03)\n- REM102-AC1-AC1-W-000 (5.6602.006.07)"
+    },
+    {
+     "rev": "A08",
+     "author": "F.Commisso",
+     "date": "2024-11-28",
+     "text": "Added Channel A information for Calibration and Accuracy Test of model REM102-AC1-AC1-W-000 (5.6602.006.07)"
+    },
+    {
+     "rev": "A09",
+     "author": "F.Commisso",
+     "date": "2025-01-09",
+     "text": "Added the model REM102-DC2-AC2-W-4GS-000 (5.6602.023/01)"
+    },
+    {
+     "rev": "A10",
+     "author": "V.Soffiatti / F.Commisso",
+     "date": "2025-02-03",
+     "text": "\"Additional Tests\" added"
+    },
+    {
+     "rev": "A11",
+     "author": "J.Hrstka / F.Commisso",
+     "date": "2025-02-20",
+     "text": "corrected ´´4.8.1.1. and 4.8.1.2 for devices (5.6602.007/03 and for device 5.6602.023/01)"
+    },
+    {
+     "rev": "A12",
+     "author": "F.Commisso",
+     "date": "2025-05-22",
+     "text": "Corrected \"4.3.4 Field Engine Installation\" for devices 5.6602.007/03 and 5.6602.023/01."
+    },
+    {
+     "rev": "A13",
+     "author": "M. Elico",
+     "date": "2026-02-11",
+     "text": "Added the model REM102-G-G-AC1-W-8-4GS-O-000 (5.6602.026/01)"
+    },
+    {
+     "rev": "A14",
+     "author": "M. Elico",
+     "date": "2026-02-17",
+     "text": "Removed the earth continuity test (not necessary) for the model REM102-G-G-AC1-W-8-4GS-O-000 (5.6602.026/01)"
+    },
+    {
+     "rev": "A15",
+     "author": "F. Commisso",
+     "date": "2026-03-09",
+     "text": "Added the model REM102-0-0-G-G-W-4GS-000 (5.6602.024/01)"
+    },
+    {
+     "rev": "A16",
+     "author": "F. Commisso",
+     "date": "2026-06-22",
+     "text": "Added the models REM102-DC2-AC2-W-4GS-O-000 (5.6602.006/09) and REM102-DC2-AC2-W-4GS-000 (5.6602.025/01)"
+    },
+    {
+     "rev": "A17",
+     "author": "F. Commisso",
+     "date": "2026-08-24",
+     "text": "Modified the accuracy test values for art. num. 5.6602.006/09"
+    }
+   ]
+  },
+  {
+   "id": "047",
+   "name": "5.2901.047J01",
+   "revision": "A51",
+   "releaser": null,
+   "released": null,
+   "file": "5.2901.047J01_REM102_RTO_A51.xlsx",
+   "models": [
+    {
+     "name": "REM102-DCAC-WR-001",
+     "art": [
+      "80002696"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-DCAC-WR-002",
+     "art": [
+      "80002771"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-000",
+     "art": [
+      "80002745"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-R00",
+     "art": [
+      "80002751"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-R03",
+     "art": [
+      "80002774"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-001",
+     "art": [
+      "80002772"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-ACAC-WR-000",
+     "art": [
+      "80002833"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-ACAC-WR-000",
+     "art": [
+      "5.6602.009/01, 5.6602.009/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-003",
+     "art": [
+      "80002841"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-DC-WR-001",
+     "art": [
+      "80002848"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-ACAC-WR-004",
+     "art": [
+      "80002916"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-002",
+     "art": [
+      "80002773"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-DC-WR-002",
+     "art": [
+      "80002903"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-DCAC-WR-003",
+     "art": [
+      "80002969"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-AC-WR-005",
+     "art": [
+      "5.6602.002/01, 5.6602.002/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-W-8-O-000",
+     "art": [
+      "5.6602.006/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-DCAC-WR-004",
+     "art": [
+      "80003030",
+      "5.6602.007/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-DCAC-WR-004",
+     "art": [
+      "5.6602.007/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-Q-T-W-G-000",
+     "art": [
+      "5.6602.010/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-MS-WR-S-0",
+     "art": [
+      "5.6602.005/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-G-G-N-T-W-8-GS-O-000",
+     "art": [
+      "5.6602.003/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-G-G-N-T-W-8-GS-O-000",
+     "art": [
+      "5.6602.012/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-R-O-W-8-4G-000",
+     "art": [
+      "5.6602.010/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-R-O-W-8-4G-000",
+     "art": [
+      "5.6602.011/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-R-O-W-4GS-000",
+     "art": [
+      "5.6602.011/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-R-O-W-4GS-000",
+     "art": [
+      "5.6602.006/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-Q-M-W-4GS-000",
+     "art": [
+      "5.6602.011/03"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-R-I-W-4GS-000",
+     "art": [
+      "5.6602.011/04"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-N-M-N-M-W-4GS-000",
+     "art": [
+      "5.6602.011/05"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-Q-P-W-4GS-000",
+     "art": [
+      "5.6602.011/06"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-V-T-W-M-GS-000",
+     "art": [
+      "5.6602.011/07"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-G-G-S-T-W-8-GS-O-000",
+     "art": [
+      "5.6602.013/01, 5.6602.013/02",
+      "5.6602.013/03, 5.6602.013/04"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-Q-P-W-000",
+     "art": [
+      "5.6602.014/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-R-T-R-T-W-M-4GS-000",
+     "art": [
+      "5.6602.015/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-G-G-W-M-4GS-000",
+     "art": [
+      "5.6602.012/02"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-G-G-N-M-RI-O-000",
+     "art": [
+      "5.6602.018/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-F-U-Q-O-W-8-4GS-000",
+     "art": [
+      "5.6602.010/04"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-G-G-RI-4GS-000",
+     "art": [
+      "5.6602.019/01"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-0-0-V-T-W-M-4GS-000",
+     "art": [
+      "5.6602.011/08"
+     ],
+     "accuracyClass": "0,5"
+    },
+    {
+     "name": "REM102-Q-P-Q-P-W-4GS-O-000",
+     "art": [
+      "5.6602.006/08"
+     ],
+     "accuracyClass": "0,5"
+    }
+   ],
+   "steps": [
+    {
+     "id": "4.1",
+     "label": "Initial Visual Inspection",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.2",
+     "label": "Pre-test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.3.1",
+     "label": "DUT Configuration",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.3.1.2",
+     "label": "Production RNT",
+     "values": [
+      "000178-RNT172-01 xx – October 26, 2017 – 12:00:00 UTC",
+      "000178-RNT172-01 xx – October 26, 2017 – 12:00:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "000178-RNT172-11/21/31 xx – October 26, 2017 – 12:00:00 UTC",
+      "000178-RNT172-11/21/31 xx – October 26, 2017 – 12:00:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "000178-RNT172-11/21/31 xx – October 26, 2017 – 12:00:00 UTC",
+      "000178-RNT172-11/21/31 xx – October 26, 2017 – 12:00:00 UTC",
+      "6231.01.21.04 – December 24, 2020 – 10:53:00 UTC",
+      "6241.00.06.03 - June 10, 2025 - 18:00:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.19.02 - June 27, 2019 - 09:00:00 UTC",
+      "6231.01.19.03 - October 17, 2019 - 16:00:00 UTC",
+      "6231.01.20.01 October 16, 2019 - 18:00:00 UTC",
+      "6231.01.20.01 October 16, 2019 - 18:00:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.19.02 - June 27, 2019 - 09:00:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.23.00 – July 28, 2021 – 09:10:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6221.01.21.00 – February 13, 2020 – 15:30:00 UTC"
+     ]
+    },
+    {
+     "id": "4.3.1.2",
+     "label": "Update RNT",
+     "values": [
+      "000178-RNT172-02 xx – October 26, 2017 – 12:00:00 UTC\n+\n000178-RNT248.sh",
+      "000178-RNT172-02 xx – October 26, 2017 – 12:00:00 UTC\n+\n000178-RNT248.sh",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "000178-RNT199-12/22/32 xx – December 14, 2018 – 10:00:00 UTC",
+      "000178-RNT172-02 xx – October 26, 2017 – 12:00:00 UTC\n+\n000178-RNT248.sh",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "000178-RNT172-02 xx – October 26, 2017 – 12:00:00 UTC\n+\n000178-RNT248.sh",
+      "000178-RNT172-02 xx – October 26, 2017 – 12:00:00 UTC\n+\n000178-RNT248.sh",
+      "6232.01.21.04 – December 24, 2020 – 10:53:00 UTC",
+      "6242.00.06.03 - June 10, 2025 - 18:00:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.19.02 - June 27, 2019 - 09:00:00 UTC",
+      "6232.01.19.03 - October 17, 2019 - 16:00:00 UTC",
+      "6232.01.20.01 October 16, 2019 - 18:00:00 UTC",
+      "6232.01.20.01 October 16, 2019 - 18:00:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.19.02 - June 27, 2019 - 09:00:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.23.00 – July 28, 2021 – 09:10:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6222.01.21.00 – February 13, 2020 – 15:30:00 UTC"
+     ]
+    },
+    {
+     "id": "4.3.1.2",
+     "label": "DSP Firmware Version",
+     "values": [
+      "02032205",
+      "02032205",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "02084405",
+      "02032205",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "02032205",
+      "02032205",
+      "0210A706",
+      "020C9705",
+      "0210A706",
+      "0210A706",
+      "020C9705",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "020C9705",
+      "0210A706",
+      "0210A706",
+      "0210C506",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706"
+     ]
+    },
+    {
+     "id": "4.3.1.3.1",
+     "label": "Test Config",
+     "values": [
+      "rem102-dcac-wr-001_test.cfg",
+      "rem102-dcac-wr-002_test.cfg",
+      "rem102-ac-wr-000_test.cfg",
+      "rem102-ac-wr-r00_test.cfg",
+      "rem102-ac-wr-r03_test.cfg",
+      "rem102-ac-wr-001_test.cfg",
+      "rem102-acac-wr-000_test.cfg",
+      "rem102-acac-wr-000_test.cfg",
+      "rem102-ac-wr-003_test.cfg",
+      "rem102-dc-wr-001_test.cfg",
+      "rem102-acac-wr-004_test.cfg",
+      "rem102-ac-wr-002_test.cfg",
+      "rem102-dc-wr-002_test.cfg",
+      "rem102-dcac-wr-003_test.cfg",
+      "rem102-ac-wr-005_test.cfg",
+      "rem102-w-8-o-000_test.cfg",
+      "rem102-dcac-wr-004_test.cfg",
+      "rem102-dcac-wr-004_test.cfg",
+      "rem102-0-0-q-t-w-g-000_test.cfg",
+      "rem102-ms-wr-s-0_test_AC.cfg\nrem102-ms-wr-s-0_test_DC.cfg",
+      "rem102-g-g-n-t-w-8-gs-o-000_test.cfg",
+      "rem102-g-g-n-t-w-8-gs-o-000_test.cfg",
+      "rem102-0-0-r-o-w-8-4g-000_test.cfg",
+      "rem102-0-0-r-o-w-8-4g-000_test.cfg",
+      "rem102-0-0-r-o-w-4gs-000_test.cfg",
+      "rem102-0-0-r-o-w-4gs-000_test.cfg",
+      "rem102-0-0-q-m-w-4gs-000_test.cfg",
+      "rem102-0-0-r-i-w-4gs-000_test.cfg",
+      "rem102-n-m-n-m-w-4gs-000_test.cfg",
+      "rem102-0-0-q-p-w-4gs-000_test.cfg",
+      "rem102-0-0-v-t-w-m-gs-000_test.cfg",
+      "rem102-g-g-s-t-w-8-gs-o-000_test.cfg",
+      "rem102-0-0-q-p-w-000_test.cfg",
+      "rem102-r-t-r-t-w-m-4gs-000_test.cfg",
+      "rem102-0-0-g-g-w-m-4gs-000_test.cfg",
+      "rem102-g-g-n-m-ri-o-000_test.cfg",
+      "rem102-f-u-q-o-w-8-4gs-000_test.cfg",
+      "rem102-0-0-g-g-ri-4gs-000_test.cfg",
+      "rem102-0-0-v-t-w-m-4gs-000_test.cfg",
+      "rem102-q-p-q-p-w-4gs-o-000.cfg"
+     ]
+    },
+    {
+     "id": "4.3.1.3.1",
+     "label": "Fieldbus",
+     "values": [
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "libremfb_sertst.so.sh",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-",
+      "-"
+     ]
+    },
+    {
+     "id": "4.4",
+     "label": "Insulation (test group)",
+     "values": [
+      "G1,G2,G3,G4,G5,G6,G7,\nG8,G9,G10,G11,G12,G13, G15",
+      "G1,G2,G3,G4,G5,G6,G7,\nG8,G9,G10,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G11bis,G12, G13",
+      "G1,G4,G5,G11,G12,G13,G14",
+      "G1,G2,G3,G4 ,G5,G6,G7,\nG8,G9,G10,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G13",
+      "G1,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G3bis,G5bis,G11,G11bis,G13",
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G4,G5,G11,G11bis,G12, G13",
+      "G1,G4,G5,G11,G11bis,G12, G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13,G14",
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G4,G5,G11,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13,G14",
+      "G1,G4,G5,G11,G12,G13,G14",
+      "G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G13",
+      "G1,G2,G3,G4,G5,G11,G11bis,G12,G13",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G11,G12,G13,G14",
+      "G1,G2,G3,G4 ,G5,G6,G7,\nG8,G9,G10,G11,G12,G13"
+     ]
+    },
+    {
+     "id": "4.4",
+     "label": "Insulation (test configuration)",
+     "values": [
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "B",
+      "B",
+      "A",
+      "A",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "A",
+      "A",
+      "A",
+      "A",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "A"
+     ]
+    },
+    {
+     "id": "4.5",
+     "label": "Burn In",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.6",
+     "label": "Power Supply Test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.6.1",
+     "label": "Current measurement",
+     "values": [
+      "24V / 110V / 137.5 V / 16.8V\n460mA/90mA/75mA/650mA",
+      "24V / 110V / 137.5 V / 16.8V\n460mA/90mA/75mA/650mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n440mA/94mA/75mA/670mA",
+      "24V / 110V / 137.5 V / 16.8V\n440mA/94mA/75mA/670mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA",
+      "24V / 110V / 137.5 V / 16.8V\n380mA/90mA/80mA/580mA"
+     ]
+    },
+    {
+     "id": "4.6.2",
+     "label": "Over- undervoltage",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.1",
+     "label": "Serial interface Test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.2",
+     "label": "GPS",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.3",
+     "label": "UPD time from WEB page",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.4",
+     "label": "RTC/Backup Battery Test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.5",
+     "label": "Mobile",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6",
+     "label": "Ethernet",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6.1",
+     "label": "Eth 0",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6.2",
+     "label": "Eth 1",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6.3",
+     "label": "Eth 2",
+     "values": [
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.7",
+     "label": "MVB",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8",
+     "label": "AC Channel 50Hz",
+     "values": [
+      "Ch B / TB1_TS / 10?",
+      "0",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TT",
+      "Ch B / TB1_TS / 10?",
+      "Ch A & B / TB1_SS / 10? / 100?",
+      "Ch A & B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_TS / 3.33?",
+      "0",
+      "Ch A & B / TB1_TT",
+      "Ch B / TB1_TS / 10?",
+      "0",
+      "Ch B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_SS / 10? / 100?",
+      "0",
+      "Ch B / TB1_TS/3.33?",
+      "Ch B / TB1_TS/3.33?",
+      "Ch B / TB1_TS/3.33?",
+      "Ch C (Ch B) / TB1_TS / 3.33?",
+      "Ch B / TB1_SS / 100? / 3.33?",
+      "Ch B / TB1_SS / 100? / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 10?",
+      "Ch B / TB1_TS / 10?",
+      "Ch A & B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_TT",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch A & Ch B / TB1_TS / 3.33?",
+      "0",
+      "Ch B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_TS / 3.33?",
+      "0",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch A & B / TB1_TT"
+     ]
+    },
+    {
+     "id": "4.7.8.1",
+     "label": "Calibration",
+     "values": [
+      "CH1_200V – CH2_200mA",
+      "0",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_200V – CH2_5A",
+      "CH1_200V – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_150V – CH2_1A",
+      "0",
+      "CH1_100V – CH2_5A",
+      "CH1_150V – CH2_250mA",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "0",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_167V – CH2_1A",
+      "CH1_200V – CH2_100mA",
+      "CH1_150V – CH2_250mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_200V – CH2_5A",
+      "CH1_62.5V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_200V – CH2_1A",
+      "0",
+      "CH1_62.5V – CH2_1A",
+      "CH1_200V – CH2_5A"
+     ]
+    },
+    {
+     "id": "4.7.8.2",
+     "label": "Accuracy Test",
+     "values": [
+      "CH1_200V – CH2_200mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_150V – CH2_1A",
+      "0",
+      "CH1_100V – CH2_5A",
+      "0",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "0",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "0",
+      "CH1_167V – CH2_1A",
+      "0",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "0",
+      "CH1_62.5V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_166,7V (Cal. 200V) – CH2_667mA",
+      "0",
+      "CH1_62.5V – CH2_1A",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8.3",
+     "label": "Multirange accuracy test",
+     "values": [
+      "0",
+      "0",
+      "Multi_CH1_150V – CH2_1A",
+      "Multi_CH1_150V – CH2_1A",
+      "Multi_CH1_200V – CH2_5A",
+      "Multi_CH1_200V – CH2_100mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Multi_CH1_150V – CH2_250mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Multi_CH1_150V – CH2_1A",
+      "0",
+      "Multi_CH1_200V – CH2_100mA",
+      "Multi_CH1_150V – CH2_250mA",
+      "0",
+      "Multi_CH1_200V – CH2_5A",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8.4",
+     "label": "Output test",
+     "values": [
+      "CH1_200V – CH2_200mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.9",
+     "label": "AC Channel 16Hz",
+     "values": [
+      "0",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TT",
+      "Ch B / TB1_TS / 10?",
+      "Ch A & B / TB1_SS / 10? / 100?",
+      "Ch A & B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_TS / 3.33?",
+      "0",
+      "Ch A & B / TB1_TT",
+      "Ch B / TB1_TS / 10?",
+      "0",
+      "Ch B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_SS / 10? / 100?",
+      "0",
+      "Ch B / TB1_TS/3.33?",
+      "Ch B / TB1_TS/3.33?",
+      "Ch B / TB1_TS/3.33?",
+      "Ch C (Ch B) / TB1_TS / 3.33?",
+      "Ch B / TB1_SS / 100? / 3.33?",
+      "Ch B / TB1_SS / 100? / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 10?",
+      "Ch B / TB1_TS / 10?",
+      "Ch A & B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_TT",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch A & Ch B / TB1_TS / 3.33?",
+      "0",
+      "Ch B / TB1_SS / 10? / 100?",
+      "Ch B / TB1_TS / 3.33?",
+      "0",
+      "Ch B / TB1_TS / 3.33?",
+      "Ch A & B / TB1_TT"
+     ]
+    },
+    {
+     "id": "4.7.9.1",
+     "label": "Calibration",
+     "values": [
+      "0",
+      "CH1_120V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_200V – CH2_5A",
+      "CH1_200V – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_150V – CH2_1A",
+      "0",
+      "CH1_100V – CH2_5A",
+      "CH1_150V – CH2_250mA",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "0",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_167V – CH2_1A",
+      "CH1_200V – CH2_100mA",
+      "CH1_150V – CH2_250mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_200V – CH2_5A",
+      "CH1_62.5V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_200V – CH2_1A",
+      "0",
+      "CH1_62.5V – CH2_1A",
+      "CH1_200V – CH2_5A"
+     ]
+    },
+    {
+     "id": "4.7.9.2",
+     "label": "Accuracy Test",
+     "values": [
+      "0",
+      "CH1_120V – CH2_1A",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "CH1_150V – CH2_1A",
+      "0",
+      "CH1_100V – CH2_5A",
+      "0",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_50mA – CH2_100mA",
+      "0",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.7V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_25mA – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "CH1_150V – CH2_1A",
+      "0",
+      "CH1_167V – CH2_1A",
+      "0",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "0",
+      "CH1_37.5V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "CH1_166.67V – CH2_1A",
+      "CH1_100V – CH2_1A",
+      "0",
+      "CH1_50mA – CH2_100mA",
+      "CH1_100V (Cal. 200V) – CH2_1A",
+      "0",
+      "CH1_37.5V – CH2_1A",
+      "CH1_100V (Cal. 200V) – CH2_5A"
+     ]
+    },
+    {
+     "id": "4.7.9.3",
+     "label": "Multirange accuracy test",
+     "values": [
+      "0",
+      "0",
+      "Multi_CH1_150V – CH2_1A",
+      "Multi_CH1_150V – CH2_1A",
+      "Multi_CH1_200V – CH2_5A",
+      "CH1_200V – CH2_100mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Multi_CH1_150V – CH2_250mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Multi_CH1_150V – CH2_1A",
+      "0",
+      "CH1_200V – CH2_100mA",
+      "Multi_CH1_150V – CH2_250mA",
+      "0",
+      "Multi_CH1_200V – CH2_5A",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.9.4",
+     "label": "Output test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.10",
+     "label": "DC Channel",
+     "values": [
+      "Ch A / TB2",
+      "Ch A / TB2",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Ch B / TB2",
+      "0",
+      "0",
+      "Ch B / TB2",
+      "Ch A / TB2",
+      "0",
+      "0",
+      "Ch A / TB2",
+      "Ch A / TB2",
+      "0",
+      "Ch C (Ch A) / TB2",
+      "Ch A / TB2",
+      "Ch A / TB2",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Ch A / TB2",
+      "0",
+      "0",
+      "Ch B / TB2",
+      "Ch A / TB2",
+      "Ch A / TB2",
+      "Ch B / TB2",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.10.1",
+     "label": "Calibration",
+     "values": [
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "CH1_50mA – CH2_±1.2A",
+      "CH1_50mA – CH2_±1.2A",
+      "0",
+      "CH1_50mA - CH2_±200mA",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_50mA – CH2_±2A",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.10.2",
+     "label": "Accuracy Test",
+     "values": [
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "CH1_50mA – CH2_±1.2A",
+      "CH1_50mA – CH2_±1.2A",
+      "0",
+      "CH1_50mA - CH2_±200mA",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_20mA – CH2_±20mA",
+      "CH1_35,714mA – CH2_±800mA",
+      "CH1_20mA – CH2_±20mA",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.10.3",
+     "label": "Output test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.11",
+     "label": "Input/Output 24Vdc Test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Min: 22.8V; Max: 25.2V",
+      "Min: 22.8V; Max: 25.2V",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Min: 22.8V; Max: 25.2V",
+      "0",
+      "0",
+      "0",
+      "Min: 22.8V; Max: 25.2V",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.12",
+     "label": "Input Test",
+     "values": [
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.13",
+     "label": "Input Output Test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.14",
+     "label": "Display and LED Test",
+     "values": [
+      "Display & Front Panel LEDs",
+      "Display & Front Panel LEDs",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display",
+      "Display"
+     ]
+    },
+    {
+     "id": "4.8",
+     "label": "Final Operation",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.8.1",
+     "label": "Firmware update",
+     "values": [
+      "0",
+      "0",
+      "Refer to project folder",
+      "Refer to project folder",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Refer to project folder",
+      "Refer to project folder",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "Refer to project folder",
+      "Refer to project folder",
+      "0",
+      "0",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "0",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder",
+      "Refer to project folder"
+     ]
+    },
+    {
+     "id": "4.9",
+     "label": "Final Visual Inspection",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    }
+   ],
+   "history": [
+    {
+     "rev": "A00",
+     "author": "C. Arm",
+     "date": "2018-06-11",
+     "text": "First issue. Based on Saira revision\n002.0.AQ 21/05/2018 (000178-RTP001)."
+    },
+    {
+     "rev": "A01",
+     "author": "M.Racek",
+     "date": "2018-10-12",
+     "text": "Corrected cell N13 - list of insulation test groups for model ACAC-WR-004, completed with digital I/O groups"
+    },
+    {
+     "rev": "A02",
+     "author": "F. Frühwirt",
+     "date": "2018-11-01",
+     "text": "Added Pre-test\nChange chapter numbers\nAdded Multi_xxxxxxx\nAdded HV group"
+    },
+    {
+     "rev": "A03",
+     "author": "F. Frühwirt, G. Bissoli",
+     "date": "2018-12-19",
+     "text": "Added REM102-AC-WR-005 model\nAdded UPD time from WEB page Update chapter number"
+    },
+    {
+     "rev": "A04",
+     "author": "G. Bissoli",
+     "date": "2019-02-11",
+     "text": "Update REM102-AC-WR-005 parameters: \n- Production RNT\n- Update RNT\n- DSP Firmware Version"
+    },
+    {
+     "rev": "A05",
+     "author": "N. Zampieri, D. Pavlíček, M. Racek",
+     "date": "2019-07-03",
+     "text": "Added:\nREM102-W-8-O-000\nREM102-DCAC-WR-004\nAdded article number 5.6602.009/01\nAdded Fieldbus row, GPStest set to 0 for REM102-AC-WR-003"
+    },
+    {
+     "rev": "A06",
+     "author": "N. Zampieri, D. Pavlíček, M. Racek, Z. Buchta",
+     "date": "2019-08-23",
+     "text": "Added:\nREM102-MS-WR-S-0"
+    },
+    {
+     "rev": "A07",
+     "author": "N. Zampieri, D. Pavlíček",
+     "date": "2019-10-24",
+     "text": "Changed RNT and DPS Firmware for             REM102-MS-WR-S-0"
+    },
+    {
+     "rev": "A08",
+     "author": "D. Pavlíček",
+     "date": "2020-01-20",
+     "text": "Changed RNT and DPS Firmware for             REM102-0-0-Q-T-W-G-000"
+    },
+    {
+     "rev": "A09",
+     "author": "N. Zampieri",
+     "date": "2020-02-04",
+     "text": "Added:\nREM102-G-G-N-T-W-8-GS-O-000\nAdded chapters:\n4.7.11 - Input/Output 24Vdc Test\n4.8.1 - Firmware update\nAdded:\nindication of \"test configuration\" for 4.4 Insulation test"
+    },
+    {
+     "rev": "A10",
+     "author": "N. Zampieri",
+     "date": "2020-02-26",
+     "text": "Modified Production RNT, Update RNT and DSP Firmware Version to manage new GPS module of devices:\nREM102-AC-WR-000\nREM102-DCAC-WR-004\nREM102-DC-WR-001"
+    },
+    {
+     "rev": "A11",
+     "author": "N. Zampieri",
+     "date": "2020-03-12",
+     "text": "Modified \"4.8.1 - Firmware update\" for device:\nREM102-G-G-N-T-W-8-GS-O-000\n\nAdded:\n- article number:\n5.6602.007/02\n\n- models:\nREM102-0-0-R-O-W-8-4G-000\nREM102-0-0-R-O-W-4GS-000\nREM102-0-0-Q-M-W-8-4GS-000\nREM102-0-0-R-I-W-4GS-000\nREM102-N-M-N-M-W-4GS-000\nREM102-0-0-Q-P-W-4GS-000"
+    },
+    {
+     "rev": "A12",
+     "author": "J.-E. Andersson",
+     "date": "2020-03-30",
+     "text": "Added revision B to REM102-G-G-N-T-W-8-GS-O-000 (5.6602.003/01), because EN50463:2017 certified."
+    },
+    {
+     "rev": "A13",
+     "author": "M. Racek",
+     "date": "2020-04-22",
+     "text": "Corrected ETH0,1,2 test chapter numbers"
+    },
+    {
+     "rev": "A14",
+     "author": "N. Zampieri, M. Racek",
+     "date": "2020-05-13",
+     "text": "Added article number 5.6602.012/01\nMoved article number 5.6602.007/02 to new column"
+    },
+    {
+     "rev": "A15",
+     "author": "N. Zampieri, M. Racek",
+     "date": "2020-06-09",
+     "text": "Updated parameter \"4.8.1 - Firmware Update\" for article number 80002751"
+    },
+    {
+     "rev": "A16",
+     "author": "N. Zampieri",
+     "date": "2020-06-16",
+     "text": "- Updated parameter \"4.8.1 - Firmware Update\" for article number 5.6602.012/01\n - Added revision B to REM102-G-G-N-T-W-8-GS-O-000 (5.6602.012/01), because EN50463:2017 certified."
+    },
+    {
+     "rev": "A17",
+     "author": "N. Zampieri",
+     "date": "2020-07-28",
+     "text": "- Modified § 4.7.3 for devices:\nREM102-AC-WR-003\nREM102-0-0-R-O-W-8-4G-000\n - Added article number 5.6602.010/02 to\nREM102-0-0-R-O-W-8-4G-000\n - Modified § 4.4 for device\nREM102-0-0-R-O-W-8-4G-000\n - Modified Production RNT and Update RNT for device REM102-0-0-R-O-W-8-4G-000"
+    },
+    {
+     "rev": "A18",
+     "author": "N. Zampieri",
+     "date": "2020-07-30",
+     "text": "Modified §4.5.1.2 for devices:\nREM102-AC-WR-R00\nREM102-AC-WR-002\nREM102-AC-WR-R03\nREM102-AC-WR-001\nREM102-ACAC-WR-000"
+    },
+    {
+     "rev": "A19",
+     "author": "N. Zampieri",
+     "date": "2020-08-24",
+     "text": "Modified §4.8.1 for device\n5.6602.012/01\nAdded device 5.6602.011/07"
+    },
+    {
+     "rev": "A20",
+     "author": "N. Zampieri",
+     "date": "2020-10-26",
+     "text": "Modified §4.8.1 for article numbers:\n - 5.6602.003/01_B\n - 5.6602.011/03\n - 5.6602.011/04\nFixed typo in §4.5.1.2 for article numbers:\n - 5.6602.011/02\n - 5.6602.011/03\n - 5.6602.011/04\n - 5.6602.011/05\n - 5.6602.011/06\nAdded Model: REM102-G-G-S-T-W-8-GS-O-000"
+    },
+    {
+     "rev": "A21",
+     "author": "N. Zampieri",
+     "date": "2020-11-19",
+     "text": "- Added Model:\nREM102-0-0-Q-P-W-000\n - Added article number:\n5.6602.006/02\n - Removed (_B) HW version indication from Model Identifier for devices:\nREM102-G-G-N-T-W-8-GS-O-000\n - Modified \"4.8.1 Firmware update\" version for:\n80002745\n80002751\n - Modified insulation test configuration for Models:\nREM102-DCAC-WR-004\nREM102-0-0-R-O-W-4GS-000"
+    },
+    {
+     "rev": "A22",
+     "author": "N. Zampieri",
+     "date": "2020-11-27",
+     "text": "Modified §4.5.1.2 for article number 80002916\nModified §4.8.1 for article numbers:\n - 80002916\n - 5.6602.011/02"
+    },
+    {
+     "rev": "A23",
+     "author": "N. Zampieri",
+     "date": "2020-11-30",
+     "text": "Modified for article number 5.6602.014/01:\n - §4.7.3 UPD time from WEB page\n - Calibration and Accuracy Test values for AC Channel 50Hz and AC Channel 16Hz"
+    },
+    {
+     "rev": "A24",
+     "author": "N. Zampieri",
+     "date": "2020-12-15",
+     "text": "Modified §4.8.1 \"Firmware update\" for article numbers:\n - 5.6602.011/01\n - 5.6602.011/06"
+    },
+    {
+     "rev": "A25",
+     "author": "N. Zampieri",
+     "date": "2021-02-15",
+     "text": "- Added Model:\nREM102-R-T-R-T-W-M-4GS-000"
+    },
+    {
+     "rev": "A26",
+     "author": "N. Zampieri",
+     "date": "2021-03-18",
+     "text": "Modified §4.8.1 \"Firmware update\" for article numbers:\n - 5.6602.014/01\n - 5.6602.011/05"
+    },
+    {
+     "rev": "A27",
+     "author": "N. Zampieri",
+     "date": "2021-04-13",
+     "text": "Modified §4.5.1.2 for model REM102-AC-WR-005"
+    },
+    {
+     "rev": "A28",
+     "author": "N. Zampieri",
+     "date": "2021-05-11",
+     "text": "- Added Model:\nREM102-0-0-Q-T-W-4GS-O-000"
+    },
+    {
+     "rev": "A29",
+     "author": "N. Zampieri",
+     "date": "2021-06-04",
+     "text": "Added Models:\n - REM102-G-G-N-M-RI-O-000\n - REM102-0-0-G-G-W-M-4GS-000\nModified § 4.7.11, 4.7.12 and 4.7.13 of\nREM102-0-0-Q-T-W-4GS-O-000"
+    },
+    {
+     "rev": "A30",
+     "author": "N. Zampieri",
+     "date": "2021-06-10",
+     "text": "Modified § 4.5.1.2, 4.7.3 and 4.8.1 of\nREM102-G-G-N-M-RI-O-000"
+    },
+    {
+     "rev": "A31",
+     "author": "N. Zampieri",
+     "date": "2021-06-17",
+     "text": "Modified §4.8.1 \"Firmware update\" for article number 5.6602.014/01"
+    },
+    {
+     "rev": "A32",
+     "author": "S. Montresor",
+     "date": "2021-08-09",
+     "text": "Modified §4.5.1.2  for article number 5.6602.018/01"
+    },
+    {
+     "rev": "A33",
+     "author": "Z Sobków",
+     "date": "2021-08-13",
+     "text": "Modified §4.7.9.1 (Calibration 16Hz) and §4.8.1 (Firmware update) for article number 5.6602.016/01"
+    },
+    {
+     "rev": "A34",
+     "author": "J. Pimper\nN. Zampieri",
+     "date": "2021-08-04",
+     "text": "- Swap positons of following chapters according to Routine test procedure 5.2901.047JEN\n - Modified §4.3.1.2 of REM102-G-G-N-M-RI-O-000\n - Modified §4.7.9.1 and 4.8.1 of REM102-0-0-Q-T-W-4GS-O-000"
+    },
+    {
+     "rev": "A35",
+     "author": "N. Zampieri",
+     "date": "2021-09-10",
+     "text": "Added model:\nREM102-F-U-Q-O-W-8-4GS-000"
+    },
+    {
+     "rev": "A36",
+     "author": "N. Zampieri",
+     "date": "2021-10-08",
+     "text": "Modified §4.8.1 for article number 80002848"
+    },
+    {
+     "rev": "A37",
+     "author": "N. Zampieri",
+     "date": "2021-12-06",
+     "text": "Added model:\nREM102-0-0-F-C-W-000"
+    },
+    {
+     "rev": "A38",
+     "author": "N. Zampieri",
+     "date": "2021-12-10",
+     "text": "Updated §2.3; 4.7.10 of model REM102-0-0-F-C-W-000"
+    },
+    {
+     "rev": "A39",
+     "author": "N. Zampieri",
+     "date": "2022-02-16",
+     "text": "Updated §4.8.1 of model REM102-0-0-F-C-W-000"
+    },
+    {
+     "rev": "A40",
+     "author": "N. Zampieri",
+     "date": "2022-02-23",
+     "text": "Modified §4.8.1 \"Firmware update\" for article number 5.6602.007/01 and 5.6602.007/02"
+    },
+    {
+     "rev": "A41",
+     "author": "M. Elico",
+     "date": "2022-05-16",
+     "text": "Added model:\nREM102-0-0-G-G-RI-4GS-000"
+    },
+    {
+     "rev": "A42",
+     "author": "G. Bissoli",
+     "date": "2022-08-11",
+     "text": "Modified §4.8.1 \"Firmware update\" for article number \n- 5.6602.011/07\n- 5.6602.010/02\n- 5.6602.015/01\nModified Identification code for article number\n- 5.6602.011/07 (AC Interface R-T is now interface V-T - typo: HW is confirmed valid)"
+    },
+    {
+     "rev": "A43",
+     "author": "Z. Sobków",
+     "date": "2022-10-05",
+     "text": "5.6602.011/07: \nUpdated decimal character for calibration and accuracy parameters"
+    },
+    {
+     "rev": "A44",
+     "author": "Z. Sobków",
+     "date": "2022-10-26",
+     "text": "Cleaned data structure"
+    },
+    {
+     "rev": "A45",
+     "author": "F. Commisso",
+     "date": "2023-05-15",
+     "text": "Removed the following models since moved to 5.2901.048J01-REM102-RTO:\n- 5.6602.016/01\n- 5.6602.015/02\n\nAdded the models:\n- 5.6602.011/08 (REM102-0-0-V-T-W-M-4GS-000 )\n- 5.6602.020/01 (REM102-0-0-G-G-W-M-4GS-000)"
+    },
+    {
+     "rev": "A46",
+     "author": "F. Commisso",
+     "date": "2023-05-23",
+     "text": "Removed the model  5.6602.020/01 since moved to 5.2901.048J01-REM102-RTO"
+    },
+    {
+     "rev": "A47",
+     "author": "F. Commisso",
+     "date": "2024-01-23",
+     "text": "Model 5.6602.011/08: added the calibration and accuracy values@16Hz; corrected the test config file."
+    },
+    {
+     "rev": "A48",
+     "author": "J. Hrstka",
+     "date": "2024-08-16",
+     "text": "Updated parameters for step: 4.7.11"
+    },
+    {
+     "rev": "A49",
+     "author": "F. Commisso",
+     "date": "2025-05-08",
+     "text": "Added model:\nREM102-Q-P-Q-P-W-4GS-O-000 (5.6602.006/08)"
+    },
+    {
+     "rev": "A50",
+     "author": "F. Commisso",
+     "date": "2025-07-23",
+     "text": "Updated SW version for model REM102-W-8-O-000 (5.6602.006/01)"
+    },
+    {
+     "rev": "A51",
+     "author": "F. Commisso",
+     "date": "2025-11-19",
+     "text": "Updated step 4.8.1 for all devices in order to refer to project folder instead of specific software versions."
+    }
+   ]
+  },
+  {
+   "id": "048",
+   "name": "5.2901.048J01",
+   "revision": "A13",
+   "releaser": "Z. Buchta",
+   "released": "2026-05-27",
+   "file": "5.2901.048J01_REM102_RTO_A13.xlsx",
+   "models": [
+    {
+     "name": "REM102-0-0-Q-T-W-4GS-O-000",
+     "art": [
+      "5.6602.016/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-F-C-W-000",
+     "art": [
+      "5.6602.015/02"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-Q-T-W-8-4GS-O-000",
+     "art": [
+      "5.6602.006/03"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-G-G-W-M-4GS-000",
+     "art": [
+      "5.6602.020/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-G-G-W-4GS-000",
+     "art": [
+      "5.6602.021/01"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-Q-T-W-8-4GS-O-000",
+     "art": [
+      "5.6602.006/05"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-Q-T-W-8-4GS-O-000",
+     "art": [
+      "5.6602.006/06"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-F-U-Q-O-W-4GS-000-1",
+     "art": [
+      "5.6602.010/06"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-R-T-R-T-W-M-4GS-000",
+     "art": [
+      "5.6602.015/03"
+     ],
+     "accuracyClass": null
+    },
+    {
+     "name": "REM102-0-0-V-T-W-M-4GS-000",
+     "art": [
+      "5.6602.020/02"
+     ],
+     "accuracyClass": null
+    }
+   ],
+   "steps": [
+    {
+     "id": "4.1",
+     "label": "Initial Visual Inspection",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.2",
+     "label": "Pre-test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.3",
+     "label": "DUT Configuration",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.3.2",
+     "label": "Production RNT",
+     "values": [
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6231.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC"
+     ]
+    },
+    {
+     "id": "4.3.2",
+     "label": "Update RNT",
+     "values": [
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00 – February 13, 2020 – 15:30:00 UTC",
+      "6232.01.21.00\nFebruary 13, 2020 – 15:30:00 UTC"
+     ]
+    },
+    {
+     "id": "4.3.2",
+     "label": "DSP Firmware Version",
+     "values": [
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706",
+      "0210A706"
+     ]
+    },
+    {
+     "id": "4.3.3",
+     "label": "Test Configuration",
+     "values": [
+      "rem102-0-0-q-t-w-4gs-000_test.cfg",
+      "rem102-0-0-f-c-w-000_test.cfg",
+      "rem102-0-0-q-t-w-8-4gs-o-000_test.cfg",
+      "rem102-0-0-g-g-w-m-4gs-000_test.cfg",
+      "rem102-0-0-g-g-w-4gs-000_test.cfg",
+      "rem102-0-0-q-t-w-8-4gs-o-000_test.cfg",
+      "rem102-0-0-q-t-w-8-4gs-o-000_test.cfg",
+      "rem102-f-u-q-o-w-4gs-000-1_test.cfg",
+      "rem102-r-t-r-t-w-m-4gs-000_test.cfg",
+      "rem102-0-0-v-t-w-m-4gs-000_test.cfg"
+     ]
+    },
+    {
+     "id": "4.4.1",
+     "label": "Insulation (test groups)",
+     "values": [
+      "G1,G4,G5,G6,G7,G8,G9,G10,G11,G12,G13",
+      "G1,G4,G5,G11,G13",
+      "G1,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G4,G5,G11,G12,G13,G14",
+      "G1,G4,G5,G11,G12,G13",
+      "G1,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G4,G5,G6,G7,G8,G9,G10,G11,G11bis,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13",
+      "G1,G2,G3,G4,G5,G11,G12,G13,G14",
+      "G1,G4,G5,G11,G12,G13,G14"
+     ]
+    },
+    {
+     "id": "4.4.2",
+     "label": "Insulation (test configuration)",
+     "values": [
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B"
+     ]
+    },
+    {
+     "id": "4.5",
+     "label": "Burn-in",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.6",
+     "label": "Power supply tests",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.6.1",
+     "label": "Current measurement",
+     "values": [
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA",
+      "24V / 110V / 137.5 V / 16.8V\n490mA/94mA/75mA/710mA"
+     ]
+    },
+    {
+     "id": "4.6.2",
+     "label": "Over-undervoltage",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.1",
+     "label": "Serial interface test",
+     "values": [
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.2",
+     "label": "GPS test",
+     "values": [
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.3",
+     "label": "UPD time from WEB page test",
+     "values": [
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.4",
+     "label": "RTC/Backup battery test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.5",
+     "label": "Mobile test",
+     "values": [
+      "1",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6",
+     "label": "Ethernet tests",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6",
+     "label": "Eth 0",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.6",
+     "label": "Eth 1",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.7",
+     "label": "MVB test",
+     "values": [
+      "0",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.7.8",
+     "label": "I/O tests",
+     "values": [
+      "1",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8.1",
+     "label": "I/O test",
+     "values": [
+      "1",
+      "0",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.8.2",
+     "label": "24Vdc test",
+     "values": [
+      "Min: 22.8V; Max: 25.2V",
+      "0",
+      "Min: 22.8V; Max: 25.2V",
+      "Min: 22.8V; Max: 25.2V",
+      "Min: 22.8V; Max: 25.2V",
+      "Min: 22.8V; Max: 25.2V",
+      "Min: 22.8V; Max: 25.2V",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.7.9",
+     "label": "Display and LED test",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.8",
+     "label": "Calibration",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.8.1",
+     "label": "AC 50Hz",
+     "values": [
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "0",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "0",
+      "0",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "CHA/(CH1_150V – CH2_2A)/TB4\nCHB/(CH1_150V – CH2_2A)/TB4",
+      "CHB/(CH1_75V - CH2_1A)/TB3/3R33"
+     ]
+    },
+    {
+     "id": "4.8.2",
+     "label": "AC 16,7Hz",
+     "values": [
+      "CHB/(CH1_120V (Cal. 200V) -CH2_1A)/TB3/3R33",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "CHA/(CH1_150V – CH2_2A)/TB4\nCHB/(CH1_150V – CH2_2A)/TB4",
+      "CHB/(CH1_75V - CH2_1A)/TB3/3R33"
+     ]
+    },
+    {
+     "id": "4.8.3",
+     "label": "DC",
+     "values": [
+      "0",
+      "CHB/(CH1_400mA - CH2_±400mA)/TB5",
+      "0",
+      "CHB/(CH1_20mA – CH2_±20mA)/TB5",
+      "CHB/(CH1_20mA – CH2_±20mA)/TB5",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.9",
+     "label": "Firmware Update",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.10",
+     "label": "Accuracy tests",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.10.2",
+     "label": "AC 50Hz",
+     "values": [
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "0",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "0",
+      "0",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "CHB/(CH1_200V - CH2_1A)/TB3/3R33",
+      "CHB/(CH1_166.7V - CH2_1A)/TB3/3R33",
+      "CHA/(CH1_100V – CH2_1A)/TB3/3R33\nCHB/(CH1_100V – CH2_1A)/TB3/3R33",
+      "CHB/(CH1_62.5V - CH2_1A)/TB3/3R33"
+     ]
+    },
+    {
+     "id": "4.10.3",
+     "label": "AC 16,7Hz",
+     "values": [
+      "CHB/(CH1_120V (Cal. 200V) - CH2_1A)/TB3/3R33",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.10.4",
+     "label": "DC",
+     "values": [
+      "0",
+      "CHB/(CH1_50mA - CH2_±400mA)/TB5",
+      "0",
+      "CHB/(CH1_20mA – CH2_±20mA)/TB5",
+      "CHB/(CH1_20mA – CH2_±20mA)/TB5",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "id": "4.11",
+     "label": "Configuration Update",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    },
+    {
+     "id": "4.12",
+     "label": "Final Visual Inspection",
+     "values": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+     ]
+    }
+   ],
+   "history": [
+    {
+     "rev": "A00",
+     "author": "N. Zampieri",
+     "date": "2022-02-18",
+     "text": "First issue"
+    },
+    {
+     "rev": "A01",
+     "author": "N. Zampieri",
+     "date": "2022-03-30",
+     "text": "General review\nModified calibration values for REM102-0-0-Q-T-W-4GS-O-000"
+    },
+    {
+     "rev": "A02",
+     "author": "M. Elico/G.Bissoli",
+     "date": "2022-10-14",
+     "text": "HaslerRail article number field added;\nModel REM102-0-0-Q-T-W-8-4GS-O-000 added"
+    },
+    {
+     "rev": "A03",
+     "author": "G.Bissoli",
+     "date": "2022-12-01",
+     "text": "Eliminate calibration and accuracy AC 16,7Hz  for Model REM102-0-0-Q-T-W-8-4GS-O-000"
+    },
+    {
+     "rev": "A04",
+     "author": "G.Bissoli",
+     "date": "2022-12-01",
+     "text": "Modified .cfg file for Model REM102-0-0-Q-T-W-8-4GS-O-000"
+    },
+    {
+     "rev": "A05",
+     "author": "F. Commisso",
+     "date": "2023-05-26",
+     "text": "Removed the following models since they follow the 5.2901.047JEN-REM102 Routine Test Procedure:\n- REM102-G-G-N-T-W-8-GS-O-000 (5.6602.003/01; 5.6602.012/0)\n- REM102-G-G-S-T-W-8-GS-O-000 (5.6602.013/0x)\n- REM102-0-0-Q-P-W-000 (5.6602.014/01)\n\nModified §4.8.1; 4.8.2; 4.8.3; 4.10.2; 4.10.3; 4.10.4 in accordance to new agreed format and to new certification procedure, for the following models:\n-REM102-0-0-Q-T-W-4GS-O-000 (5.6602.016/01)\n-REM102-0-0-F-C-W-000 (5.6602.015/02)\n-REM102-0-0-Q-T-W-8-4GS-O-000 (5.6602.006/03)\n\nAdded the model REM102-0-0-G-G-W-M-4GS-000 (5.6602.020/01)"
+    },
+    {
+     "rev": "A06",
+     "author": "F. Commisso",
+     "date": "2023-06-12",
+     "text": "Added the model REM102-0-0-AC1-W-000 (5.6602.006/04)"
+    },
+    {
+     "rev": "A07",
+     "author": "F. Commisso",
+     "date": "2023-11-10",
+     "text": "Added the model REM102-0-0-G-G-W-4GS-000 (5.6602.021/01)"
+    },
+    {
+     "rev": "A08",
+     "author": "F. Commisso",
+     "date": "2024-04-12",
+     "text": "Added the model REM102-0-0-Q-T-W-8-4GS-O-000 (5.6602.006/05)"
+    },
+    {
+     "rev": "A09",
+     "author": "F. Commisso",
+     "date": "2024-05-22",
+     "text": "Added the model REM102-0-0-Q-T-W-8-4GS-O-000 (5.6602.006/06)"
+    },
+    {
+     "rev": "A10",
+     "author": "J. Hrstka",
+     "date": "2024-08-16",
+     "text": "Modified §4.7.8.2"
+    },
+    {
+     "rev": "A11",
+     "author": "F. Commisso",
+     "date": "2024-08-20",
+     "text": "Removed the model REM102-0-0-AC1-W-000 (5.6602.006/04) since it follows the 5.2901.046JEN-REM102 Routine Test Procedure.\nAdded the model REM102-F-U-Q-O-W-4GS-000-1 (5.6602.010/06)"
+    },
+    {
+     "rev": "A12",
+     "author": "F. Commisso",
+     "date": "2025-06-05",
+     "text": "Added the model  REM102-R-T-R-T-W-M-4GS-000 (5.6602.015/03)"
+    },
+    {
+     "rev": "A13",
+     "author": "F. Commisso",
+     "date": "2026-05-25",
+     "text": "Added the model REM102-0-0-V-T-W-M-4GS-000 (5.6602.020/02)"
+    }
+   ]
+  }
+ ]
+}

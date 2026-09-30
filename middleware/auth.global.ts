@@ -4,6 +4,7 @@ function getRequiredPermission(path: string): keyof NavPermissions | null {
   if (path === '/') return 'overview'
   if (path.startsWith('/test-results')) return 'results'
   if (path.startsWith('/results-db'))  return 'results'
+  if (path.startsWith('/rto-viewer'))  return 'results'
   if (path.startsWith('/device-config')) return 'config'
   if (path.startsWith('/device-status')) return 'deviceStatus'
   if (path.startsWith('/station-schema')) return 'stationSchema'
@@ -16,6 +17,10 @@ function getRequiredPermission(path: string): keyof NavPermissions | null {
 export default defineNuxtRouteMiddleware((to) => {
   // Ignore WebSocket upgrade paths and internal Nuxt paths
   if (to.path.startsWith('/_') || to.path === '/ws') return
+
+  // Dev-only: the RTO viewer is static data, so skip login when running `npm run dev`
+  // (import.meta.dev is false in production builds).
+  if (import.meta.dev && to.path.startsWith('/rto-viewer')) return
 
   const auth = useAuthStore()
 
