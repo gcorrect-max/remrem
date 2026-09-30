@@ -4,6 +4,7 @@ function getRequiredPermission(path: string): keyof NavPermissions | null {
   if (path === '/') return 'overview'
   if (path.startsWith('/test-results')) return 'results'
   if (path.startsWith('/results-db'))  return 'results'
+  if (path.startsWith('/rto-viewer'))  return 'results'
   if (path.startsWith('/device-config')) return 'config'
   if (path.startsWith('/device-status')) return 'deviceStatus'
   if (path.startsWith('/station-schema')) return 'stationSchema'
