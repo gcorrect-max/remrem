@@ -30,9 +30,10 @@
               <option value="all">model + article no.</option>
               <option value="model">model</option>
               <option value="art">article no.</option>
+              <option value="tail">article no. ending (e.g. 013/01)</option>
             </select>
           </label>
-          <input v-model="mq" type="text" :placeholder="mqField === 'model' ? 'Model name…' : mqField === 'art' ? 'Article number, e.g. 5.6602.006…' : 'Model or article number…'" class="rail-input max-w-xs" />
+          <input v-model="mq" type="text" :placeholder="mqField === 'model' ? 'Model name…' : mqField === 'art' ? 'Article number, e.g. 5.6602.006…' : mqField === 'tail' ? 'Last digits, e.g. 013/01' : 'Model or article number…'" class="rail-input max-w-xs" />
           <label class="flex items-center gap-2 font-mono text-[10px] text-rail-dim">
             show
             <select v-model="dupFilter" class="rail-input w-auto">
@@ -458,19 +459,31 @@ const dupStats = {
 }
 const dupRef = (rs: Row[]) => rs.map(x => `${x.doc} #${x.pos}`).join(', ')
 const mq = ref('')
-const mqField = ref<'all' | 'model' | 'art'>('all')
+const mqField = ref<'all' | 'model' | 'art' | 'tail'>('all')
 const dupFilter = ref('all')
 const regCols = [{ key: 'model', label: 'Model' }, { key: 'art', label: 'Article no.' }, { key: 'doc', label: 'RTO' }]
 const regSort = ref<{ key: string; dir: 1 | -1 }>({ key: 'model', dir: 1 })
 const sortBy = (key: string) => { regSort.value = { key, dir: regSort.value.key === key ? (-regSort.value.dir as 1 | -1) : 1 } }
 const sameArtSet = (a: Row, b: Row) => keyOf(a.arts.join()) === keyOf(b.arts.join())
+// "5.6602.013/01" -> tail "013/01"; SAP numbers (80002833) have no prefix, so the tail is the whole number.
+// Separators in the query (space, dot, dash) are treated as "/", so "013 01" finds 013/01.
+const artTail = (a: string) => a.replace(/^\d+\.\d+\./, '')
+const tailHit = (r: Row, needle: string) => {
+  const n = needle.replace(/[\s.\-\\]+/g, '/')
+  return r.arts.some(a => artTail(a).toLowerCase().includes(n))
+}
 const registryRows = computed(() => {
   const needle = mq.value.trim().toLowerCase()
   const f = dupFilter.value
   const rows = registry.filter(r => {
     if (needle) {
-      const hay = mqField.value === 'model' ? r.model : mqField.value === 'art' ? r.arts.join(' ') : `${r.model} ${r.arts.join(' ')} ${r.doc}`
-      if (!hay.toLowerCase().includes(needle)) return false
+      if (mqField.value === 'tail') {
+        if (!tailHit(r, needle)) return false
+      } else {
+        const hay = mqField.value === 'model' ? r.model : mqField.value === 'art' ? r.arts.join(' ') : `${r.model} ${r.arts.join(' ')} ${r.doc}`
+        // in "all" mode a query that looks like an article ending (013/01, 13 01) also matches by tail
+        if (!hay.toLowerCase().includes(needle) && !(mqField.value === 'all' && /^\d{1,3}[\s./-]\d{1,2}$/.test(needle) && tailHit(r, needle))) return false
+      }
     }
     switch (f) {
       case 'any': return r.dupModel.length || r.dupArt.length
