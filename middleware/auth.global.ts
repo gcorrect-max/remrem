@@ -18,6 +18,10 @@ export default defineNuxtRouteMiddleware((to) => {
   // Ignore WebSocket upgrade paths and internal Nuxt paths
   if (to.path.startsWith('/_') || to.path === '/ws') return
 
+  // Dev-only: the RTO viewer is static data, so skip login when running `npm run dev`
+  // (import.meta.dev is false in production builds).
+  if (import.meta.dev && to.path.startsWith('/rto-viewer')) return
+
   const auth = useAuthStore()
 
   if (to.path === '/login') {
