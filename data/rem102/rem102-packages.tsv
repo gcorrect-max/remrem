@@ -54,10 +54,10 @@ index	name	tab	id	cgi	query	request	method	min_level	requires	label
 52	monitoring.dev_mvbcs	monitoring	dev_mvbcs	/cgi-bin/mpc105.fcgi	query=12	/cgi-bin/mpc105.fcgi?query=12	GET	0		Monitoring > Other Devices > MVBCS
 53	monitoring.dev_modem	monitoring	dev_modem	/cgi-bin/mpc105.fcgi	query=17	/cgi-bin/mpc105.fcgi?query=17	GET	0	features.mobile	Monitoring > Other Devices > MODEM
 54	features.dcs	features	dcs	/cgi-bin/rem.fcgi	query=463	/cgi-bin/rem.fcgi?query=463	GET	0		DCS enabled?
-55	features.dcs_user_1	features	dcs_user_1	/cgi-bin/rem.fcgi	query=462&user=1	/cgi-bin/rem.fcgi?query=462&user=1	GET	1		DCS User 1 enabled?
-56	features.dcs_user_2	features	dcs_user_2	/cgi-bin/rem.fcgi	query=462&user=2	/cgi-bin/rem.fcgi?query=462&user=2	GET	1		DCS User 2 enabled?
-57	features.dcs_user_3	features	dcs_user_3	/cgi-bin/rem.fcgi	query=462&user=3	/cgi-bin/rem.fcgi?query=462&user=3	GET	1		DCS User 3 enabled?
-58	features.dcs_user_4	features	dcs_user_4	/cgi-bin/rem.fcgi	query=462&user=4	/cgi-bin/rem.fcgi?query=462&user=4	GET	1		DCS User 4 enabled?
+55	features.dcs_user_1	features	dcs_user_1	/cgi-bin/rem.fcgi	query=462&user=1	/cgi-bin/rem.fcgi?query=462&user=1	GET	0		DCS User 1 enabled?
+56	features.dcs_user_2	features	dcs_user_2	/cgi-bin/rem.fcgi	query=462&user=2	/cgi-bin/rem.fcgi?query=462&user=2	GET	0		DCS User 2 enabled?
+57	features.dcs_user_3	features	dcs_user_3	/cgi-bin/rem.fcgi	query=462&user=3	/cgi-bin/rem.fcgi?query=462&user=3	GET	0		DCS User 3 enabled?
+58	features.dcs_user_4	features	dcs_user_4	/cgi-bin/rem.fcgi	query=462&user=4	/cgi-bin/rem.fcgi?query=462&user=4	GET	0		DCS User 4 enabled?
 59	features.dmeter_rem	features	dmeter_rem	/cgi-bin/rem.fcgi	query=420	/cgi-bin/rem.fcgi?query=420	GET	0		DMeter (rem) enabled?
 60	features.dmeter_items	features	dmeter_items	/cgi-bin/items.fcgi	query=400	/cgi-bin/items.fcgi?query=400	GET	0		DMeter (items) enabled?
 61	features.rtp100	features	rtp100	/cgi-bin/rem.fcgi	query=430	/cgi-bin/rem.fcgi?query=430	GET	0		RTP100 enabled?

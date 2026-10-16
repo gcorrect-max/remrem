@@ -239,40 +239,112 @@ jq 'del(.device) | [to_entries[] | .key as $t | .value | to_entries[]
 jq '.monitoring' rem102.json
 ```
 
-### Example output (illustrative)
+### Result structure
 
-> The response `body` below is **made up** and only shows the envelope structure. The real field names are returned by the device.
+Below is just the package envelope. The device's response content (`body`) is replaced by a placeholder. Real responses are in the [Response examples](#response-examples) section and appear there only once captured from the device.
 
 ```json
 {
-  "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
+  "device": { "host": "192.168.128.1", "collected_at": "<UTC time>" },
   "identity": {
     "device_settings": {
       "label": "Advanced > Information > Device Settings (model, serial no., article no.)",
       "cgi": "/cgi-bin/mpc105.fcgi",
       "query": "query=302",
       "http_status": 200,
-      "body": { "model": "<model>", "serial": "<serial number>", "article": "<article number>" }
-    },
-    "version": {
-      "label": "Advanced > Information > Version (firmware/FPGA/DSP)",
-      "cgi": "/cgi-bin/mpc105.fcgi",
-      "query": "query=301",
-      "http_status": 200,
-      "body": "plain-text response when it is not JSON"
-    }
-  },
-  "advanced": {
-    "events": {
-      "label": "Advanced > Information > Events",
-      "cgi": "/cgi-bin/mpc105.fcgi",
-      "query": "query=314",
-      "http_status": 500,
-      "body": null
+      "body": "<device response – to be filled in after connecting>"
     }
   }
 }
 ```
+
+<!-- rem102-samples:start -->
+
+## Response examples
+
+The examples come **only** from responses captured on a real device – nothing is made up. Packages without an example are waiting to be filled in after connecting to the device.
+
+Captured examples: 0 of 65.
+
+How to fill them in (once connected to the device):
+
+```bash
+REM_OUT_DIR=data/rem102/samples REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password \
+  ./scripts/rem102-info.sh > /dev/null
+python3 scripts/build-rem102-docs.py
+```
+
+<details><summary>To be filled in (65)</summary>
+
+- `identity.device_settings`
+- `identity.version`
+- `identity.host`
+- `identity.auth_message`
+- `identity.meter_settings`
+- `identity.dmeter_serial`
+- `home.meter_status`
+- `home.emf_status`
+- `home.emf_measures`
+- `home.emf_cebd`
+- `home.dhs_memory`
+- `home.digital_io`
+- `home.net_interfaces`
+- `home.net_services`
+- `setup.channels_configuration`
+- `setup.dcs_user_1`
+- `setup.dcs_user_2`
+- `setup.dcs_user_3`
+- `setup.dcs_user_4`
+- `setup.dcs_communication`
+- `setup.dcs_binding`
+- `setup.dcs_conn_test`
+- `setup.ethernet_0`
+- `setup.ethernet_1`
+- `setup.mobile_settings`
+- `setup.dhcp_client`
+- `setup.gateway_dns`
+- `setup.servers`
+- `setup.ntp_servers`
+- `setup.ems_time_servers`
+- `setup.gps`
+- `advanced.rtc_time`
+- `advanced.events`
+- `monitoring.eth_0`
+- `monitoring.eth_1`
+- `monitoring.mobile`
+- `monitoring.gps`
+- `monitoring.dcs_stats_user_1`
+- `monitoring.dcs_stats_user_2`
+- `monitoring.dcs_stats_user_3`
+- `monitoring.dcs_stats_user_4`
+- `monitoring.dmeter_status`
+- `monitoring.rtp100_vars`
+- `monitoring.rtp100_files`
+- `monitoring.mem_nand`
+- `monitoring.mem_nor`
+- `monitoring.mem_ram`
+- `monitoring.dev_rtc`
+- `monitoring.dev_fpga`
+- `monitoring.dev_fram`
+- `monitoring.dev_adc`
+- `monitoring.dev_dsp`
+- `monitoring.dev_mvbcs`
+- `monitoring.dev_modem`
+- `features.dcs`
+- `features.dcs_user_1`
+- `features.dcs_user_2`
+- `features.dcs_user_3`
+- `features.dcs_user_4`
+- `features.dmeter_rem`
+- `features.dmeter_items`
+- `features.rtp100`
+- `features.mobile`
+- `features.gps`
+- `features.dsp_digitalio`
+
+</details>
+
+<!-- rem102-samples:end -->
 
 ## Using it from LabVIEW
 
