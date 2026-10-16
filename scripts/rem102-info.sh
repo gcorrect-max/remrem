@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pełny odczyt informacji o urządzeniu REM102 (zakładki Home, Setup, Advanced + settings.json)
+# Pełny odczyt informacji o urządzeniu REM102 (zakładki Home, Monitoring, Setup, Advanced + settings.json)
 # wyłącznie zapytania ODCZYTOWE (pola "query" z plików Config/*.json). Nie wywołuje żadnych "set".
 #
 # Użycie:
@@ -22,6 +22,7 @@ trap 'rm -f "$JAR"' EXIT
 REM=/cgi-bin/rem.fcgi
 MPC=/cgi-bin/mpc105.fcgi
 ITEMS=/cgi-bin/items.fcgi
+RTP=/cgi-bin/rtp.fcgi
 
 # q <cgi> <query> <opis>
 q() {
@@ -71,6 +72,26 @@ q $MPC "query=205" "Setup > Services > GPS"
 echo; echo "##### ADVANCED #####"
 q $MPC "query=303" "Advanced > RTC > Time Settings"
 q $MPC "query=314" "Advanced > Information > Events"
+
+echo; echo "##### MONITORING #####"
+q $MPC "query=3"  "Monitoring > Network Interfaces > Ethernet 0"
+q $MPC "query=4"  "Monitoring > Network Interfaces > Ethernet 1"
+q $MPC "query=13" "Monitoring > Network Interfaces > Mobile"
+q $MPC "query=16" "Monitoring > Network Interfaces > GPS"
+for u in 1 2 3 4; do q $REM "query=461&user=${u}" "Monitoring > DCS Statistics > DCS User ${u}"; done
+q $ITEMS "query=409" "Monitoring > DMeter Status"
+q $RTP "query=441" "Monitoring > RTP100 Variables"
+q $RTP "query=444" "Monitoring > RTP100 Files"
+q $MPC "query=23" "Monitoring > Memory > NAND"
+q $MPC "query=24" "Monitoring > Memory > NOR"
+q $MPC "query=25" "Monitoring > Memory > RAM"
+q $MPC "query=7"  "Monitoring > Other Devices > RTC"
+q $MPC "query=8"  "Monitoring > Other Devices > FPGA"
+q $MPC "query=9"  "Monitoring > Other Devices > FRAM"
+q $MPC "query=10" "Monitoring > Other Devices > ADC"
+q $MPC "query=11" "Monitoring > Other Devices > DSP"
+q $MPC "query=12" "Monitoring > Other Devices > MVBCS"
+q $MPC "query=17" "Monitoring > Other Devices > MODEM"
 
 echo; echo "##### FLAGI DOSTĘPNOŚCI FUNKCJI (en_query) #####"
 q $REM  "query=463"        "DCS włączony?"
