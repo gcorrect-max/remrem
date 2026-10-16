@@ -1,5 +1,7 @@
 # REM102 – odczyt informacji o urządzeniu przez CGI (curl)
 
+> Wersja angielska: [`rem102-info_en.md`](rem102-info_en.md) · Wersja HTML: [`rem102-api.html`](rem102-api.html)
+
 Skrypt `scripts/rem102-info.sh` loguje się do urządzenia REM102 i zbiera **wszystkie pakiety informacji tylko do odczytu** z zakładek **Home, Setup, Advanced, Monitoring** oraz z `settings.json` (nazwa projektu/host). Każdy pakiet jest zwracany jako obiekt JSON.
 
 Źródłem listy zapytań są pliki konfiguracyjne interfejsu WWW urządzenia: `home.json`, `setup.json`, `advanced.json`, `monitoring.json`, `settings.json`.
@@ -41,7 +43,7 @@ Jeden obiekt: `device` (metadane zbierania) + po jednym kluczu na zakładkę, a 
   "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
   "identity": {
     "device_settings": {
-      "label": "Advanced > Information > Device Settings (model, SN, nr artykułu)",
+      "label": "Advanced > Information > Device Settings (model, serial no., article no.)",
       "cgi": "/cgi-bin/mpc105.fcgi",
       "query": "query=302",
       "http_status": 200,
@@ -200,7 +202,7 @@ jq '.monitoring' rem102.json
   "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
   "identity": {
     "device_settings": {
-      "label": "Advanced > Information > Device Settings (model, SN, nr artykułu)",
+      "label": "Advanced > Information > Device Settings (model, serial no., article no.)",
       "cgi": "/cgi-bin/mpc105.fcgi",
       "query": "query=302",
       "http_status": 200,
@@ -225,6 +227,41 @@ jq '.monitoring' rem102.json
   }
 }
 ```
+
+## Użycie w LabVIEW
+
+Lista zapytań jest dostępna jako pliki w `data/rem102/`. Kolejność wierszy jest we wszystkich plikach taka sama.
+
+| Plik | Zawartość | Użycie |
+|---|---|---|
+| `rem102-package-names.txt` | jedna nazwa pakietu w wierszu (`tab.id`) | pozycje enuma (typedef) |
+| `rem102-package-requests.txt` | jedno zapytanie w wierszu, np. `/cgi-bin/mpc105.fcgi?query=302` | tablica stringów indeksowana wartością enuma |
+| `rem102-packages.tsv` | kolumny z nagłówkiem: `index, name, tab, id, cgi, query, request, method, min_level, requires, label` | wyszukiwanie po nazwie, bramkowanie po `min_level` i `requires` |
+
+Nazwy mają postać `tab.id`, bo samo `id` się powtarza (np. `gps` występuje w Setup, Monitoring i Features).
+
+Przepływ:
+
+1. **Enum.** Typedef `REM102 Package` z pozycjami z `rem102-package-names.txt`. Wartość enuma to 0-based numer wiersza.
+2. **Tablica zapytań.** *Read from Text File* (z konwersją końców linii), rozbicie na wiersze do `String[]`. Wczytaj raz przy starcie.
+3. **Zapytanie.** *Index Array* wartością enuma daje ścieżkę. Dopisz `http://` i host.
+4. **GET.** *HTTP Client* z ciasteczkami sesji po logowaniu (`query=120`) zwraca ciało odpowiedzi jako string.
+5. **Parsowanie.** *Unflatten From JSON* do typedefu danego pakietu.
+
+### VI polimorficzny
+
+Polimorficzny VI wybiera instancję po **typie** podłączonych danych, nie po wartości enuma. Enum wybiera więc zapytanie, a typ wybiera parser. Dla jednego VI obsługującego każdy pakiet najlepiej pasuje **malleable VI** (`.vim`, LabVIEW 2017 lub nowszy):
+
+```text
+Get Package.vim
+  wejścia:  Package (enum REM102 Package), Type (dowolny typedef – specyfikator typu), Host, sesja
+  wyjścia:  Data (typu Type), Raw Body (string), HTTP Status, error out
+  wnętrze:  Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)
+```
+
+Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Klasyczny polimorficzny `.vi` też zadziała, ale wymaga instancji na każdy typedef.
+
+Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem (`REM_OUT_DIR`) na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
 
 ## Założenia (do potwierdzenia)
 

@@ -54,9 +54,9 @@ curl -sS --max-time 10 -c "$JAR" -X POST "http://${HOST}${MPC}" --data-raw "$LOG
 grep -q CGIUSER "$JAR" || echo "UWAGA: brak ciasteczek CGIUSER* – logowanie się nie powiodło (sprawdź REM_LOGIN_BODY)" >&2
 
 # --- IDENTYFIKACJA: model / numer seryjny / numer artykułu / wersje ---
-q identity device_settings   $MPC   "query=302" "Advanced > Information > Device Settings (model, SN, nr artykułu)"
+q identity device_settings   $MPC   "query=302" "Advanced > Information > Device Settings (model, serial no., article no.)"
 q identity version           $MPC   "query=301" "Advanced > Information > Version (firmware/FPGA/DSP)"
-q identity host              $MPC   "query=126" "settings.json > host (nazwa hosta)"
+q identity host              $MPC   "query=126" "settings.json > host (hostname)"
 q identity auth_message      $MPC   "query=125" "settings.json > auth_message"
 q identity meter_settings    $REM   "query=105" "Setup > Meter > Settings"
 q identity dmeter_serial     $ITEMS "query=407" "Setup > DMeter > DMeter Serial Number"
@@ -116,17 +116,17 @@ q monitoring dev_mvbcs      $MPC   "query=12" "Monitoring > Other Devices > MVBC
 q monitoring dev_modem      $MPC   "query=17" "Monitoring > Other Devices > MODEM"
 
 # --- FLAGI DOSTĘPNOŚCI FUNKCJI (en_query) ---
-q features dcs           $REM   "query=463"        "DCS włączony?"
-q features dcs_user_1    $REM   "query=462&user=1" "DCS User 1 włączony?"
-q features dcs_user_2    $REM   "query=462&user=2" "DCS User 2 włączony?"
-q features dcs_user_3    $REM   "query=462&user=3" "DCS User 3 włączony?"
-q features dcs_user_4    $REM   "query=462&user=4" "DCS User 4 włączony?"
-q features dmeter_rem    $REM   "query=420"        "DMeter (rem) włączony?"
-q features dmeter_items  $ITEMS "query=400"        "DMeter (items) włączony?"
-q features rtp100        $REM   "query=430"        "RTP100 włączony?"
-q features mobile        $MPC   "query=14"         "Modem/Mobile włączony?"
-q features gps           $MPC   "query=15"         "GPS włączony?"
-q features dsp_digitalio $MPC   "query=18"         "DSP/Digital IO włączony?"
+q features dcs           $REM   "query=463"        "DCS enabled?"
+q features dcs_user_1    $REM   "query=462&user=1" "DCS User 1 enabled?"
+q features dcs_user_2    $REM   "query=462&user=2" "DCS User 2 enabled?"
+q features dcs_user_3    $REM   "query=462&user=3" "DCS User 3 enabled?"
+q features dcs_user_4    $REM   "query=462&user=4" "DCS User 4 enabled?"
+q features dmeter_rem    $REM   "query=420"        "DMeter (rem) enabled?"
+q features dmeter_items  $ITEMS "query=400"        "DMeter (items) enabled?"
+q features rtp100        $REM   "query=430"        "RTP100 enabled?"
+q features mobile        $MPC   "query=14"         "Modem/Mobile enabled?"
+q features gps           $MPC   "query=15"         "GPS enabled?"
+q features dsp_digitalio $MPC   "query=18"         "DSP/Digital IO enabled?"
 
 # --- składanie wyniku: { device, <tab>: { <id>: pakiet, ... }, ... } ---
 RESULT="$WORK/result.json"
