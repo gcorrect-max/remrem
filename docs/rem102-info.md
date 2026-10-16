@@ -34,6 +34,52 @@ REM_OUT_DIR=./dump REM_HOST=... REM_USER=... REM_PASS=... ./scripts/rem102-info.
 
 Ostrzeżenia (np. nieudane logowanie) idą na stderr, więc stdout zawsze zawiera czysty JSON.
 
+## Podstawowe informacje – pełna sekwencja curl
+
+Użytkownik `user`, hasło `password`, adres domyślny `192.168.128.1`. Kroki 2–6 zwracają model, numer seryjny, numer artykułu i pozostałe dane identyfikacyjne.
+
+```bash
+HOST=192.168.128.1
+JAR=$(mktemp)
+
+# 1. login (cookies CGIUSERNAME / CGIUSERLEVEL are saved in $JAR)
+curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.fcgi" \
+     --data-raw "query=120&username=user&pwd=password"
+cat "$JAR"    # powinny być widoczne CGIUSERNAME i CGIUSERLEVEL
+
+# 2. model, numer seryjny, numer artykułu i pozostałe dane urządzenia
+curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=302"
+
+# 3. wersje oprogramowania (firmware, FPGA, DSP)
+curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=301"
+
+# 4. nazwa hosta
+curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=126"
+
+# 5. ustawienia miernika
+curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/rem.fcgi" --data-raw "query=105"
+
+# 6. numer seryjny DMeter (tylko jeśli moduł jest włączony)
+curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/items.fcgi" --data-raw "query=407"
+
+# 7. wylogowanie (opcjonalnie)
+curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=1983"
+rm -f "$JAR"
+```
+
+Wszystko jednym poleceniem (bez wylogowania), z nagłówkiem przed każdą odpowiedzią:
+
+```bash
+HOST=192.168.128.1; JAR=$(mktemp)
+curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=120&username=user&pwd=password"
+for r in mpc105.fcgi:302 mpc105.fcgi:301 mpc105.fcgi:126 rem.fcgi:105 items.fcgi:407; do
+  printf '\n== %s?query=%s ==\n' "${r%%:*}" "${r##*:}"
+  curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/${r%%:*}" --data-raw "query=${r##*:}"
+done; rm -f "$JAR"
+```
+
+Uwagi: nazwy pól logowania (`username`, `pwd`) są założeniem (patrz [Założenia](#założenia-do-potwierdzenia)). Hasło ze znakami specjalnymi (`&`, `+`, `%`) wymaga kodowania URL w `--data-raw` albo użycia `--data-urlencode "pwd=..."`.
+
 ## Format wyniku
 
 Jeden obiekt: `device` (metadane zbierania) + po jednym kluczu na zakładkę, a w nim pakiety po `id`.
