@@ -1,38 +1,54 @@
 #!/usr/bin/env python3
-"""Generates the REM102 CGI API documentation from data/rem102/rem102-packages.tsv.
+"""Generates the REM102 documentation from the package list and from data captured on a real device.
+
+Inputs (all inside rem102/):
+  data/rem102-packages.tsv        list of packages (single source of truth)
+  results/samples/<tab>/<id>.json captured responses, or
+  results/collected.json          the same data in one file (written by scripts/collect.sh)
 
 Outputs:
-  docs/rem102-api.html, docs/rem102-api_en.html   – API-style reference pages (PL/EN)
-  docs/rem102-info.md,  docs/rem102-info_en.md    – the "Response examples" section
-                                                    (between the rem102-samples markers)
+  docs/rem102-api.html, docs/rem102-api_en.html   API-style reference pages (PL/EN)
+  docs/rem102-info.md,  docs/rem102-info_en.md    the "Response examples" section
+                                                  (between the rem102-samples markers)
+  index.html                                      the hub page (what was done, TODO, file list)
 
-Response examples come ONLY from samples captured on a real device:
-  REM_OUT_DIR=data/rem102/samples REM_HOST=... REM_USER=... REM_PASS=... ./scripts/rem102-info.sh > /dev/null
-  python3 scripts/build-rem102-docs.py
-Packages without a captured sample are marked as "to be filled in".
+Response examples come ONLY from data captured on a real device:
+  REM_HOST=... REM_USER=... REM_PASS=... ./rem102/scripts/collect.sh
+  python3 rem102/scripts/build-docs.py
+Packages without captured data are marked as "to be filled in".
 
-Usage: python3 scripts/build-rem102-docs.py [--samples DIR]
+Usage: python3 rem102/scripts/build-docs.py [--samples DIR] [--collected FILE]
 """
 import csv, html, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SAMPLES = os.path.join(ROOT, "data", "rem102", "samples")
+SAMPLES = os.path.join(ROOT, "results", "samples")
+COLLECTED = os.path.join(ROOT, "results", "collected.json")
 if "--samples" in sys.argv:
     SAMPLES = os.path.abspath(sys.argv[sys.argv.index("--samples") + 1])
+if "--collected" in sys.argv:
+    COLLECTED = os.path.abspath(sys.argv[sys.argv.index("--collected") + 1])
 esc = html.escape
 
-with open(os.path.join(ROOT, "data", "rem102", "rem102-packages.tsv"), encoding="utf-8", newline="") as f:
+with open(os.path.join(ROOT, "data", "rem102-packages.tsv"), encoding="utf-8", newline="") as f:
     eps = list(csv.DictReader(f, delimiter="	"))
 
 def req_of(e):
     return [r.split(".", 1)[1] for r in e["requires"].split(";") if r]
 
+_collected = None
+if os.path.isfile(COLLECTED):
+    with open(COLLECTED, encoding="utf-8") as f:
+        _collected = json.load(f)
+
 def load_sample(e):
+    """Captured package (envelope with http_status/body) or None. A per-package file wins over collected.json."""
     p = os.path.join(SAMPLES, e["tab"], e["id"] + ".json")
-    if not os.path.isfile(p):
-        return None
-    with open(p, encoding="utf-8") as f:
-        return json.load(f)
+    if os.path.isfile(p):
+        with open(p, encoding="utf-8") as f:
+            return json.load(f)
+    d = (_collected or {}).get(e["tab"], {}).get(e["id"])
+    return d if isinstance(d, dict) and "http_status" in d else None
 
 def sample_text(d):
     body = d.get("body")
@@ -109,7 +125,7 @@ L = {
  prose=dict(
  title="REM102 – CGI API (odczyt)",
  overview='''<p class="lead">Opis zapytań HTTP, którymi interfejs WWW urządzenia REM102 pobiera dane. Zestawione z plików <code>home.json</code>, <code>setup.json</code>, <code>advanced.json</code>, <code>monitoring.json</code> i <code>settings.json</code>. Uwzględnione są wyłącznie zapytania odczytowe.</p>
-<div class="callout"><strong>Status.</strong> Skrypt <code>scripts/rem102-info.sh</code> sprawdzono na atrapie serwera, nie na prawdziwym urządzeniu. Format ciał odpowiedzi i parametry logowania są założeniami – patrz <a href="#assumptions">Założenia</a>.</div>
+<div class="callout"><strong>Status.</strong> Skrypt <code>rem102/scripts/rem102-info.sh</code> sprawdzono na atrapie serwera, nie na prawdziwym urządzeniu. Format ciał odpowiedzi i parametry logowania są założeniami – patrz <a href="#assumptions">Założenia</a>.</div>
 <div class="card"><strong>Base URL</strong><pre><code>http://&lt;HOST&gt;        # domyślnie 192.168.128.1</code></pre>
 <p>Urządzenie udostępnia cztery pliki CGI:</p>
 <div class="tablewrap"><table><tr><th>Plik CGI</th><th>Zakres</th></tr>
@@ -131,15 +147,15 @@ L = {
 <li>Pola <code>en_cgi</code>/<code>en_query</code> w menu sprawdzają, czy moduł jest włączony – to pakiety z zakładki <a href="#tab-features">Features</a>.</li>
 <li>Pola <code>set</code> i <code>set1</code> zapisują konfigurację – <strong>nie są</strong> używane.</li>
 </ul>''',
- env_intro='<p>Skrypt zwraca jeden obiekt JSON: <code>device</code> + klucz na zakładkę + pakiety po <code>id</code>.</p>',
- env_fields=[("label","ścieżka w menu WWW"),("cgi, query","dokładnie to, co poszło do urządzenia"),("http_status","kod HTTP; <code>0</code> = błąd połączenia lub timeout"),("body","JSON, jeśli odpowiedź się parsuje; inaczej surowy tekst; <code>null</code> gdy pusta")],
+ env_intro='<p>Skrypt zwraca jeden obiekt JSON: <code>device</code> (metadane), <code>login</code> (wynik logowania) + klucz na zakładkę + pakiety po <code>id</code>.</p>',
+ env_fields=[("label","ścieżka w menu WWW"),("cgi, query","dokładnie to, co poszło do urządzenia"),("http_status","kod HTTP; <code>0</code> = błąd połączenia lub timeout"),("content_type","nagłówek Content-Type odpowiedzi (<code>null</code>, jeśli go brak)"),("post_retry","tylko gdy GET zawiódł (kod inny niż 2xx lub pusta odpowiedź): wynik jednorazowej próby POST"),("body","JSON, jeśli odpowiedź się parsuje; inaczej surowy tekst; <code>null</code> gdy pusta")],
  env_th=("Pole","Opis"), env_note="Błąd jednego pakietu (np. moduł wyłączony) nie przerywa zbierania pozostałych.", env_orig="odpowiedź urządzenia",
  excl_callout="Poniższych zapytań skrypt <strong>nie</strong> wysyła – zmieniają stan urządzenia lub ujawniają dane kont.",
  excl_th=("Zapytanie","Powód"),
  excl=[("rem.fcgi?query=440","Restore Factory Default – przywraca ustawienia fabryczne"),("mpc105.fcgi?query=1982","restart urządzenia"),("rem.fcgi?query=402","Export SIC Configuration – akcja eksportu"),("mpc105.fcgi?query=122","Accounts Management – dane kont użytkowników"),("items.fcgi?query=410, rtp.fcgi?query=442/443/445","zapis/komendy DMeter i RTP100"),("wszystkie pola set / set1","zapis konfiguracji")],
  script_th=("Zmienna","Znaczenie","Domyślnie"),
- script_vars=[("REM_HOST","adres urządzenia (może zawierać port)","192.168.128.1"),("REM_USER","login","wymagana"),("REM_PASS","hasło","wymagana"),("REM_LOGIN_BODY","pełne ciało żądania logowania","query=120&amp;username=…&amp;pwd=…"),("REM_OUT_DIR","katalog na osobne pliki pakietów","wyłączone")],
- script_dump="# dodatkowo osobny plik JSON na pakiet: ./dump/&lt;zakładka&gt;/&lt;id&gt;.json oraz ./dump/all.json",
+ script_vars=[("REM_HOST","adres urządzenia (może zawierać port)","192.168.128.1"),("REM_USER","login","wymagana"),("REM_PASS","hasło","wymagana"),("REM_LOGIN_BODY","pełne ciało żądania logowania","query=120&amp;username=…&amp;pwd=…"),("REM_OUT_DIR","katalog wynikowy (collected.json, samples/, collect.log)","rem102/results/"),("REM_TIMEOUT","limit czasu jednego zapytania, s","10"),("REM_DELAY","przerwa między zapytaniami, s","0")],
+ script_dump="# zapis do plików (domyślnie rem102/results/): collected.json, samples/&lt;zakładka&gt;/&lt;id&gt;.json, collect.log",
  script_req="Wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>. Przykłady <code>jq</code>:",
  jq1="# identyfikacja urządzenia", jq2="# pakiety, które się nie udały",
  assum='''<ol>
@@ -148,7 +164,7 @@ L = {
 <li><strong>Format odpowiedzi.</strong> Nie wiadomo, czy urządzenie odpowiada JSON-em. Skrypt obsługuje JSON i zwykły tekst.</li>
 <li><strong>Poziomy dostępu.</strong> Znaczenie <code>show_level</code> przyjęto jako minimalny poziom użytkownika do wyświetlenia strony.</li>
 </ol>''',
- lv='''<p>Lista zapytań jest dostępna jako pliki w <code>data/rem102/</code>, gotowe do wczytania w LabVIEW. Kolejność wierszy jest we wszystkich plikach taka sama.</p>
+ lv='''<p>Lista zapytań jest dostępna jako pliki w <code>rem102/data/</code>, gotowe do wczytania w LabVIEW. Kolejność wierszy jest we wszystkich plikach taka sama.</p>
 <div class="tablewrap"><table><tr><th>Plik</th><th>Zawartość</th><th>Użycie</th></tr>
 <tr><td><code>rem102-package-names.txt</code></td><td>jedna nazwa pakietu w wierszu (<code>tab.id</code>)</td><td>pozycje enuma (typedef)</td></tr>
 <tr><td><code>rem102-package-requests.txt</code></td><td>jedno zapytanie w wierszu: <code>/cgi-bin/mpc105.fcgi?query=302</code></td><td>tablica stringów indeksowana wartością enuma</td></tr>
@@ -169,7 +185,7 @@ L = {
   wyjścia:  Data (typu Type), Raw Body (string), HTTP Status, error out
   wnętrze:  Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)</code></pre>
 <p>Dla każdego pakietu wystarczy osobny typedef klastra – nie trzeba osobnej instancji. Klasyczny polimorficzny <code>.vi</code> też zadziała, ale wymaga instancji na każdy typedef.</p>
-<p>Dopóki nie znasz prawdziwych odpowiedzi, użyj <code>Get Package (Raw).vi</code> zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem (<code>REM_OUT_DIR</code>) na prawdziwym urządzeniu.</p>
+<p>Dopóki nie znasz prawdziwych odpowiedzi, użyj <code>Get Package (Raw).vi</code> zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem <code>collect.sh</code> na prawdziwym urządzeniu.</p>
 <p class="muted">Przed odczytem sprawdź w tsv kolumny <code>min_level</code> (poziom konta) i <code>requires</code> (pakiet <code>features.*</code>, który mówi, czy moduł jest włączony).</p>''',
  ),
 ),
@@ -194,7 +210,7 @@ L = {
  prose=dict(
  title="REM102 – CGI API (read-only)",
  overview='''<p class="lead">Description of the HTTP requests that the REM102 web interface uses to fetch data. Compiled from <code>home.json</code>, <code>setup.json</code>, <code>advanced.json</code>, <code>monitoring.json</code> and <code>settings.json</code>. Only read requests are included.</p>
-<div class="callout"><strong>Status.</strong> The <code>scripts/rem102-info.sh</code> script was tested against a mock server, not a real device. The response body format and the login parameters are assumptions – see <a href="#assumptions">Assumptions</a>.</div>
+<div class="callout"><strong>Status.</strong> The <code>rem102/scripts/rem102-info.sh</code> script was tested against a mock server, not a real device. The response body format and the login parameters are assumptions – see <a href="#assumptions">Assumptions</a>.</div>
 <div class="card"><strong>Base URL</strong><pre><code>http://&lt;HOST&gt;        # default 192.168.128.1</code></pre>
 <p>The device exposes four CGI files:</p>
 <div class="tablewrap"><table><tr><th>CGI file</th><th>Scope</th></tr>
@@ -216,15 +232,15 @@ L = {
 <li>The <code>en_cgi</code>/<code>en_query</code> menu fields check whether a module is enabled – these are the packages in the <a href="#tab-features">Features</a> tab.</li>
 <li>The <code>set</code> and <code>set1</code> fields write configuration – they are <strong>not</strong> used.</li>
 </ul>''',
- env_intro='<p>The script returns one JSON object: <code>device</code> + a key per tab + packages keyed by <code>id</code>.</p>',
- env_fields=[("label","path in the web menu"),("cgi, query","exactly what was sent to the device"),("http_status","HTTP code; <code>0</code> = connection error or timeout"),("body","JSON if the response parses; otherwise raw text; <code>null</code> when empty")],
+ env_intro='<p>The script returns one JSON object: <code>device</code> (metadata), <code>login</code> (login result) + a key per tab + packages keyed by <code>id</code>.</p>',
+ env_fields=[("label","path in the web menu"),("cgi, query","exactly what was sent to the device"),("http_status","HTTP code; <code>0</code> = connection error or timeout"),("content_type","response Content-Type header (<code>null</code> if absent)"),("post_retry","only when GET failed (non-2xx code or empty response): result of a single POST retry"),("body","JSON if the response parses; otherwise raw text; <code>null</code> when empty")],
  env_th=("Field","Description"), env_note="A failure of one package (e.g. a disabled module) does not stop the collection of the others.", env_orig="device response",
  excl_callout="The script does <strong>not</strong> send the requests below – they change device state or expose account data.",
  excl_th=("Request","Reason"),
  excl=[("rem.fcgi?query=440","Restore Factory Default – resets the device to factory settings"),("mpc105.fcgi?query=1982","device reboot"),("rem.fcgi?query=402","Export SIC Configuration – an export action"),("mpc105.fcgi?query=122","Accounts Management – user account data"),("items.fcgi?query=410, rtp.fcgi?query=442/443/445","DMeter and RTP100 writes/commands"),("all set / set1 fields","configuration writes")],
  script_th=("Variable","Meaning","Default"),
- script_vars=[("REM_HOST","device address (may include a port)","192.168.128.1"),("REM_USER","login","required"),("REM_PASS","password","required"),("REM_LOGIN_BODY","full login request body","query=120&amp;username=…&amp;pwd=…"),("REM_OUT_DIR","directory for separate package files","disabled")],
- script_dump="# additionally one JSON file per package: ./dump/&lt;tab&gt;/&lt;id&gt;.json and ./dump/all.json",
+ script_vars=[("REM_HOST","device address (may include a port)","192.168.128.1"),("REM_USER","login","required"),("REM_PASS","password","required"),("REM_LOGIN_BODY","full login request body","query=120&amp;username=…&amp;pwd=…"),("REM_OUT_DIR","output directory (collected.json, samples/, collect.log)","rem102/results/"),("REM_TIMEOUT","per-request time limit, s","10"),("REM_DELAY","pause between requests, s","0")],
+ script_dump="# write to files (default rem102/results/): collected.json, samples/&lt;tab&gt;/&lt;id&gt;.json, collect.log",
  script_req="Requires <code>bash</code>, <code>curl</code>, <code>jq</code>. <code>jq</code> examples:",
  jq1="# device identification", jq2="# packages that failed",
  assum='''<ol>
@@ -233,7 +249,7 @@ L = {
 <li><strong>Response format.</strong> It is not known whether the device answers with JSON. The script handles both JSON and plain text.</li>
 <li><strong>Access levels.</strong> <code>show_level</code> is taken to mean the minimum user level needed to display the page.</li>
 </ol>''',
- lv='''<p>The request list is available as files in <code>data/rem102/</code>, ready to load in LabVIEW. Row order is identical in all files.</p>
+ lv='''<p>The request list is available as files in <code>rem102/data/</code>, ready to load in LabVIEW. Row order is identical in all files.</p>
 <div class="tablewrap"><table><tr><th>File</th><th>Content</th><th>Use</th></tr>
 <tr><td><code>rem102-package-names.txt</code></td><td>one package name per line (<code>tab.id</code>)</td><td>enum items (typedef)</td></tr>
 <tr><td><code>rem102-package-requests.txt</code></td><td>one request per line: <code>/cgi-bin/mpc105.fcgi?query=302</code></td><td>string array indexed by the enum value</td></tr>
@@ -254,7 +270,7 @@ L = {
   outputs:  Data (of type Type), Raw Body (string), HTTP Status, error out
   inside:   Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)</code></pre>
 <p>Each package only needs its own cluster typedef – no separate instance. A classic polymorphic <code>.vi</code> also works but needs one instance per typedef.</p>
-<p>Until you know the real responses, use a <code>Get Package (Raw).vi</code> that returns just the string. Build the typedefs from samples collected with the script (<code>REM_OUT_DIR</code>) on a real device.</p>
+<p>Until you know the real responses, use a <code>Get Package (Raw).vi</code> that returns just the string. Build the typedefs from samples collected with <code>collect.sh</code> on a real device.</p>
 <p class="muted">Before reading, check the <code>min_level</code> (account level) and <code>requires</code> columns in the tsv (the <code>features.*</code> package that tells whether the module is enabled).</p>''',
  ),
 ),
@@ -372,7 +388,7 @@ jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
 <pre><code>REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='…' ./scripts/rem102-info.sh &gt; rem102.json
 
 {P["script_dump"]}
-REM_OUT_DIR=./dump REM_HOST=… REM_USER=… REM_PASS=… ./scripts/rem102-info.sh &gt; /dev/null</code></pre>
+REM_HOST=… REM_USER=… REM_PASS=… ./rem102/scripts/collect.sh</code></pre>
 {table(P["script_th"], [(f"<code>{a}</code>",b,(f"<code>{c}</code>" if c.startswith(("192","query")) else c)) for a,b,c in P["script_vars"]])}
 <p>{P["script_req"]}</p>
 <pre><code>{jq}</code></pre></section>
@@ -407,6 +423,120 @@ REM_OUT_DIR=./dump REM_HOST=… REM_USER=… REM_PASS=… ./scripts/rem102-info.
     open(f"{ROOT}/docs/{T['file']}","w",encoding="utf-8").write(page)
 
 
+SESSION_URL = "https://claude.ai/code/session_01EnRG8vGUPDNmrrRkAUgc9q"
+
+def build_index():
+    """Hub page rem102/index.html: what was done and why, order of solutions, TODO, list of files."""
+    def exists(rel):
+        return os.path.exists(os.path.join(ROOT, rel))
+    def status(rel):
+        return '<span class="b ok">jest</span>' if exists(rel) else '<span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span>'
+    captured = sum(1 for e in eps if load_sample(e))
+    def files(rows):
+        h = "<tr><th>Plik</th><th>Opis</th><th>Stan</th></tr>"
+        for rel, desc, st in rows:
+            name = f'<code>{esc(rel)}</code>'
+            if "<" not in rel and exists(rel):
+                name = f'<a href="{esc(rel)}"><code>{esc(rel)}</code></a>'
+            h += f'<tr><td>{name}</td><td>{desc}</td><td>{st}</td></tr>'
+        return f'<div class="tablewrap"><table>{h}</table></div>'
+    isok = '<span class="b ok">jest</span>'
+    out_rows = [
+        ("results/collected.json", "wszystko z jednego uruchomienia w jednym pliku: <code>device</code>, <code>login</code>, 65 pakietów (<code>http_status</code>, <code>content_type</code>, <code>body</code>, ewentualnie <code>post_retry</code>). <strong>To wystarczy przekazać dalej.</strong>", status("results/collected.json")),
+        ("results/samples/<zakładka>/<id>.json", "ten sam wynik rozbity na pakiety; z nich generator wstawia przykłady do dokumentacji", status("results/samples")),
+        ("results/collect.log", "log przebiegu: numer, nazwa pakietu, kod HTTP, rozmiar (bez hasła)", status("results/collect.log")),
+    ]
+    src_rows = [
+        ("data/rem102-packages.tsv", "lista 65 pakietów: nazwa, zakładka, id, zapytanie, poziom dostępu, wymagane moduły – jedno źródło prawdy", isok),
+        ("data/rem102-package-names.txt", "nazwy pakietów (<code>tab.id</code>) – pozycje enuma w LabVIEW", isok),
+        ("data/rem102-package-requests.txt", "zapytania w tej samej kolejności – tablica stringów indeksowana enumem", isok),
+        ("scripts/collect.sh", "pobiera po kolei wszystkie pakiety i zapisuje wynik do <code>results/</code>", isok),
+        ("scripts/rem102-info.sh", "skrót do <code>collect.sh</code>: ten sam odczyt, wynik JSON na stdout", isok),
+        ("scripts/build-docs.py", "generuje strony HTML, sekcje „Przykłady odpowiedzi” w md i tę stronę", isok),
+    ]
+    doc_rows = [
+        ("docs/rem102-api.html", "dokumentacja jak do API (PL)", isok),
+        ("docs/rem102-api_en.html", "dokumentacja jak do API (EN)", isok),
+        ("docs/rem102-info.md", "opis i przykłady (PL)", isok),
+        ("docs/rem102-info_en.md", "opis i przykłady (EN)", isok),
+    ]
+    done = lambda t: f'<li>☑ {t}</li>'
+    todo = lambda t: f'<li>☐ {t}</li>'
+    page = f"""<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REM102 – odczyt informacji</title>
+<style>
+{CSS}.sub{{margin:18px 0 6px;font-size:16px}} .b.ok{{background:var(--get-bg);color:var(--get)}} ul.chk{{list-style:none;padding-left:0}} ul.chk li{{margin:4px 0}} main{{margin:0 auto}} a,code{{overflow-wrap:anywhere}}
+</style>
+</head>
+<body>
+<main>
+<h1>REM102 – odczyt informacji o urządzeniu</h1>
+<p class="lead">Strona prowadząca do wątku, w którym powstał ten zestaw: <a href="{SESSION_URL}">{SESSION_URL}</a></p>
+<div class="callout"><strong>Stan:</strong> skrypty sprawdzono na atrapie serwera, nie na prawdziwym urządzeniu. Przykładowe odpowiedzi w dokumentacji są puste, dopóki nie zostaną zebrane z urządzenia (zebrano: {captured} z {len(eps)} pakietów).</div>
+
+<h2>Cel</h2>
+<p>Pełny opis podłączonego urządzenia REM102 (model, numer seryjny, numer artykułu i reszta informacji z zakładek Home, Setup, Advanced, Monitoring) pobierany przez CGI przy użyciu curl, razem z dokumentacją tych zapytań i danymi do użycia w LabVIEW.</p>
+
+<h2>Działania i po co</h2>
+<ul>
+<li><strong>Odczytano menu WWW urządzenia</strong> (<code>home/setup/advanced/monitoring/settings.json</code>) – żeby poznać zapytania CGI bez dokumentacji producenta.</li>
+<li><strong>Zebrano 65 zapytań tylko do odczytu</strong> i wykluczono zapis, reset, reboot oraz konta – żeby odczyt niczego nie zmieniał.</li>
+<li><strong>Napisano <code>collect.sh</code></strong> – pobiera wszystko po kolei i zapisuje do plików, z których uzupełnia się dokumentację.</li>
+<li><strong>Dokumentacja w md i HTML, PL i EN</strong> – opis API, sekwencja curl dla podstawowych informacji, przykłady.</li>
+<li><strong>Tabele dla LabVIEW</strong> – nazwy do enuma i tablica zapytań, żeby jeden VI obsługiwał każdy pakiet.</li>
+<li><strong>Generator dokumentacji</strong> – przykłady odpowiedzi trafiają do dokumentów tylko z danych zebranych z urządzenia, nic nie jest zmyślone.</li>
+</ul>
+
+<h2>Kolejność rozwiązań</h2>
+<ol>
+<li>Wyciągnięcie zapytań z plików menu i zamiana separatora <code>~</code> na <code>&amp;</code>.</li>
+<li>Logowanie <code>query=120</code> i ciasteczka <code>CGIUSERNAME</code>/<code>CGIUSERLEVEL</code>.</li>
+<li>Odczyt metodą GET; przy błędzie jednorazowa próba POST (<code>post_retry</code>).</li>
+<li>Wynik każdego pakietu w kopercie JSON: <code>http_status</code>, <code>content_type</code>, <code>body</code> (JSON albo tekst).</li>
+<li>Jedno źródło listy pakietów: <code>rem102-packages.tsv</code>; z niego nazwy, zapytania i dokumentacja.</li>
+<li>Generator wstawia do dokumentów wyłącznie zebrane próbki; reszta jest oznaczona „do uzupełnienia”.</li>
+<li>LabVIEW: enum wybiera zapytanie, a typ (typedef) wybiera parser – najlepiej malleable VI <code>Get Package.vim</code>.</li>
+</ol>
+
+<h2>TODO</h2>
+<ul class="chk">
+{done("Lista zapytań, skrypty, dokumentacja PL/EN, tabele dla LabVIEW, generator")}
+{todo("Uruchomić <code>collect.sh</code> na prawdziwym urządzeniu (przykład: użytkownik <code>user</code>, hasło <code>password</code>)")}
+{todo("Przekazać wynik: <code>results/collected.json</code> (commit na gałąź lub załącznik) – dokumentację uzupełnia się z niego")}
+{todo("Uruchomić <code>python3 rem102/scripts/build-docs.py</code> – znikną oznaczenia „do uzupełnienia”")}
+{todo("Potwierdzić format logowania (pola <code>username</code>/<code>pwd</code>) – pole <code>login</code> w <code>collected.json</code>")}
+{todo("Potwierdzić GET kontra POST – pola <code>post_retry</code> w pakietach")}
+{todo("Sprawdzić format odpowiedzi (JSON czy tekst) – <code>content_type</code> i <code>body</code>")}
+{todo("Zweryfikować poziomy dostępu (<code>min_level</code>) i zależności modułów (<code>requires</code>) na tle <code>features.*</code>")}
+{todo("Potwierdzić, że odczyt <code>advanced.events</code> (<code>query=314</code>) jest bezpieczny – w menu to samo zapytanie służy też do zapisu")}
+{todo("LabVIEW: typedefy z próbek, <code>Get Package.vim</code> i <code>Get Package (Raw).vi</code>")}
+{todo("Opcjonalnie: wersja EN tej strony")}
+</ul>
+
+<h2>Pliki</h2>
+<h3 class="sub">Wynikowe (zbierane z urządzenia) – <code>rem102/results/</code></h3>
+{files(out_rows)}
+<h3 class="sub">Źródłowe i skrypty – <code>rem102/data/</code>, <code>rem102/scripts/</code></h3>
+{files(src_rows)}
+<h3 class="sub">Dokumentacja – <code>rem102/docs/</code></h3>
+{files(doc_rows)}
+
+<h2>Uruchomienie</h2>
+<pre><code>REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh
+python3 rem102/scripts/build-docs.py</code></pre>
+<p class="muted">Wymaga <code>bash</code>, <code>curl</code>, <code>jq</code> (zbieranie) oraz <code>python3</code> (generator). Skrypt nie zapisuje hasła w plikach wynikowych ani w logu.</p>
+</main>
+</body>
+</html>
+"""
+    with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
+        f.write(page)
+
+
 MD = {
  "pl": dict(file="docs/rem102-info.md", before="## Użycie w LabVIEW", title="## Przykłady odpowiedzi",
    intro="Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia.",
@@ -426,9 +556,8 @@ def md_section(code):
     todo = [e for e, d in have if d is None]
     o = [START, "", T["title"], "", T["intro"], "", T["count"].format(n=len(done), t=len(eps)), "",
          T["how"], "", "```bash",
-         "REM_OUT_DIR=data/rem102/samples REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password \\",
-         "  ./scripts/rem102-info.sh > /dev/null",
-         "python3 scripts/build-rem102-docs.py", "```", ""]
+         "REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh",
+         "python3 rem102/scripts/build-docs.py", "```", ""]
     for e, d in done:
         o += [f"### `{e['name']}`", "", f"`GET {e['request']}` · HTTP {d.get('http_status')}", "",
               "```" + ("text" if isinstance(d.get("body"), str) else "json"), sample_text(d), "```", ""]
@@ -455,4 +584,5 @@ def patch_md(code):
 for c in ("pl", "en"):
     build(c)
     patch_md(c)
+build_index()
 print("ok:", sum(1 for e in eps if load_sample(e)), "of", len(eps), "packages have captured samples")

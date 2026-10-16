@@ -66,7 +66,7 @@ pre{margin:0;padding:12px 14px;background:var(--code-bg);border-radius:6px;overf
 </aside>
 <main>
 <section id="overview"><h1>REM102 – CGI API (read-only)</h1><p class="lead">Description of the HTTP requests that the REM102 web interface uses to fetch data. Compiled from <code>home.json</code>, <code>setup.json</code>, <code>advanced.json</code>, <code>monitoring.json</code> and <code>settings.json</code>. Only read requests are included.</p>
-<div class="callout"><strong>Status.</strong> The <code>scripts/rem102-info.sh</code> script was tested against a mock server, not a real device. The response body format and the login parameters are assumptions – see <a href="#assumptions">Assumptions</a>.</div>
+<div class="callout"><strong>Status.</strong> The <code>rem102/scripts/rem102-info.sh</code> script was tested against a mock server, not a real device. The response body format and the login parameters are assumptions – see <a href="#assumptions">Assumptions</a>.</div>
 <div class="card"><strong>Base URL</strong><pre><code>http://&lt;HOST&gt;        # default 192.168.128.1</code></pre>
 <p>The device exposes four CGI files:</p>
 <div class="tablewrap"><table><tr><th>CGI file</th><th>Scope</th></tr>
@@ -131,7 +131,7 @@ done; rm -f &quot;$JAR&quot;</code></pre></div>
 <li>The <code>set</code> and <code>set1</code> fields write configuration – they are <strong>not</strong> used.</li>
 </ul></section>
 
-<section id="envelope"><h2>Response format</h2><p>The script returns one JSON object: <code>device</code> + a key per tab + packages keyed by <code>id</code>.</p>
+<section id="envelope"><h2>Response format</h2><p>The script returns one JSON object: <code>device</code> (metadata), <code>login</code> (login result) + a key per tab + packages keyed by <code>id</code>.</p>
 <pre><code>{
   "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
   "identity": {
@@ -144,7 +144,7 @@ done; rm -f &quot;$JAR&quot;</code></pre></div>
     }
   }
 }</code></pre>
-<div class="tablewrap"><table><tr><th>Field</th><th>Description</th></tr><tr><td><code>label</code></td><td>path in the web menu</td></tr><tr><td><code>cgi, query</code></td><td>exactly what was sent to the device</td></tr><tr><td><code>http_status</code></td><td>HTTP code; <code>0</code> = connection error or timeout</td></tr><tr><td><code>body</code></td><td>JSON if the response parses; otherwise raw text; <code>null</code> when empty</td></tr></table></div>
+<div class="tablewrap"><table><tr><th>Field</th><th>Description</th></tr><tr><td><code>label</code></td><td>path in the web menu</td></tr><tr><td><code>cgi, query</code></td><td>exactly what was sent to the device</td></tr><tr><td><code>http_status</code></td><td>HTTP code; <code>0</code> = connection error or timeout</td></tr><tr><td><code>content_type</code></td><td>response Content-Type header (<code>null</code> if absent)</td></tr><tr><td><code>post_retry</code></td><td>only when GET failed (non-2xx code or empty response): result of a single POST retry</td></tr><tr><td><code>body</code></td><td>JSON if the response parses; otherwise raw text; <code>null</code> when empty</td></tr></table></div>
 <p class="muted">A failure of one package (e.g. a disabled module) does not stop the collection of the others.</p></section>
 
 <section class="tab" id="tab-identity"><h2>Identity <code class="tabkey">identity</code></h2><p class="muted">Model, serial number, article number and software versions.</p><article class="ep" id="identity-device_settings" data-s="device_settings advanced &gt; information &gt; device settings (model, serial no., article no.) query=302 /cgi-bin/mpc105.fcgi">
@@ -676,9 +676,9 @@ done; rm -f &quot;$JAR&quot;</code></pre></div>
 <section id="script"><h2>Script</h2>
 <pre><code>REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='…' ./scripts/rem102-info.sh &gt; rem102.json
 
-# additionally one JSON file per package: ./dump/&lt;tab&gt;/&lt;id&gt;.json and ./dump/all.json
-REM_OUT_DIR=./dump REM_HOST=… REM_USER=… REM_PASS=… ./scripts/rem102-info.sh &gt; /dev/null</code></pre>
-<div class="tablewrap"><table><tr><th>Variable</th><th>Meaning</th><th>Default</th></tr><tr><td><code>REM_HOST</code></td><td>device address (may include a port)</td><td><code>192.168.128.1</code></td></tr><tr><td><code>REM_USER</code></td><td>login</td><td>required</td></tr><tr><td><code>REM_PASS</code></td><td>password</td><td>required</td></tr><tr><td><code>REM_LOGIN_BODY</code></td><td>full login request body</td><td><code>query=120&amp;username=…&amp;pwd=…</code></td></tr><tr><td><code>REM_OUT_DIR</code></td><td>directory for separate package files</td><td>disabled</td></tr></table></div>
+# write to files (default rem102/results/): collected.json, samples/&lt;tab&gt;/&lt;id&gt;.json, collect.log
+REM_HOST=… REM_USER=… REM_PASS=… ./rem102/scripts/collect.sh</code></pre>
+<div class="tablewrap"><table><tr><th>Variable</th><th>Meaning</th><th>Default</th></tr><tr><td><code>REM_HOST</code></td><td>device address (may include a port)</td><td><code>192.168.128.1</code></td></tr><tr><td><code>REM_USER</code></td><td>login</td><td>required</td></tr><tr><td><code>REM_PASS</code></td><td>password</td><td>required</td></tr><tr><td><code>REM_LOGIN_BODY</code></td><td>full login request body</td><td><code>query=120&amp;username=…&amp;pwd=…</code></td></tr><tr><td><code>REM_OUT_DIR</code></td><td>output directory (collected.json, samples/, collect.log)</td><td>rem102/results/</td></tr><tr><td><code>REM_TIMEOUT</code></td><td>per-request time limit, s</td><td>10</td></tr><tr><td><code>REM_DELAY</code></td><td>pause between requests, s</td><td>0</td></tr></table></div>
 <p>Requires <code>bash</code>, <code>curl</code>, <code>jq</code>. <code>jq</code> examples:</p>
 <pre><code># device identification
 jq '.identity | {device_settings: .device_settings.body, version: .version.body}' rem102.json
@@ -687,7 +687,7 @@ jq '.identity | {device_settings: .device_settings.body, version: .version.body}
 jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
        | select(.value.http_status != 200) | "\($t)/\(.key): HTTP \(.value.http_status)"' rem102.json</code></pre></section>
 
-<section id="labview"><h2>LabVIEW integration</h2><p>The request list is available as files in <code>data/rem102/</code>, ready to load in LabVIEW. Row order is identical in all files.</p>
+<section id="labview"><h2>LabVIEW integration</h2><p>The request list is available as files in <code>rem102/data/</code>, ready to load in LabVIEW. Row order is identical in all files.</p>
 <div class="tablewrap"><table><tr><th>File</th><th>Content</th><th>Use</th></tr>
 <tr><td><code>rem102-package-names.txt</code></td><td>one package name per line (<code>tab.id</code>)</td><td>enum items (typedef)</td></tr>
 <tr><td><code>rem102-package-requests.txt</code></td><td>one request per line: <code>/cgi-bin/mpc105.fcgi?query=302</code></td><td>string array indexed by the enum value</td></tr>
@@ -708,7 +708,7 @@ jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
   outputs:  Data (of type Type), Raw Body (string), HTTP Status, error out
   inside:   Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)</code></pre>
 <p>Each package only needs its own cluster typedef – no separate instance. A classic polymorphic <code>.vi</code> also works but needs one instance per typedef.</p>
-<p>Until you know the real responses, use a <code>Get Package (Raw).vi</code> that returns just the string. Build the typedefs from samples collected with the script (<code>REM_OUT_DIR</code>) on a real device.</p>
+<p>Until you know the real responses, use a <code>Get Package (Raw).vi</code> that returns just the string. Build the typedefs from samples collected with <code>collect.sh</code> on a real device.</p>
 <p class="muted">Before reading, check the <code>min_level</code> (account level) and <code>requires</code> columns in the tsv (the <code>features.*</code> package that tells whether the module is enabled).</p></section>
 
 <section id="assumptions"><h2>Assumptions</h2><ol>

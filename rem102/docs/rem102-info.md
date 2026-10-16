@@ -2,7 +2,7 @@
 
 > Wersja angielska: [`rem102-info_en.md`](rem102-info_en.md) · Wersja HTML: [`rem102-api.html`](rem102-api.html)
 
-Skrypt `scripts/rem102-info.sh` loguje się do urządzenia REM102 i zbiera **wszystkie pakiety informacji tylko do odczytu** z zakładek **Home, Setup, Advanced, Monitoring** oraz z `settings.json` (nazwa projektu/host). Każdy pakiet jest zwracany jako obiekt JSON.
+Skrypt `rem102/scripts/rem102-info.sh` loguje się do urządzenia REM102 i zbiera **wszystkie pakiety informacji tylko do odczytu** z zakładek **Home, Setup, Advanced, Monitoring** oraz z `settings.json` (nazwa projektu/host). Każdy pakiet jest zwracany jako obiekt JSON.
 
 Źródłem listy zapytań są pliki konfiguracyjne interfejsu WWW urządzenia: `home.json`, `setup.json`, `advanced.json`, `monitoring.json`, `settings.json`.
 
@@ -20,8 +20,8 @@ Skrypt `scripts/rem102-info.sh` loguje się do urządzenia REM102 i zbiera **wsz
 # jeden plik JSON na stdout
 REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='...' ./scripts/rem102-info.sh > rem102.json
 
-# dodatkowo osobny plik na każdy pakiet: ./dump/<zakładka>/<id>.json oraz ./dump/all.json
-REM_OUT_DIR=./dump REM_HOST=... REM_USER=... REM_PASS=... ./scripts/rem102-info.sh > /dev/null
+# zapis do plików (domyślnie rem102/results/): collected.json, samples/<zakładka>/<id>.json, collect.log
+REM_HOST=... REM_USER=... REM_PASS=... ./rem102/scripts/collect.sh
 ```
 
 | Zmienna | Znaczenie | Domyślnie |
@@ -30,7 +30,9 @@ REM_OUT_DIR=./dump REM_HOST=... REM_USER=... REM_PASS=... ./scripts/rem102-info.
 | `REM_USER` | login | – (wymagana) |
 | `REM_PASS` | hasło | – (wymagana) |
 | `REM_LOGIN_BODY` | pełne ciało żądania logowania (nadpisuje domyślne) | `query=120&username=$REM_USER&pwd=$REM_PASS` |
-| `REM_OUT_DIR` | katalog na osobne pliki JSON pakietów | puste (wyłączone) |
+| `REM_OUT_DIR` | katalog wynikowy (`collected.json`, `samples/`, `collect.log`) | `rem102/results/` (w `rem102-info.sh`: wyłączony) |
+| `REM_TIMEOUT` | limit czasu jednego zapytania, s | `10` |
+| `REM_DELAY` | przerwa między zapytaniami, s | `0` |
 
 Ostrzeżenia (np. nieudane logowanie) idą na stderr, więc stdout zawsze zawiera czysty JSON.
 
@@ -269,9 +271,8 @@ Zebrano przykładów: 0 z 65.
 Jak uzupełnić (po podłączeniu do urządzenia):
 
 ```bash
-REM_OUT_DIR=data/rem102/samples REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password \
-  ./scripts/rem102-info.sh > /dev/null
-python3 scripts/build-rem102-docs.py
+REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh
+python3 rem102/scripts/build-docs.py
 ```
 
 <details><summary>Do uzupełnienia (65)</summary>
@@ -348,7 +349,7 @@ python3 scripts/build-rem102-docs.py
 
 ## Użycie w LabVIEW
 
-Lista zapytań jest dostępna jako pliki w `data/rem102/`. Kolejność wierszy jest we wszystkich plikach taka sama.
+Lista zapytań jest dostępna jako pliki w `rem102/data/`. Kolejność wierszy jest we wszystkich plikach taka sama.
 
 | Plik | Zawartość | Użycie |
 |---|---|---|
@@ -379,7 +380,7 @@ Get Package.vim
 
 Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Klasyczny polimorficzny `.vi` też zadziała, ale wymaga instancji na każdy typedef.
 
-Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem (`REM_OUT_DIR`) na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
+Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem `collect.sh` na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
 
 ## Założenia (do potwierdzenia)
 

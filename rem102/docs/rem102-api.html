@@ -66,7 +66,7 @@ pre{margin:0;padding:12px 14px;background:var(--code-bg);border-radius:6px;overf
 </aside>
 <main>
 <section id="overview"><h1>REM102 – CGI API (odczyt)</h1><p class="lead">Opis zapytań HTTP, którymi interfejs WWW urządzenia REM102 pobiera dane. Zestawione z plików <code>home.json</code>, <code>setup.json</code>, <code>advanced.json</code>, <code>monitoring.json</code> i <code>settings.json</code>. Uwzględnione są wyłącznie zapytania odczytowe.</p>
-<div class="callout"><strong>Status.</strong> Skrypt <code>scripts/rem102-info.sh</code> sprawdzono na atrapie serwera, nie na prawdziwym urządzeniu. Format ciał odpowiedzi i parametry logowania są założeniami – patrz <a href="#assumptions">Założenia</a>.</div>
+<div class="callout"><strong>Status.</strong> Skrypt <code>rem102/scripts/rem102-info.sh</code> sprawdzono na atrapie serwera, nie na prawdziwym urządzeniu. Format ciał odpowiedzi i parametry logowania są założeniami – patrz <a href="#assumptions">Założenia</a>.</div>
 <div class="card"><strong>Base URL</strong><pre><code>http://&lt;HOST&gt;        # domyślnie 192.168.128.1</code></pre>
 <p>Urządzenie udostępnia cztery pliki CGI:</p>
 <div class="tablewrap"><table><tr><th>Plik CGI</th><th>Zakres</th></tr>
@@ -131,7 +131,7 @@ done; rm -f &quot;$JAR&quot;</code></pre></div>
 <li>Pola <code>set</code> i <code>set1</code> zapisują konfigurację – <strong>nie są</strong> używane.</li>
 </ul></section>
 
-<section id="envelope"><h2>Format odpowiedzi</h2><p>Skrypt zwraca jeden obiekt JSON: <code>device</code> + klucz na zakładkę + pakiety po <code>id</code>.</p>
+<section id="envelope"><h2>Format odpowiedzi</h2><p>Skrypt zwraca jeden obiekt JSON: <code>device</code> (metadane), <code>login</code> (wynik logowania) + klucz na zakładkę + pakiety po <code>id</code>.</p>
 <pre><code>{
   "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
   "identity": {
@@ -144,7 +144,7 @@ done; rm -f &quot;$JAR&quot;</code></pre></div>
     }
   }
 }</code></pre>
-<div class="tablewrap"><table><tr><th>Pole</th><th>Opis</th></tr><tr><td><code>label</code></td><td>ścieżka w menu WWW</td></tr><tr><td><code>cgi, query</code></td><td>dokładnie to, co poszło do urządzenia</td></tr><tr><td><code>http_status</code></td><td>kod HTTP; <code>0</code> = błąd połączenia lub timeout</td></tr><tr><td><code>body</code></td><td>JSON, jeśli odpowiedź się parsuje; inaczej surowy tekst; <code>null</code> gdy pusta</td></tr></table></div>
+<div class="tablewrap"><table><tr><th>Pole</th><th>Opis</th></tr><tr><td><code>label</code></td><td>ścieżka w menu WWW</td></tr><tr><td><code>cgi, query</code></td><td>dokładnie to, co poszło do urządzenia</td></tr><tr><td><code>http_status</code></td><td>kod HTTP; <code>0</code> = błąd połączenia lub timeout</td></tr><tr><td><code>content_type</code></td><td>nagłówek Content-Type odpowiedzi (<code>null</code>, jeśli go brak)</td></tr><tr><td><code>post_retry</code></td><td>tylko gdy GET zawiódł (kod inny niż 2xx lub pusta odpowiedź): wynik jednorazowej próby POST</td></tr><tr><td><code>body</code></td><td>JSON, jeśli odpowiedź się parsuje; inaczej surowy tekst; <code>null</code> gdy pusta</td></tr></table></div>
 <p class="muted">Błąd jednego pakietu (np. moduł wyłączony) nie przerywa zbierania pozostałych.</p></section>
 
 <section class="tab" id="tab-identity"><h2>Identyfikacja <code class="tabkey">identity</code></h2><p class="muted">Model, numer seryjny, numer artykułu i wersje oprogramowania.</p><article class="ep" id="identity-device_settings" data-s="device_settings advanced &gt; information &gt; device settings (model, serial no., article no.) query=302 /cgi-bin/mpc105.fcgi">
@@ -676,9 +676,9 @@ done; rm -f &quot;$JAR&quot;</code></pre></div>
 <section id="script"><h2>Skrypt</h2>
 <pre><code>REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='…' ./scripts/rem102-info.sh &gt; rem102.json
 
-# dodatkowo osobny plik JSON na pakiet: ./dump/&lt;zakładka&gt;/&lt;id&gt;.json oraz ./dump/all.json
-REM_OUT_DIR=./dump REM_HOST=… REM_USER=… REM_PASS=… ./scripts/rem102-info.sh &gt; /dev/null</code></pre>
-<div class="tablewrap"><table><tr><th>Zmienna</th><th>Znaczenie</th><th>Domyślnie</th></tr><tr><td><code>REM_HOST</code></td><td>adres urządzenia (może zawierać port)</td><td><code>192.168.128.1</code></td></tr><tr><td><code>REM_USER</code></td><td>login</td><td>wymagana</td></tr><tr><td><code>REM_PASS</code></td><td>hasło</td><td>wymagana</td></tr><tr><td><code>REM_LOGIN_BODY</code></td><td>pełne ciało żądania logowania</td><td><code>query=120&amp;username=…&amp;pwd=…</code></td></tr><tr><td><code>REM_OUT_DIR</code></td><td>katalog na osobne pliki pakietów</td><td>wyłączone</td></tr></table></div>
+# zapis do plików (domyślnie rem102/results/): collected.json, samples/&lt;zakładka&gt;/&lt;id&gt;.json, collect.log
+REM_HOST=… REM_USER=… REM_PASS=… ./rem102/scripts/collect.sh</code></pre>
+<div class="tablewrap"><table><tr><th>Zmienna</th><th>Znaczenie</th><th>Domyślnie</th></tr><tr><td><code>REM_HOST</code></td><td>adres urządzenia (może zawierać port)</td><td><code>192.168.128.1</code></td></tr><tr><td><code>REM_USER</code></td><td>login</td><td>wymagana</td></tr><tr><td><code>REM_PASS</code></td><td>hasło</td><td>wymagana</td></tr><tr><td><code>REM_LOGIN_BODY</code></td><td>pełne ciało żądania logowania</td><td><code>query=120&amp;username=…&amp;pwd=…</code></td></tr><tr><td><code>REM_OUT_DIR</code></td><td>katalog wynikowy (collected.json, samples/, collect.log)</td><td>rem102/results/</td></tr><tr><td><code>REM_TIMEOUT</code></td><td>limit czasu jednego zapytania, s</td><td>10</td></tr><tr><td><code>REM_DELAY</code></td><td>przerwa między zapytaniami, s</td><td>0</td></tr></table></div>
 <p>Wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>. Przykłady <code>jq</code>:</p>
 <pre><code># identyfikacja urządzenia
 jq '.identity | {device_settings: .device_settings.body, version: .version.body}' rem102.json
@@ -687,7 +687,7 @@ jq '.identity | {device_settings: .device_settings.body, version: .version.body}
 jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
        | select(.value.http_status != 200) | "\($t)/\(.key): HTTP \(.value.http_status)"' rem102.json</code></pre></section>
 
-<section id="labview"><h2>Integracja z LabVIEW</h2><p>Lista zapytań jest dostępna jako pliki w <code>data/rem102/</code>, gotowe do wczytania w LabVIEW. Kolejność wierszy jest we wszystkich plikach taka sama.</p>
+<section id="labview"><h2>Integracja z LabVIEW</h2><p>Lista zapytań jest dostępna jako pliki w <code>rem102/data/</code>, gotowe do wczytania w LabVIEW. Kolejność wierszy jest we wszystkich plikach taka sama.</p>
 <div class="tablewrap"><table><tr><th>Plik</th><th>Zawartość</th><th>Użycie</th></tr>
 <tr><td><code>rem102-package-names.txt</code></td><td>jedna nazwa pakietu w wierszu (<code>tab.id</code>)</td><td>pozycje enuma (typedef)</td></tr>
 <tr><td><code>rem102-package-requests.txt</code></td><td>jedno zapytanie w wierszu: <code>/cgi-bin/mpc105.fcgi?query=302</code></td><td>tablica stringów indeksowana wartością enuma</td></tr>
@@ -708,7 +708,7 @@ jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
   wyjścia:  Data (typu Type), Raw Body (string), HTTP Status, error out
   wnętrze:  Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)</code></pre>
 <p>Dla każdego pakietu wystarczy osobny typedef klastra – nie trzeba osobnej instancji. Klasyczny polimorficzny <code>.vi</code> też zadziała, ale wymaga instancji na każdy typedef.</p>
-<p>Dopóki nie znasz prawdziwych odpowiedzi, użyj <code>Get Package (Raw).vi</code> zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem (<code>REM_OUT_DIR</code>) na prawdziwym urządzeniu.</p>
+<p>Dopóki nie znasz prawdziwych odpowiedzi, użyj <code>Get Package (Raw).vi</code> zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem <code>collect.sh</code> na prawdziwym urządzeniu.</p>
 <p class="muted">Przed odczytem sprawdź w tsv kolumny <code>min_level</code> (poziom konta) i <code>requires</code> (pakiet <code>features.*</code>, który mówi, czy moduł jest włączony).</p></section>
 
 <section id="assumptions"><h2>Założenia</h2><ol>

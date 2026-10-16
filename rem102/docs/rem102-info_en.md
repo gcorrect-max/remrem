@@ -2,7 +2,7 @@
 
 > Polish version: [`rem102-info.md`](rem102-info.md) · HTML version: [`rem102-api_en.html`](rem102-api_en.html)
 
-The `scripts/rem102-info.sh` script logs in to a REM102 device and collects **all read-only information packages** from the **Home, Setup, Advanced, Monitoring** tabs and from `settings.json` (project name/host). Each package is returned as a JSON object.
+The `rem102/scripts/rem102-info.sh` script logs in to a REM102 device and collects **all read-only information packages** from the **Home, Setup, Advanced, Monitoring** tabs and from `settings.json` (project name/host). Each package is returned as a JSON object.
 
 The request list comes from the configuration files of the device's web interface: `home.json`, `setup.json`, `advanced.json`, `monitoring.json`, `settings.json`.
 
@@ -20,8 +20,8 @@ The request list comes from the configuration files of the device's web interfac
 # one JSON document on stdout
 REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='...' ./scripts/rem102-info.sh > rem102.json
 
-# additionally one file per package: ./dump/<tab>/<id>.json and ./dump/all.json
-REM_OUT_DIR=./dump REM_HOST=... REM_USER=... REM_PASS=... ./scripts/rem102-info.sh > /dev/null
+# write to files (default rem102/results/): collected.json, samples/<tab>/<id>.json, collect.log
+REM_HOST=... REM_USER=... REM_PASS=... ./rem102/scripts/collect.sh
 ```
 
 | Variable | Meaning | Default |
@@ -30,7 +30,9 @@ REM_OUT_DIR=./dump REM_HOST=... REM_USER=... REM_PASS=... ./scripts/rem102-info.
 | `REM_USER` | login | – (required) |
 | `REM_PASS` | password | – (required) |
 | `REM_LOGIN_BODY` | full login request body (overrides the default) | `query=120&username=$REM_USER&pwd=$REM_PASS` |
-| `REM_OUT_DIR` | directory for separate package JSON files | empty (disabled) |
+| `REM_OUT_DIR` | output directory (`collected.json`, `samples/`, `collect.log`) | `rem102/results/` (in `rem102-info.sh`: disabled) |
+| `REM_TIMEOUT` | per-request time limit, s | `10` |
+| `REM_DELAY` | pause between requests, s | `0` |
 
 Warnings (e.g. a failed login) go to stderr, so stdout always holds clean JSON.
 
@@ -269,9 +271,8 @@ Captured examples: 0 of 65.
 How to fill them in (once connected to the device):
 
 ```bash
-REM_OUT_DIR=data/rem102/samples REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password \
-  ./scripts/rem102-info.sh > /dev/null
-python3 scripts/build-rem102-docs.py
+REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh
+python3 rem102/scripts/build-docs.py
 ```
 
 <details><summary>To be filled in (65)</summary>
@@ -348,7 +349,7 @@ python3 scripts/build-rem102-docs.py
 
 ## Using it from LabVIEW
 
-The request list is available as files in `data/rem102/`. Row order is identical in all files.
+The request list is available as files in `rem102/data/`. Row order is identical in all files.
 
 | File | Content | Use |
 |---|---|---|
@@ -379,7 +380,7 @@ Get Package.vim
 
 Each package only needs its own cluster typedef, with no separate instance. A classic polymorphic `.vi` also works but needs one instance per typedef.
 
-Until you know the real responses, use a `Get Package (Raw).vi` that returns just the string. Build the typedefs from samples collected with the script (`REM_OUT_DIR`) on a real device. Before reading, check the `min_level` and `requires` columns in the tsv (the `features.*` package tells whether the module is enabled).
+Until you know the real responses, use a `Get Package (Raw).vi` that returns just the string. Build the typedefs from samples collected with `collect.sh` on a real device. Before reading, check the `min_level` and `requires` columns in the tsv (the `features.*` package tells whether the module is enabled).
 
 ## Assumptions to confirm
 
