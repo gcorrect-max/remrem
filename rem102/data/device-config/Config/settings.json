@@ -1,0 +1,51 @@
+[
+    {
+        "type": "LoginOnStart",		
+		"require": "true",
+		"cgi": "cgi-bin/mpc105.cgi",
+		"query": "query=120",
+		"change": "query=121"
+    },
+	{
+    "type": "logout",		
+		"cgi": "cgi-bin/mpc105j.cgi",
+		"query": "query=122"
+    },
+	  {
+        "type": "Project",		
+		"name": "REM-102"
+    },
+	{
+        "type": "page",
+		"site": "home.html",
+		"label": "Home",
+		"cgi": "Config/home.json",
+		"query": ""
+    },
+	{
+        "type": "page",
+		"site": "monitoring.html",
+		"label": "Monitoring",
+		"cgi": "Config/monitoring.json",
+		"query": ""
+    },
+    {
+        "type": "page",
+		"site": "setup.html",
+		"label": "Setup",
+		"cgi": "Config/setup.json",
+		"query": ""
+    },
+	{
+        "type": "page",
+		"site": "advanced.html",
+		"label": "Advanced",
+		"cgi": "Config/advanced.json",
+		"query": ""
+    },
+	{
+        "type": "reboot",
+		"cgi": "cgi-bin/mpc105.cgi",
+		"query": "query=1982"
+    }	
+]

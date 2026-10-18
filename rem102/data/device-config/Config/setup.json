@@ -1,0 +1,320 @@
+[
+	{
+	"type":"menu",
+	"label":"Meter",
+	"submenu":
+		[
+			{
+			"label":"Settings",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=105",
+			"set":"query=205",
+			"reboot":1,
+			"cyclicTime":0
+			},
+			{
+			"label":"Channels Configuration",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=100",
+			"set":"query=200",
+			"reboot":1,
+			"cyclicTime":0
+			},
+			{
+			"label":"FTP Hosts",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=101",
+			"set":"query=201",			
+			"reboot":1,
+			"cyclicTime":0
+			},
+			{
+			"label":"UDP Clients",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=102",
+			"set":"query=202",
+			"reboot":1,
+			"cyclicTime":0
+			},
+			{
+			"label":"Messages",
+			"rules":"Config/messages_rule.json",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=103",
+			"set":"query=203",
+			"reboot":1,
+			"cyclicTime":0
+			},
+			{
+			"label":"Calibration",
+			"web":"calibration.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=7~block_offset=8192~byte_offset=0~data_size=1024~type=DINT~name=energy~memory=remshm~number=2",
+			"set":"query=6~memory=remshm~type=DINT",
+			"reboot":0,
+			"show_level":3,
+			"cyclicTime":5000
+			},
+			{
+			"label":"Thresholds Protection",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/rem.cgi",
+			"query":"query=111",
+			"set":"query=211",
+			"reboot":1,
+			"cyclicTime":0
+			}					
+		]
+	},
+    {
+        "type":"menu",
+        "label":"RTP100",
+        "en_cgi": "/cgi-bin/rem.cgi",
+        "en_query": "query=430",
+        "submenu":
+        [
+			{
+			"label":"RTP100 Command",
+			"rules":"",
+			"color":"black",
+			"web":"RTP100_cmd.html",
+			"cgi":"/cgi-bin/rtp.cgi",
+			"query":"query=442",
+            "set":"query=440",
+			"set1":"query=443",
+			"reboot":0,
+			"cyclicTime":1000
+			}
+        ]
+    },
+	{
+	"type":"menu",
+	"label":"Ethernet Interfaces",
+	"submenu":
+		[
+			{
+			"label":"Ethernet 0",
+			"rules":"Config/eth_rule.json",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=103",
+			"set":"query=113",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "ethernet0help.html"
+			},
+			{
+			"label":"Ethernet 1",
+			"rules":"Config/eth_rule.json",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=104",
+			"set":"query=114",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "ethernet1help.html"
+			},
+			{
+			"label":"Ethernet 2",
+			"rules":"Config/eth_rule.json",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=105",
+			"set":"query=115",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "ethernet2help.html"
+			},
+			{
+			"label":"Switch Ethernet",
+			"rules":"Config/switch_rule.json",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=107",
+			"set":"query=117",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "switchhelp.html"
+			}
+		]
+	},
+	{
+	"type":"menu",
+	"label":"Mobile Interface",
+	"submenu":
+		[
+			{
+			"label":"Mobile Settings",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=101",
+			"set":"query=100",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "mobilehelp.html"
+			}
+		]
+	},	
+	{
+	"type":"menu",
+	"label":"Wireless Interface",
+	"submenu":
+		[
+			{
+			"label":"WLAN",
+			"color":"black",
+			"rules":"Config/wlan_rule.json",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=106",
+			"set":"query=116",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "wlanhelp.html"
+			},
+			{
+			"label":"Client Access",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=204",
+			"set":"query=214",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "wlancli.html"
+			}
+		]
+	},
+	{
+	"type":"menu",
+	"label":"DHCP",
+	"submenu":
+		[
+			{
+			"label":"Client Settings",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=200",
+			"set":"query=210",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "dhcpcli.html"
+			},
+			{
+			"label":"Server Settings",
+			"color":"black",
+			"rules":"Config/dhcp_rule.json",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=208",
+			"set":"query=218",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "dhcpsrv.html"
+			},
+			{
+			"label":"Address Reservation",
+			"color":"black",
+			"web":"reservation.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=209",
+			"set":"query=219",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "addrres.html"
+			}
+		]
+	},	
+	{
+	"type":"menu",
+	"label":"Services",
+	"submenu":
+		[
+			{
+			"label":"Gateway & DNS",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=201",
+			"set":"query=211",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "gwdns.html"
+			},
+			{
+			"label":"Servers",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=202",
+			"set":"query=212",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "servers.html"
+			},
+			{
+			"label":"NTP Servers",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=203",
+			"set":"query=213",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "ntp.html"
+			},
+			{
+			"label":"GPS",
+			"color":"black",
+			"web":"default.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=205",
+			"set":"query=215",
+			"reboot":1,
+			"cyclicTime":0,
+			"help": "gpshelp.html"
+			},
+			{
+			"label":"Port Forwarding",
+			"color":"black",
+			"web":"port_forwarding.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=207",
+			"set":"query=217",
+			"reboot":0,
+			"cyclicTime":0,
+			"help": "portfw.html"
+			},
+			{
+			"label":"Proxy settings",
+			"color":"black",
+			"web":"proxy.html",
+			"cgi":"/cgi-bin/mpc105.cgi",
+			"query":"query=220",
+			"set":"query=221",
+			"reboot":0,
+			"cyclicTime":0,
+			"help": "proxyhelp.html"
+			}			
+		]
+	}
+
+]
+

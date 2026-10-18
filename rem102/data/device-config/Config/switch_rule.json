@@ -1,0 +1,19 @@
+[	
+	{
+	"tag":"dhcp",
+	"rules":
+		[
+			{"tag":"ip", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"},
+			{"tag":"mask", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"}
+		]
+	},	
+	{
+	"tag":"default",
+	"rules":
+		[			
+			{"tag":"dhcp", "action":"checked", "action_value": false},
+			{"tag":"ip", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"mask", "action":"disabled", "action_value": false, "backcolor":"trasparent"}
+		]
+	}
+]	

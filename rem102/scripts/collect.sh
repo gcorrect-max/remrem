@@ -12,16 +12,18 @@
 #   samples/<zakładka>/<id>.json    ten sam wynik rozbity na pakiety
 #   collect.log                     log przebiegu (bez hasła)
 #
-# Zmienne: REM_HOST (192.168.128.1), REM_USER, REM_PASS (wymagane), REM_LOGIN_BODY, REM_OUT_DIR,
+# Zmienne: REM_HOST (192.168.128.1), REM_PASS (wymagane), REM_USER ("User"/"Admin"/"Super Admin") albo REM_LEVEL (1/2/3),
+#          REM_LOGIN_BODY (pełne ciało logowania, nadpisuje domyślne), REM_OUT_DIR,
 #          REM_TIMEOUT (10 s na zapytanie), REM_DELAY (przerwa między zapytaniami, s; domyślnie 0),
 #          REM_TSV (inna lista pakietów), REM_BASE_URL (pełny adres bazowy, np. https://192.168.128.1:8443 lub http://host/prefix;
-#          domyślnie http://$REM_HOST), REM_INSECURE=1 (akceptuj certyfikat self-signed),
-#          REM_CGI_EXT=cgi (rozszerzenie CGI; to urządzenie używa .cgi, a nie .fcgi)
+#          domyślnie http://$REM_HOST), REM_INSECURE=1 (akceptuj certyfikat self-signed)
 # Wymaga: bash, curl, jq.
 #
-# Założenia (do potwierdzenia właśnie tym zbiorem danych – patrz pole "login" i "post_retry"):
-#   - logowanie: POST /cgi-bin/mpc105.fcgi, query=120, pola username/pwd; ciasteczka CGIUSERNAME/CGIUSERLEVEL
-#   - odczyty: GET; jeśli GET zawiedzie (kod != 2xx lub pusta odpowiedź), jednorazowo próbujemy POST
+# Logowanie tak, jak robi to strona urządzenia (Script/mainParent.js):
+#   POST /cgi-bin/mpc105.cgi  query=120&login=<1|2|3>&pwd=<hasło>   (1 = User, 2 = Admin, 3 = Super Admin)
+#   odpowiedź: JSON {"value":"fail"} przy złym haśle; ciasteczko sesji CGISESSID (poziom = 5. znak: A..D = 0..3)
+# Odczyty: GET, odpowiedzi JSON; {"value":"fail"} oznacza "wymagane logowanie".
+# Gdy GET zawiedzie (kod != 2xx lub pusta odpowiedź), jednorazowo próbujemy POST.
 set -u
 
 command -v jq >/dev/null || { echo "Brak jq – zainstaluj (apt install jq / brew install jq)" >&2; exit 1; }
@@ -31,12 +33,17 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE="$(dirname "$HERE")"
 TSV="${REM_TSV:-$BASE/data/rem102-packages.tsv}"
 HOST="${REM_HOST:-192.168.128.1}"
-USER_NAME="${REM_USER:?ustaw REM_USER}"
+USER_NAME="${REM_USER:-}"
 PASS="${REM_PASS:?ustaw REM_PASS}"
-LOGIN_BODY="${REM_LOGIN_BODY:-query=120&username=${USER_NAME}&pwd=${PASS}}"
+LEVEL="${REM_LEVEL:-}"
+if [ -z "$LEVEL" ]; then
+  case "$(printf '%s' "$USER_NAME" | tr '[:upper:]' '[:lower:]' | tr -d ' ')" in
+    1|user) LEVEL=1 ;; 2|admin) LEVEL=2 ;; 3|superadmin) LEVEL=3 ;;
+    *) echo "Ustaw REM_LEVEL=1|2|3 albo REM_USER=\"User\"|\"Admin\"|\"Super Admin\"" >&2; exit 1 ;;
+  esac
+fi
 BASE_URL="${REM_BASE_URL:-http://${HOST}}"; BASE_URL="${BASE_URL%/}"
 CURL_X=(); [ -n "${REM_INSECURE:-}" ] && CURL_X=(-k)
-CGI_EXT="${REM_CGI_EXT:-}"   # np. cgi: zamienia .fcgi na .cgi w loginie i zapytaniach
 TIMEOUT="${REM_TIMEOUT:-10}"
 DELAY="${REM_DELAY:-0}"
 
@@ -54,8 +61,8 @@ LOG="$WORK/collect.log"
 : > "$ENTRIES"; : > "$LOG"
 trap 'rm -rf "$WORK"' EXIT
 
-# zapytania, których nigdy nie wysyłamy (zapis, reset, reboot, konta, komendy RTP100/DMeter)
-DENY='query=(440|1982|402|122|121|1983|410|442|443|445)(&|$)'
+# zapytania, których nigdy nie wysyłamy (zapis, reset, reboot, wylogowanie, zmiana hasła, upload, komendy RTP100)
+DENY='query=(440|1982|402|401|122|121|1983|310|443|445)(&|$)'
 
 log() { printf '%s\n' "$*" >&2; printf '%s\n' "$*" >> "$LOG"; }
 
@@ -83,31 +90,44 @@ resp_json() {
 }
 
 # ---------- logowanie ----------
-log "== logowanie: POST ${BASE_URL}/cgi-bin/mpc105.${CGI_EXT:-fcgi} (query=120), użytkownik: ${USER_NAME}"
+LOGIN_PATH="/cgi-bin/mpc105.cgi"
+log "== logowanie: POST ${BASE_URL}${LOGIN_PATH} (query=120, login=${LEVEL})"
 : > "$WORK/resp.tmp"
-res="$(curl -sS ${CURL_X[@]+"${CURL_X[@]}"} --max-time "$TIMEOUT" -c "$JAR" -X POST "${BASE_URL}/cgi-bin/mpc105.${CGI_EXT:-fcgi}" --data-raw "$LOGIN_BODY" \
+if [ -n "${REM_LOGIN_BODY:-}" ]; then
+  LOGIN_DATA=(--data-raw "$REM_LOGIN_BODY")
+else
+  LOGIN_DATA=(--data "query=120" --data "login=${LEVEL}" --data-urlencode "pwd=${PASS}")   # hasło kodowane jak w jQuery serialize()
+fi
+res="$(curl -sS ${CURL_X[@]+"${CURL_X[@]}"} --max-time "$TIMEOUT" -c "$JAR" -X POST "${BASE_URL}${LOGIN_PATH}" "${LOGIN_DATA[@]}" \
        -o "$WORK/resp.tmp" -w '%{http_code}\t%{content_type}')" || res=$'0\t'
 F_CODE="${res%%$'\t'*}"; F_CTYPE="${res#*$'\t'}"
-LOGIN_OK=false
-grep -q CGIUSER "$JAR" 2>/dev/null && LOGIN_OK=true
 COOKIES="$(sed 's/^#HttpOnly_//' "$JAR" 2>/dev/null | grep -v '^#' | awk 'NF>=7{print $6"="$7}')"
-LOGIN_JSON="$(resp_json | jq -c --argjson ok "$LOGIN_OK" --arg cookies "$COOKIES" '
-  . + { ok: $ok,
+SID="$(printf '%s\n' "$COOKIES" | sed -n 's/^CGISESSID=//p' | head -1)"
+LEVEL_COOKIE=null
+if [ "${#SID}" -gt 4 ]; then
+  case "${SID:4:1}" in A) LEVEL_COOKIE=0 ;; B) LEVEL_COOKIE=1 ;; C) LEVEL_COOKIE=2 ;; D) LEVEL_COOKIE=3 ;; esac
+fi
+LOGIN_VALUE="$(jq -r 'try (fromjson | .value) catch ""' "$WORK/resp.tmp" 2>/dev/null || true)"
+[ -z "$LOGIN_VALUE" ] && LOGIN_VALUE="$(jq -Rrs 'try (fromjson | .value // "") catch ""' "$WORK/resp.tmp" 2>/dev/null || true)"
+LOGIN_OK=false
+[ -n "$SID" ] && [[ "$F_CODE" =~ ^2 ]] && [ "$(printf '%s' "$LOGIN_VALUE" | tr '[:upper:]' '[:lower:]')" != fail ] && LOGIN_OK=true
+LOGIN_JSON="$(resp_json | jq -c --argjson ok "$LOGIN_OK" --arg cookies "$COOKIES" --arg value "$LOGIN_VALUE" \
+    --argjson lreq "$LEVEL" --argjson lcookie "$LEVEL_COOKIE" '
+  . + { ok: $ok, value: (if $value == "" then null else $value end),
         cookie_names: ($cookies | split("\n") | map(select(length>0) | split("=")[0])),
-        user_level: ($cookies | split("\n") | map(select(startswith("CGIUSERLEVEL="))) | (.[0] // null) | if . then sub("CGIUSERLEVEL=";"") else null end) }')"
+        level_requested: $lreq, level_from_cookie: $lcookie }')"
 if [ "$LOGIN_OK" = true ]; then
-  log "   OK (HTTP ${F_CODE}); ciasteczka: $(jq -r '.cookie_names | join(", ")' <<<"$LOGIN_JSON")"
+  log "   OK (HTTP ${F_CODE}, value=${LOGIN_VALUE}); ciasteczka: $(jq -r '.cookie_names | join(", ")' <<<"$LOGIN_JSON"); poziom z ciasteczka: ${LEVEL_COOKIE}"
 else
-  log "   UWAGA: brak ciasteczek CGIUSER* (HTTP ${F_CODE}) – logowanie mogło się nie udać; sprawdź REM_LOGIN_BODY. Kontynuuję."
+  log "   UWAGA: logowanie nie powiodło się (HTTP ${F_CODE}, value=${LOGIN_VALUE}) – dane poniżej będą prawdopodobnie odpowiedzią 'wymagane logowanie'. Kontynuuję."
 fi
 
 # ---------- pakiety, po kolei ----------
 TOTAL="$(tail -n +2 "$TSV" | tr -d '\r' | grep -c .)"
-N=0; OK=0; BAD=0; SKIPPED=0
+N=0; OK=0; BAD=0; AUTHFAIL=0; SKIPPED=0
 log "== pobieranie ${TOTAL} pakietów (lista: ${TSV})"
 while IFS=$'\t' read -r name tab id request label; do
   N=$((N+1))
-  [ -n "$CGI_EXT" ] && request="${request/.fcgi?/.${CGI_EXT}?}"
   cgi="${request%%\?*}"; query="${request#*\?}"
   if [[ "$query" =~ $DENY ]]; then
     log "[$N/$TOTAL] $name  POMINIĘTO (lista zakazanych zapytań)"; SKIPPED=$((SKIPPED+1)); continue
@@ -125,21 +145,22 @@ while IFS=$'\t' read -r name tab id request label; do
                   --argjson e "$entry" '{tab:$tab, id:$id, label:$label, cgi:$cgi, query:$query} + $e')"
   printf '%s\n' "$entry" >> "$ENTRIES"
   code="$(jq -r .http_status <<<"$entry")"
-  if [[ "$code" =~ ^2 ]]; then OK=$((OK+1)); else BAD=$((BAD+1)); fi
+  if jq -e '.body == {"value":"fail"}' <<<"$entry" >/dev/null 2>&1; then AUTHFAIL=$((AUTHFAIL+1)); note="${note}  WYMAGANE LOGOWANIE (value=fail)"
+  elif [[ "$code" =~ ^2 ]]; then OK=$((OK+1)); else BAD=$((BAD+1)); fi
   log "[$N/$TOTAL] $name  HTTP ${code}  ${bytes} B${note}"
   [ "$DELAY" != 0 ] && sleep "$DELAY"
 done < <(tail -n +2 "$TSV" | tr -d '\r' | grep . | cut -f2,3,4,7,11)
 
 # ---------- składanie wyniku: { device, login, <zakładka>: { <id>: pakiet } } ----------
 RESULT="$WORK/collected.json"
-jq -s --arg host "$HOST" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson login "$LOGIN_JSON" \
-      --argjson total "$TOTAL" --argjson ok "$OK" --argjson bad "$BAD" --argjson skipped "$SKIPPED" '
-  reduce .[] as $e ({device: {host: $host, collected_at: $ts, script: "collect.sh",
-                              packages_total: $total, packages_http_2xx: $ok, packages_failed: $bad, packages_skipped: $skipped},
+jq -s --arg host "$BASE_URL" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson login "$LOGIN_JSON" \
+      --argjson total "$TOTAL" --argjson ok "$OK" --argjson auth "$AUTHFAIL" --argjson bad "$BAD" --argjson skipped "$SKIPPED" '
+  reduce .[] as $e ({device: {base_url: $host, collected_at: $ts, script: "collect.sh",
+                              packages_total: $total, packages_ok: $ok, packages_login_required: $auth, packages_failed: $bad, packages_skipped: $skipped},
                      login: $login};
                     setpath([$e.tab, $e.id]; ($e | del(.tab, .id))))' "$ENTRIES" > "$RESULT"
 
-log "== gotowe: ${OK} z ${TOTAL} pakietów zwróciło HTTP 2xx, ${BAD} z błędem, ${SKIPPED} pominiętych"
+log "== gotowe: ${OK} z ${TOTAL} pakietów zwróciło dane, ${AUTHFAIL} wymaga logowania, ${BAD} z błędem, ${SKIPPED} pominiętych"
 
 [ "$STDOUT" = 1 ] && cat "$RESULT"
 

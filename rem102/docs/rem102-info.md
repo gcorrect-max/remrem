@@ -1,92 +1,52 @@
-# REM102 – odczyt informacji o urządzeniu przez CGI (curl)
+# REM-102 – CGI API (odczyt)
 
-> Wersja angielska: [`rem102-info_en.md`](rem102-info_en.md) · Wersja HTML: [`rem102-api.html`](rem102-api.html)
+> Wersja angielska: [`rem102-info_en.md`](rem102-info_en.md) · HTML: [`rem102-api.html`](rem102-api.html) · strona główna: [`../index.html`](../index.html)
 
-Skrypt `rem102/scripts/rem102-info.sh` loguje się do urządzenia REM102 i zbiera **wszystkie pakiety informacji tylko do odczytu** z zakładek **Home, Setup, Advanced, Monitoring** oraz z `settings.json` (nazwa projektu/host). Każdy pakiet jest zwracany jako obiekt JSON.
+## Wprowadzenie
 
-Źródłem listy zapytań są pliki konfiguracyjne interfejsu WWW urządzenia: `home.json`, `setup.json`, `advanced.json`, `monitoring.json`, `settings.json`.
+Opis zapytań CGI, którymi interfejs WWW urządzenia **REM-102** (serwer Boa, strona producenta HaslerRail) pobiera dane. Lista pochodzi z plików, które urządzenie samo udostępnia (`Config/*.json`), odczytanych skryptem `collect.ps1 -Discover`. Uwzględnione są wyłącznie zapytania odczytowe.
 
-> **Status:** skrypt sprawdzono na atrapie serwera HTTP (składanie JSON, pliki wyjściowe, obsługa błędów), **nie na prawdziwym urządzeniu**. Format ciał odpowiedzi urządzenia nie był znany – patrz sekcja [Założenia](#założenia-do-potwierdzenia).
+> **Status.** Logowanie, nazwy CGI, ciasteczko sesji i poziomy dostępu pochodzą ze skryptów strony urządzenia (`Script/mainParent.js`, `Script/globalFunc.js`). Skrypty zbierające sprawdzono na atrapie serwera, nie na prawdziwych odpowiedziach. **Treści odpowiedzi poszczególnych pakietów nie znamy jeszcze** – patrz sekcja „Przykłady odpowiedzi”.
 
-## Wymagania
+Adres bazowy: `http://<HOST>` (domyślnie `192.168.128.1`, port 80). Urządzenie udostępnia cztery pliki CGI:
 
-- `bash`, `curl`, `jq`
-- dostęp sieciowy do urządzenia (domyślnie `192.168.128.1`, jak w `data/modulesCfg.ts`)
-- konto z odpowiednim poziomem uprawnień (strony z `show_level` 1–2 mogą wymagać wyższego poziomu)
-
-## Uruchomienie
-
-```bash
-# jeden plik JSON na stdout
-REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='...' ./scripts/rem102-info.sh > rem102.json
-
-# zapis do plików (domyślnie rem102/results/): collected.json, samples/<zakładka>/<id>.json, collect.log
-REM_HOST=... REM_USER=... REM_PASS=... ./rem102/scripts/collect.sh
-```
-
-| Zmienna | Znaczenie | Domyślnie |
-|---|---|---|
-| `REM_HOST` | adres IP/host urządzenia (może zawierać port) | `192.168.128.1` |
-| `REM_USER` | login | – (wymagana) |
-| `REM_PASS` | hasło | – (wymagana) |
-| `REM_LOGIN_BODY` | pełne ciało żądania logowania (nadpisuje domyślne) | `query=120&username=$REM_USER&pwd=$REM_PASS` |
-| `REM_OUT_DIR` | katalog wynikowy (`collected.json`, `samples/`, `collect.log`) | `rem102/results/` (w `rem102-info.sh`: wyłączony) |
-| `REM_TIMEOUT` | limit czasu jednego zapytania, s | `10` |
-| `REM_DELAY` | przerwa między zapytaniami, s | `0` |
-
-Ostrzeżenia (np. nieudane logowanie) idą na stderr, więc stdout zawsze zawiera czysty JSON.
-
-### Windows (PowerShell)
-
-Pliki `.sh` nie uruchomią się w Windows (system pyta, czym otworzyć plik). Użyj wersji PowerShell: `rem102\scripts\collect.ps1`. Nie wymaga ani basha, ani `curl`, ani `jq`, ani Pythona – wystarcza Windows PowerShell 5.1.
-
-```powershell
-cd C:\rem102\scripts
-.\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password
-```
-
-- Bez `-Password` skrypt zapyta o hasło.
-- `collect.cmd` uruchamia `collect.ps1` z `-ExecutionPolicy Bypass`, więc nie trzeba zmieniać ustawień PowerShell. Jeśli uruchamiasz `.ps1` bezpośrednio i dostajesz błąd o zablokowanych skryptach, wykonaj `Unblock-File .\collect.ps1`.
-- Wynik jest w `rem102\results\` (`collected.json`, `samples\`, `collect.log`), w tym samym formacie co z `collect.sh`.
-- Parametry odpowiadają zmiennym `REM_*`: `-DeviceHost`, `-User`, `-Password`, `-LoginBody`, `-OutDir`, `-TimeoutSec`, `-DelayMs`, `-StdOut`.
-- W PowerShellu `curl` jest aliasem `Invoke-WebRequest`. Polecenia curl z tej dokumentacji uruchamiaj jako `curl.exe` (Windows 10 i nowsze); składnia powłoki (`\`, `$HOST`) też się różni, więc do zbierania danych użyj `collect.cmd`.
-- Nazwę użytkownika ze spacją podaj w cudzysłowie: `-User "Super Admin"` (bez cudzysłowu druga część trafia do innego parametru). To samo dotyczy hasła ze znakami specjalnymi.
-- Gdy wszystko zwraca HTTP 404 (jak przy pierwszym uruchomieniu), uruchom `.\collect.cmd -DeviceHost 192.168.128.1 -Probe`. Tryb `-Probe` nie wysyła danych logowania; sprawdza porty 80/8080/8000/8081/443/8443 i kilka ścieżek, a wynik zapisuje w `results\probe.json`.
-- Gdy CGI jest pod innym adresem, podaj go: `-BaseUrl https://192.168.128.1:8443` (albo `http://host:port/prefiks`); `-Insecure` akceptuje certyfikat self-signed.
-- Gdy urządzenie używa `.cgi` zamiast `.fcgi` (tak jest w firmware, który odpowiedział w teście), dodaj `-CgiExt cgi`. Wtedy login i wszystkie zapytania idą na `/cgi-bin/*.cgi`.
-- `-Discover` czyta własne pliki WWW urządzenia (strona logowania, `Config/*.json`, skrypty JS), bez logowania, i zapisuje `results\discover.json`. Pokazuje prawdziwe nazwy CGI i format logowania.
-- `collect.ps1` sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.
+| Plik CGI | Zakres |
+|---|---|
+| `/cgi-bin/mpc105.cgi` | platforma: logowanie, sieć, GPS, modem, RTC, pamięci, informacje o urządzeniu |
+| `/cgi-bin/mpc105j.cgi` | wylogowanie |
+| `/cgi-bin/rem.cgi` | miernik: kanały A/B, energia, archiwa, konfiguracja |
+| `/cgi-bin/rtp.cgi` | RTP100 |
 
 ## Podstawowe informacje – pełna sekwencja curl
 
-Użytkownik `user`, hasło `password`, adres domyślny `192.168.128.1`. Kroki 2–6 zwracają model, numer seryjny, numer artykułu i pozostałe dane identyfikacyjne.
+Poziom Super Admin (`login=3`), hasło `password` (wpisz własne). Kroki 2–6 zwracają model, numer seryjny, numer artykułu i pozostałe dane identyfikacyjne oraz podstawową konfigurację.
 
 ```bash
 HOST=192.168.128.1
 JAR=$(mktemp)
 
-# 1. login (cookies CGIUSERNAME / CGIUSERLEVEL are saved in $JAR)
-curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.fcgi" \
-     --data-raw "query=120&username=user&pwd=password"
-cat "$JAR"    # powinny być widoczne CGIUSERNAME i CGIUSERLEVEL
+# 1. logowanie jako Super Admin (login=3); hasło kodowane jak w formularzu
+curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" \
+     --data "query=120" --data "login=3" --data-urlencode "pwd=password"
+cat "$JAR"    # powinno być widoczne ciasteczko CGISESSID
 
-# 2. model, numer seryjny, numer artykułu i pozostałe dane urządzenia
-curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=302"
+# 2. model, numer seryjny, numer artykułu i pozostałe dane urządzenia (Advanced > Information > Device Settings)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
 
-# 3. wersje oprogramowania (firmware, FPGA, DSP)
-curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=301"
+# 3. wersje oprogramowania (Advanced > Information > Version)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
 
-# 4. nazwa hosta
-curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=126"
+# 4. ustawienia miernika (Setup > Meter > Settings)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/rem.cgi?query=105"
 
-# 5. ustawienia miernika
-curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/rem.fcgi" --data-raw "query=105"
+# 5. konfiguracja kanałów (Setup > Meter > Channels Configuration)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/rem.cgi?query=100"
 
-# 6. numer seryjny DMeter (tylko jeśli moduł jest włączony)
-curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/items.fcgi" --data-raw "query=407"
+# 6. stan Ethernet 0 (Monitoring > Network Interfaces)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=3"
 
 # 7. wylogowanie (opcjonalnie)
-curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=1983"
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
 rm -f "$JAR"
 ```
 
@@ -94,279 +54,310 @@ Wszystko jednym poleceniem (bez wylogowania), z nagłówkiem przed każdą odpow
 
 ```bash
 HOST=192.168.128.1; JAR=$(mktemp)
-curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=120&username=user&pwd=password"
-for r in mpc105.fcgi:302 mpc105.fcgi:301 mpc105.fcgi:126 rem.fcgi:105 items.fcgi:407; do
-  printf '\n== %s?query=%s ==\n' "${r%%:*}" "${r##*:}"
-  curl -sS -w '\n' -b "$JAR" -G "http://$HOST/cgi-bin/${r%%:*}" --data-raw "query=${r##*:}"
+curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=3" --data-urlencode "pwd=password"
+for r in mpc105.cgi?query=302 mpc105.cgi?query=301 rem.cgi?query=105 rem.cgi?query=100; do
+  printf '\n== %s ==\n' "$r"
+  curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/$r"
 done; rm -f "$JAR"
 ```
 
-Uwagi: nazwy pól logowania (`username`, `pwd`) są założeniem (patrz [Założenia](#założenia-do-potwierdzenia)). Hasło ze znakami specjalnymi (`&`, `+`, `%`) wymaga kodowania URL w `--data-raw` albo użycia `--data-urlencode "pwd=..."`.
+Uwagi: `--data-urlencode` koduje hasło tak, jak robi to formularz strony (znaki `@`, `!`, `&` są bezpieczne). W PowerShellu `curl` jest aliasem `Invoke-WebRequest`: używaj `curl.exe` albo skryptu `collect.cmd` (patrz „Skrypty”). Zła para poziom/hasło zwraca `{"value":"fail"}`.
 
-## Format wyniku
+## Logowanie i poziomy dostępu
 
-Jeden obiekt: `device` (metadane zbierania) + po jednym kluczu na zakładkę, a w nim pakiety po `id`.
+Logowanie wykonuje formularz strony (`Script/mainParent.js`): `POST /cgi-bin/mpc105.cgi` z polami formularza:
+
+| Pole | Znaczenie |
+|---|---|
+| `query` | zawsze `120` (z `Config/settings.json`, typ `LoginOnStart`) |
+| `login` | poziom: `1` = User, `2` = Admin, `3` = Super Admin (nie nazwa użytkownika) |
+| `pwd` | hasło, kodowane URL |
+| `change` | zaznaczone tylko przy zmianie hasła |
+
+- Odpowiedź to JSON z polem `value`: `"fail"` = złe hasło, `"change"` = trzeba zmienić hasło, inna wartość = zalogowano.
+- Sesję niesie ciasteczko `CGISESSID`; poziom odczytuje strona z 5. znaku wartości (`A`..`D` = 0..3).
+- Wylogowanie: `GET /cgi-bin/mpc105j.cgi?query=122`, strona kasuje ciasteczko.
+- Strona pokazuje pozycję menu, gdy `show_level` ≤ poziom użytkownika; zapis wymaga `write_level`.
+- Według skryptów strony odpowiedź `{"value":"fail"}` na zapytanie odczytowe oznacza „Needed Authentication”.
+
+## Konwencje
+
+- Zapytania odczytowe to `GET <cgi>?<query>`, odpowiedzi są w JSON (strona używa `$.getJSON`).
+- W plikach menu parametry zapytań bywają rozdzielone znakiem `~` (np. `query=7~block_offset=10240~…`). W tabeli pakietów zapisano je jako `&`; to założenie, patrz „Założenia”.
+- Pola `en_cgi`/`en_query` w menu sprawdzają, czy moduł jest włączony – to pakiety z zakładki Features.
+- Pola `set`, `set1`, `set2` zapisują konfigurację – **nie są** używane.
+
+## Format wyniku skryptów
+
+Skrypty zbierające zwracają jeden obiekt JSON: `device` (metadane), `login` (wynik logowania) i klucz na zakładkę z pakietami po `id`.
 
 ```json
 {
-  "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
-  "identity": {
-    "device_settings": {
-      "label": "Advanced > Information > Device Settings (model, serial no., article no.)",
-      "cgi": "/cgi-bin/mpc105.fcgi",
+  "device": { "base_url": "http://192.168.128.1", "collected_at": "<czas UTC>", "packages_total": 66 },
+  "login": { "http_status": 200, "ok": true, "value": "<odpowiedź>", "level_requested": 3, "level_from_cookie": 3 },
+  "advanced": {
+    "information_device_settings": {
+      "label": "Advanced > Information > Device Settings",
+      "cgi": "/cgi-bin/mpc105.cgi",
       "query": "query=302",
       "http_status": 200,
-      "body": { "...": "odpowiedź urządzenia" }
-    }
-  },
-  "home": { "...": "..." },
-  "setup": { "...": "..." },
-  "advanced": { "...": "..." },
-  "monitoring": { "...": "..." },
-  "features": { "...": "..." }
-}
-```
-
-Pola pakietu:
-
-| Pole | Opis |
-|---|---|
-| `label` | ścieżka w menu WWW, z którego pochodzi zapytanie |
-| `cgi`, `query` | dokładnie to, co poszło do urządzenia |
-| `http_status` | kod HTTP; `0` = błąd połączenia/timeout |
-| `body` | odpowiedź: **JSON, jeśli się parsuje**; w przeciwnym razie surowy tekst; `null` gdy pusta |
-
-Błąd jednego pakietu (np. moduł wyłączony → 4xx/5xx lub pusta odpowiedź) **nie przerywa** zbierania pozostałych.
-
-## Pakiety
-
-Wszystkie zapytania to `GET http://$HOST<cgi>?<query>` z ciasteczkami sesji.
-
-### `identity` – model, numer seryjny, numer artykułu, wersje
-
-| id | cgi | query | Źródło w menu |
-|---|---|---|---|
-| `device_settings` | `mpc105.fcgi` | `query=302` | Advanced › Information › Device Settings (**model, SN, nr artykułu**) |
-| `version` | `mpc105.fcgi` | `query=301` | Advanced › Information › Version |
-| `host` | `mpc105.fcgi` | `query=126` | settings.json › host |
-| `auth_message` | `mpc105.fcgi` | `query=125` | settings.json › auth_message |
-| `meter_settings` | `rem.fcgi` | `query=105` | Setup › Meter › Settings |
-| `dmeter_serial` | `items.fcgi` | `query=407` | Setup › DMeter › Serial Number |
-
-Nazwa projektu w `settings.json` to `REM102-S2` (prawdopodobny model).
-
-### `home`
-
-| id | cgi | query |
-|---|---|---|
-| `meter_status` | `rem.fcgi` | `query=10` |
-| `emf_status` | `rem.fcgi` | `query=406` |
-| `emf_measures` | `rem.fcgi` | `query=407` |
-| `emf_cebd` | `rem.fcgi` | `query=409` |
-| `dhs_memory` | `rem.fcgi` | `query=459` |
-| `digital_io` | `rem.fcgi` | `query=11` |
-| `net_interfaces` | `mpc105.fcgi` | `query=500` |
-| `net_services` | `mpc105.fcgi` | `query=501` |
-
-### `setup`
-
-| id | cgi | query |
-|---|---|---|
-| `channels_configuration` | `rem.fcgi` | `query=100` |
-| `dcs_user_1` … `dcs_user_4` | `rem.fcgi` | `query=450&user=N` |
-| `dcs_communication` | `rem.fcgi` | `query=452` |
-| `dcs_binding` | `rem.fcgi` | `query=457` |
-| `dcs_conn_test` | `rem.fcgi` | `query=455` |
-| `ethernet_0` / `ethernet_1` | `mpc105.fcgi` | `query=103` / `query=104` |
-| `mobile_settings` | `mpc105.fcgi` | `query=101` |
-| `dhcp_client` | `mpc105.fcgi` | `query=200` |
-| `gateway_dns` | `mpc105.fcgi` | `query=201` |
-| `servers` | `mpc105.fcgi` | `query=202` |
-| `ntp_servers` | `mpc105.fcgi` | `query=203` |
-| `ems_time_servers` | `mpc105.fcgi` | `query=230` |
-| `gps` | `mpc105.fcgi` | `query=205` |
-
-### `advanced`
-
-| id | cgi | query |
-|---|---|---|
-| `rtc_time` | `mpc105.fcgi` | `query=303` |
-| `events` | `mpc105.fcgi` | `query=314` |
-
-(`Device Settings` i `Version` są w pakiecie `identity`.)
-
-### `monitoring`
-
-| id | cgi | query |
-|---|---|---|
-| `eth_0`, `eth_1`, `mobile`, `gps` | `mpc105.fcgi` | `query=3`, `4`, `13`, `16` |
-| `dcs_stats_user_1` … `_4` | `rem.fcgi` | `query=461&user=N` |
-| `dmeter_status` | `items.fcgi` | `query=409` |
-| `rtp100_vars`, `rtp100_files` | `rtp.fcgi` | `query=441`, `444` |
-| `mem_nand`, `mem_nor`, `mem_ram` | `mpc105.fcgi` | `query=23`, `24`, `25` |
-| `dev_rtc`, `dev_fpga`, `dev_fram`, `dev_adc`, `dev_dsp`, `dev_mvbcs`, `dev_modem` | `mpc105.fcgi` | `query=7`, `8`, `9`, `10`, `11`, `12`, `17` |
-
-### `features` – które moduły są włączone (`en_query` z menu)
-
-`dcs` (463), `dcs_user_1..4` (`462&user=N`), `dmeter_rem` (420), `dmeter_items` (`items.fcgi` 400), `rtp100` (430), `mobile` (`mpc105` 14), `gps` (`mpc105` 15), `dsp_digitalio` (`mpc105` 18).
-Pozwalają zrozumieć, czemu np. pakiety DCS czy GPS są puste.
-
-## Celowo pominięte
-
-| Zapytanie | Dlaczego |
-|---|---|
-| `rem.fcgi query=440` (Restore Factory Default) | przywraca ustawienia fabryczne |
-| `mpc105.fcgi query=1982` (reboot) | restartuje urządzenie |
-| `rem.fcgi query=402` (Export SIC Configuration) | akcja eksportu, nie odczyt informacji |
-| `mpc105.fcgi query=122` (Accounts Management) | dane kont użytkowników |
-| wszystkie pola `set` / `set1` | zapisują konfigurację |
-| `items.fcgi query=410`, `rtp.fcgi query=442/443/445` | zapis/komendy RTP100 i DMeter |
-
-## Przykłady
-
-### Pojedyncze zapytania curl (ręcznie)
-
-```bash
-HOST=192.168.128.1
-JAR=$(mktemp)
-
-# logowanie (cookies CGIUSERNAME / CGIUSERLEVEL trafiają do $JAR)
-curl -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.fcgi" \
-     --data-raw "query=120&username=Admin&pwd=HASLO"
-
-# model, numer seryjny, numer artykułu
-curl -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=302"
-
-# wersje oprogramowania
-curl -b "$JAR" -G "http://$HOST/cgi-bin/mpc105.fcgi" --data-raw "query=301"
-
-# DCS User 2 (w JSON-ach menu zapis "query=450~user=2"; "~" = "&")
-curl -b "$JAR" -G "http://$HOST/cgi-bin/rem.fcgi" --data-raw "query=450&user=2"
-```
-
-### Wyciąganie danych z wyniku (`jq`)
-
-```bash
-# identyfikacja urządzenia
-jq '.identity | {device_settings: .device_settings.body, version: .version.body}' rem102.json
-
-# które pakiety się nie udały (kod HTTP != 200)
-jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
-       | select(.value.http_status != 200) | "\($t)/\(.key): HTTP \(.value.http_status)"' rem102.json
-
-# wszystkie pakiety jako płaska lista id -> body
-jq 'del(.device) | [to_entries[] | .key as $t | .value | to_entries[]
-       | {id: "\($t)/\(.key)", body: .value.body}]' rem102.json
-
-# jedna zakładka
-jq '.monitoring' rem102.json
-```
-
-### Struktura wyniku
-
-Poniżej sama koperta pakietu. Treść odpowiedzi urządzenia (`body`) jest tu zastąpiona znacznikiem. Prawdziwe odpowiedzi są w sekcji [Przykłady odpowiedzi](#przykłady-odpowiedzi) i pojawiają się tam dopiero po zebraniu ich z urządzenia.
-
-```json
-{
-  "device": { "host": "192.168.128.1", "collected_at": "<czas UTC>" },
-  "identity": {
-    "device_settings": {
-      "label": "Advanced > Information > Device Settings (model, serial no., article no.)",
-      "cgi": "/cgi-bin/mpc105.fcgi",
-      "query": "query=302",
-      "http_status": 200,
+      "content_type": "<nagłówek>",
       "body": "<odpowiedź urządzenia – do uzupełnienia po podłączeniu>"
     }
   }
 }
 ```
 
-<!-- rem102-samples:start -->
+| Pole | Opis |
+|---|---|
+| `label` | ścieżka w menu WWW |
+| `cgi`, `query` | dokładnie to, co poszło do urządzenia |
+| `http_status` | kod HTTP; `0` = brak odpowiedzi HTTP (pole `error` podaje powód) |
+| `content_type`, `server` | nagłówki odpowiedzi |
+| `body` | JSON, jeśli odpowiedź się parsuje; inaczej tekst; `null` gdy pusta |
+| `post_retry` | tylko gdy GET zawiódł: wynik jednorazowej próby POST |
+
+Błąd jednego pakietu nie przerywa zbierania pozostałych.
+
+## Pakiety
+
+### Home (`home`)
+
+Odczyty miernika: kanały A i B, energia, wejścia/wyjścia cyfrowe, archiwa, sieć.
+
+| Nazwa | Zapytanie | min. poziom | Uwagi |
+|---|---|---|---|
+| `home.summary_meter_status` | `/cgi-bin/rem.cgi?query=7&block_offset=10240&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=17&string_size=32` | 0 |  |
+| `home.ch_a_energy` | `/cgi-bin/rem.cgi?query=7&block_offset=11264&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32` | 0 |  |
+| `home.ch_a_measures` | `/cgi-bin/rem.cgi?query=106&channel=0` | 0 | W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt. |
+| `home.ch_b_energy` | `/cgi-bin/rem.cgi?query=7&block_offset=12288&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32` | 0 |  |
+| `home.ch_b_measures` | `/cgi-bin/rem.cgi?query=106&channel=1` | 0 | W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt. |
+| `home.digital_io` | `/cgi-bin/rem.cgi?query=7&block_offset=13312&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=12&string_size=32` | 0 |  |
+| `home.archive_1_waiting_files` | `/cgi-bin/rem.cgi?query=107&id=1` | 0 |  |
+| `home.archive_1_sent_files` | `/cgi-bin/rem.cgi?query=108&id=1` | 0 |  |
+| `home.archive_1_test_files` | `/cgi-bin/rem.cgi?query=112&id=1` | 0 |  |
+| `home.archive_2_waiting_files` | `/cgi-bin/rem.cgi?query=107&id=2` | 0 |  |
+| `home.archive_2_sent_files` | `/cgi-bin/rem.cgi?query=108&id=2` | 0 |  |
+| `home.archive_2_test_files` | `/cgi-bin/rem.cgi?query=112&id=2` | 0 |  |
+| `home.networking_interfaces` | `/cgi-bin/mpc105.cgi?query=500` | 0 |  |
+| `home.networking_services` | `/cgi-bin/mpc105.cgi?query=501` | 0 |  |
+| `home.networking_redirection` | `/cgi-bin/mpc105.cgi?query=502` | 0 |  |
+
+### Monitoring (`monitoring`)
+
+Stan interfejsów sieciowych, pamięci i podzespołów oraz RTP100.
+
+| Nazwa | Zapytanie | min. poziom | Uwagi |
+|---|---|---|---|
+| `monitoring.network_interfaces_ethernet_0` | `/cgi-bin/mpc105.cgi?query=3` | 0 |  |
+| `monitoring.network_interfaces_ethernet_1` | `/cgi-bin/mpc105.cgi?query=4` | 0 |  |
+| `monitoring.network_interfaces_ethernet_2` | `/cgi-bin/mpc105.cgi?query=5` | 0 |  |
+| `monitoring.network_interfaces_wlan` | `/cgi-bin/mpc105.cgi?query=6` | 0 |  |
+| `monitoring.network_interfaces_mobile` | `/cgi-bin/mpc105.cgi?query=13` | 0 |  |
+| `monitoring.network_interfaces_ethernet_switch` | `/cgi-bin/mpc105.cgi?query=14` | 0 |  |
+| `monitoring.network_interfaces_gps` | `/cgi-bin/mpc105.cgi?query=16` | 0 |  |
+| `monitoring.rtp100_rtp100_variables` | `/cgi-bin/rtp.cgi?query=441` | 0 | Wymaga włączonego modułu: `features.rtp100`. |
+| `monitoring.rtp100_rtp100_files` | `/cgi-bin/rtp.cgi?query=444` | 0 | Wymaga włączonego modułu: `features.rtp100`. |
+| `monitoring.memory_nand` | `/cgi-bin/mpc105.cgi?query=23` | 0 |  |
+| `monitoring.memory_nor` | `/cgi-bin/mpc105.cgi?query=24` | 0 |  |
+| `monitoring.memory_ram` | `/cgi-bin/mpc105.cgi?query=25` | 0 |  |
+| `monitoring.other_devices_rtc` | `/cgi-bin/mpc105.cgi?query=7` | 0 |  |
+| `monitoring.other_devices_fpga` | `/cgi-bin/mpc105.cgi?query=8` | 0 |  |
+| `monitoring.other_devices_fram` | `/cgi-bin/mpc105.cgi?query=9` | 0 |  |
+| `monitoring.other_devices_adc` | `/cgi-bin/mpc105.cgi?query=10` | 0 |  |
+| `monitoring.other_devices_hdlc` | `/cgi-bin/mpc105.cgi?query=11` | 0 |  |
+| `monitoring.other_devices_mvbcs` | `/cgi-bin/mpc105.cgi?query=12` | 0 |  |
+| `monitoring.other_devices_modem` | `/cgi-bin/mpc105.cgi?query=17` | 0 |  |
+| `monitoring.other_devices_wifi` | `/cgi-bin/mpc105.cgi?query=18` | 0 |  |
+
+### Setup (`setup`)
+
+Konfiguracja miernika, interfejsów sieciowych, DHCP i usług.
+
+| Nazwa | Zapytanie | min. poziom | Uwagi |
+|---|---|---|---|
+| `setup.meter_settings` | `/cgi-bin/rem.cgi?query=105` | 0 | Ustawienia miernika (rem.cgi, nie mpc105.cgi). |
+| `setup.meter_channels_configuration` | `/cgi-bin/rem.cgi?query=100` | 0 |  |
+| `setup.meter_ftp_hosts` | `/cgi-bin/rem.cgi?query=101` | 0 |  |
+| `setup.meter_udp_clients` | `/cgi-bin/rem.cgi?query=102` | 0 |  |
+| `setup.meter_messages` | `/cgi-bin/rem.cgi?query=103` | 0 |  |
+| `setup.meter_calibration` | `/cgi-bin/rem.cgi?query=7&block_offset=8192&byte_offset=0&data_size=1024&type=DINT&name=energy&memory=remshm&number=2` | 3 | Odczyt pamięci współdzielonej; w menu show_level 3 (Super Admin). |
+| `setup.meter_thresholds_protection` | `/cgi-bin/rem.cgi?query=111` | 0 |  |
+| `setup.rtp100_rtp100_command` | `/cgi-bin/rtp.cgi?query=442` | 0 | Wymaga włączonego modułu: `features.rtp100`. |
+| `setup.ethernet_interfaces_ethernet_0` | `/cgi-bin/mpc105.cgi?query=103` | 0 |  |
+| `setup.ethernet_interfaces_ethernet_1` | `/cgi-bin/mpc105.cgi?query=104` | 0 |  |
+| `setup.ethernet_interfaces_ethernet_2` | `/cgi-bin/mpc105.cgi?query=105` | 0 |  |
+| `setup.ethernet_interfaces_switch_ethernet` | `/cgi-bin/mpc105.cgi?query=107` | 0 |  |
+| `setup.mobile_interface_mobile_settings` | `/cgi-bin/mpc105.cgi?query=101` | 0 |  |
+| `setup.wireless_interface_wlan` | `/cgi-bin/mpc105.cgi?query=106` | 0 |  |
+| `setup.wireless_interface_client_access` | `/cgi-bin/mpc105.cgi?query=204` | 0 |  |
+| `setup.dhcp_client_settings` | `/cgi-bin/mpc105.cgi?query=200` | 0 |  |
+| `setup.dhcp_server_settings` | `/cgi-bin/mpc105.cgi?query=208` | 0 |  |
+| `setup.dhcp_address_reservation` | `/cgi-bin/mpc105.cgi?query=209` | 0 |  |
+| `setup.services_gateway_dns` | `/cgi-bin/mpc105.cgi?query=201` | 0 |  |
+| `setup.services_servers` | `/cgi-bin/mpc105.cgi?query=202` | 0 |  |
+| `setup.services_ntp_servers` | `/cgi-bin/mpc105.cgi?query=203` | 0 |  |
+| `setup.services_gps` | `/cgi-bin/mpc105.cgi?query=205` | 0 |  |
+| `setup.services_port_forwarding` | `/cgi-bin/mpc105.cgi?query=207` | 0 |  |
+| `setup.services_proxy_settings` | `/cgi-bin/mpc105.cgi?query=220` | 0 |  |
+
+### Advanced (`advanced`)
+
+Czas RTC, konfiguracja i informacje o urządzeniu (model, numer seryjny, wersje, zdarzenia).
+
+| Nazwa | Zapytanie | min. poziom | Uwagi |
+|---|---|---|---|
+| `advanced.rtc_time_settings` | `/cgi-bin/mpc105.cgi?query=303` | 0 |  |
+| `advanced.rtc_time_zones` | `/cgi-bin/mpc105.cgi?query=305` | 0 |  |
+| `advanced.configuration_settings` | `/cgi-bin/rem.cgi?query=113` | 0 |  |
+| `advanced.information_device_settings` | `/cgi-bin/mpc105.cgi?query=302` | 1 | Model, numer seryjny, numer artykułu i pozostałe dane urządzenia. W menu: show_level 1, write_level 3. |
+| `advanced.information_events` | `/cgi-bin/mpc105.cgi?query=314` | 0 | W menu to samo zapytanie służy też do zapisu (set = query=314); skrypt wysyła tylko odczyt. |
+| `advanced.information_version` | `/cgi-bin/mpc105.cgi?query=301` | 0 | Wersje oprogramowania. |
+
+### Features (`features`)
+
+Flagi włączenia modułów (`en_query` z menu).
+
+| Nazwa | Zapytanie | min. poziom | Uwagi |
+|---|---|---|---|
+| `features.rtp100` | `/cgi-bin/rem.cgi?query=430` | 0 | Odpowiedź to tablica obiektów; `{"type":"enable","value":"true"}` oznacza włączony moduł (reguła ze skryptu strony). |
 
 ## Przykłady odpowiedzi
 
-Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia.
+Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia. Odpowiedź `{"value":"fail"}` (wymagane logowanie) i błędy HTTP nie są przykładami.
 
-Zebrano przykładów: 0 z 65.
+Zebrano przykładów: 0 z 66.
 
-Jak uzupełnić (po podłączeniu do urządzenia):
+Jak uzupełnić:
 
 ```bash
-REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh
+REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='password' ./rem102/scripts/collect.sh
 python3 rem102/scripts/build-docs.py
 ```
 
-<details><summary>Do uzupełnienia (65)</summary>
+<details><summary>Do uzupełnienia (66)</summary>
 
-- `identity.device_settings`
-- `identity.version`
-- `identity.host`
-- `identity.auth_message`
-- `identity.meter_settings`
-- `identity.dmeter_serial`
-- `home.meter_status`
-- `home.emf_status`
-- `home.emf_measures`
-- `home.emf_cebd`
-- `home.dhs_memory`
+- `home.summary_meter_status`
+- `home.ch_a_energy`
+- `home.ch_a_measures`
+- `home.ch_b_energy`
+- `home.ch_b_measures`
 - `home.digital_io`
-- `home.net_interfaces`
-- `home.net_services`
-- `setup.channels_configuration`
-- `setup.dcs_user_1`
-- `setup.dcs_user_2`
-- `setup.dcs_user_3`
-- `setup.dcs_user_4`
-- `setup.dcs_communication`
-- `setup.dcs_binding`
-- `setup.dcs_conn_test`
-- `setup.ethernet_0`
-- `setup.ethernet_1`
-- `setup.mobile_settings`
-- `setup.dhcp_client`
-- `setup.gateway_dns`
-- `setup.servers`
-- `setup.ntp_servers`
-- `setup.ems_time_servers`
-- `setup.gps`
-- `advanced.rtc_time`
-- `advanced.events`
-- `monitoring.eth_0`
-- `monitoring.eth_1`
-- `monitoring.mobile`
-- `monitoring.gps`
-- `monitoring.dcs_stats_user_1`
-- `monitoring.dcs_stats_user_2`
-- `monitoring.dcs_stats_user_3`
-- `monitoring.dcs_stats_user_4`
-- `monitoring.dmeter_status`
-- `monitoring.rtp100_vars`
-- `monitoring.rtp100_files`
-- `monitoring.mem_nand`
-- `monitoring.mem_nor`
-- `monitoring.mem_ram`
-- `monitoring.dev_rtc`
-- `monitoring.dev_fpga`
-- `monitoring.dev_fram`
-- `monitoring.dev_adc`
-- `monitoring.dev_dsp`
-- `monitoring.dev_mvbcs`
-- `monitoring.dev_modem`
-- `features.dcs`
-- `features.dcs_user_1`
-- `features.dcs_user_2`
-- `features.dcs_user_3`
-- `features.dcs_user_4`
-- `features.dmeter_rem`
-- `features.dmeter_items`
+- `home.archive_1_waiting_files`
+- `home.archive_1_sent_files`
+- `home.archive_1_test_files`
+- `home.archive_2_waiting_files`
+- `home.archive_2_sent_files`
+- `home.archive_2_test_files`
+- `home.networking_interfaces`
+- `home.networking_services`
+- `home.networking_redirection`
+- `monitoring.network_interfaces_ethernet_0`
+- `monitoring.network_interfaces_ethernet_1`
+- `monitoring.network_interfaces_ethernet_2`
+- `monitoring.network_interfaces_wlan`
+- `monitoring.network_interfaces_mobile`
+- `monitoring.network_interfaces_ethernet_switch`
+- `monitoring.network_interfaces_gps`
+- `monitoring.rtp100_rtp100_variables`
+- `monitoring.rtp100_rtp100_files`
+- `monitoring.memory_nand`
+- `monitoring.memory_nor`
+- `monitoring.memory_ram`
+- `monitoring.other_devices_rtc`
+- `monitoring.other_devices_fpga`
+- `monitoring.other_devices_fram`
+- `monitoring.other_devices_adc`
+- `monitoring.other_devices_hdlc`
+- `monitoring.other_devices_mvbcs`
+- `monitoring.other_devices_modem`
+- `monitoring.other_devices_wifi`
+- `setup.meter_settings`
+- `setup.meter_channels_configuration`
+- `setup.meter_ftp_hosts`
+- `setup.meter_udp_clients`
+- `setup.meter_messages`
+- `setup.meter_calibration`
+- `setup.meter_thresholds_protection`
+- `setup.rtp100_rtp100_command`
+- `setup.ethernet_interfaces_ethernet_0`
+- `setup.ethernet_interfaces_ethernet_1`
+- `setup.ethernet_interfaces_ethernet_2`
+- `setup.ethernet_interfaces_switch_ethernet`
+- `setup.mobile_interface_mobile_settings`
+- `setup.wireless_interface_wlan`
+- `setup.wireless_interface_client_access`
+- `setup.dhcp_client_settings`
+- `setup.dhcp_server_settings`
+- `setup.dhcp_address_reservation`
+- `setup.services_gateway_dns`
+- `setup.services_servers`
+- `setup.services_ntp_servers`
+- `setup.services_gps`
+- `setup.services_port_forwarding`
+- `setup.services_proxy_settings`
+- `advanced.rtc_time_settings`
+- `advanced.rtc_time_zones`
+- `advanced.configuration_settings`
+- `advanced.information_device_settings`
+- `advanced.information_events`
+- `advanced.information_version`
 - `features.rtp100`
-- `features.mobile`
-- `features.gps`
-- `features.dsp_digitalio`
 
 </details>
 
-<!-- rem102-samples:end -->
+## Pominięte zapytania
+
+> Poniższych zapytań skrypty **nie** wysyłają – zmieniają stan urządzenia, kończą sesję albo służą do przesyłania plików.
+
+| Zapytanie | Powód |
+|---|---|
+| `rem.cgi?query=440` | Restore Factory Default – przywraca ustawienia fabryczne |
+| `mpc105.cgi?query=1982` | restart urządzenia |
+| `mpc105j.cgi?query=122` | wylogowanie (kończy sesję) |
+| `mpc105.cgi?query=121` | zmiana hasła |
+| `rem.cgi?query=402` | Export (akcja pobrania konfiguracji) |
+| `rem.cgi?query=401`, `mpc105.cgi?query=310` | Import konfiguracji i Firmware Upgrade (upload plików) |
+| `rtp.cgi?query=440`, `443`, `445` | zapis i komendy RTP100 |
+| wszystkie pola `set`, `set1`, `set2` | zapis konfiguracji |
+
+## Skrypty
+
+Zbieranie wszystkich pakietów po kolei: `rem102/scripts/collect.sh` (bash, curl, jq) albo `rem102/scripts/collect.ps1` (Windows PowerShell 5.1+, bez dodatkowych narzędzi). Oba zapisują `collected.json`, `samples/<zakładka>/<id>.json` i `collect.log` w `rem102/results/`. `rem102-info.sh` to skrót do `collect.sh` z wynikiem na stdout.
+
+### Linux / macOS / Git Bash
+
+```bash
+REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='password' ./rem102/scripts/collect.sh
+python3 rem102/scripts/build-docs.py
+```
+
+| Zmienna | Znaczenie | Domyślnie |
+|---|---|---|
+| `REM_HOST` | adres urządzenia | `192.168.128.1` |
+| `REM_USER` / `REM_LEVEL` | `User`, `Admin`, `Super Admin` albo poziom `1`, `2`, `3` | – (wymagane jedno z dwóch) |
+| `REM_PASS` | hasło | – (wymagane) |
+| `REM_BASE_URL` | pełny adres bazowy (inny port, HTTPS, prefiks) | `http://$REM_HOST` |
+| `REM_INSECURE` | `1` = akceptuj certyfikat self-signed | – |
+| `REM_OUT_DIR` | katalog wynikowy | `rem102/results/` |
+| `REM_TIMEOUT`, `REM_DELAY` | limit czasu zapytania i przerwa między zapytaniami, s | `10`, `0` |
+| `REM_LOGIN_BODY` | pełne ciało logowania (nadpisuje domyślne) | – |
+
+### Windows (PowerShell)
+
+Pliki `.sh` nie uruchomią się w Windows. Użyj `collect.cmd` (uruchamia `collect.ps1` z `-ExecutionPolicy Bypass`):
+
+```powershell
+cd C:\rem102\scripts
+.\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'password'
+```
+
+- Bez `-Password` skrypt zapyta o hasło. Nazwę ze spacją podaj w cudzysłowie; zamiast nazwy można podać `-Level 3`.
+- `-Discover` czyta własne pliki WWW urządzenia (bez logowania) i zapisuje `results\discover.json`; `-Probe` sprawdza porty i ścieżki (`results\probe.json`).
+- `-BaseUrl https://192.168.128.1:8443 -Insecure` – inny adres bazowy lub certyfikat self-signed.
+- Zwykły HTTP idzie surowym połączeniem TCP, więc nietypowe odpowiedzi CGI też zostają zapisane (z powodem w polu `error`).
+- Jeśli uruchamiasz `.ps1` bezpośrednio i dostajesz błąd o zablokowanych skryptach: `Unblock-File .\collect.ps1`.
+- `collect.ps1` sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.
 
 ## Użycie w LabVIEW
 
@@ -375,17 +366,15 @@ Lista zapytań jest dostępna jako pliki w `rem102/data/`. Kolejność wierszy j
 | Plik | Zawartość | Użycie |
 |---|---|---|
 | `rem102-package-names.txt` | jedna nazwa pakietu w wierszu (`tab.id`) | pozycje enuma (typedef) |
-| `rem102-package-requests.txt` | jedno zapytanie w wierszu, np. `/cgi-bin/mpc105.fcgi?query=302` | tablica stringów indeksowana wartością enuma |
-| `rem102-packages.tsv` | kolumny z nagłówkiem: `index, name, tab, id, cgi, query, request, method, min_level, requires, label` | wyszukiwanie po nazwie, bramkowanie po `min_level` i `requires` |
+| `rem102-package-requests.txt` | jedno zapytanie w wierszu, np. `/cgi-bin/mpc105.cgi?query=302` | tablica stringów indeksowana wartością enuma |
+| `rem102-packages.tsv` | kolumny z nagłówkiem: `index, name, tab, id, cgi, query, request, method, min_level, requires, label, cyclic_ms, note` | wyszukiwanie po nazwie, bramkowanie po `min_level` i `requires` |
 
-Nazwy mają postać `tab.id`, bo samo `id` się powtarza (np. `gps` występuje w Setup, Monitoring i Features).
+Nazwy mają postać `tab.id`, bo samo `id` mogłoby się powtarzać między zakładkami.
 
-Przepływ:
-
-1. **Enum.** Typedef `REM102 Package` z pozycjami z `rem102-package-names.txt`. Wartość enuma to 0-based numer wiersza.
-2. **Tablica zapytań.** *Read from Text File* (z konwersją końców linii), rozbicie na wiersze do `String[]`. Wczytaj raz przy starcie.
-3. **Zapytanie.** *Index Array* wartością enuma daje ścieżkę. Dopisz `http://` i host.
-4. **GET.** *HTTP Client* z ciasteczkami sesji po logowaniu (`query=120`) zwraca ciało odpowiedzi jako string.
+1. **Enum.** Typedef `REM102 Package` z pozycjami z `rem102-package-names.txt`; wartość enuma to numer wiersza liczony od 0.
+2. **Tablica zapytań.** *Read from Text File* (z konwersją końców linii), rozbicie na wiersze do `String[]`; wczytaj raz przy starcie.
+3. **Logowanie.** `POST /cgi-bin/mpc105.cgi` z `query=120&login=<1|2|3>&pwd=<hasło>`; zachowaj ciasteczko `CGISESSID` i wysyłaj je w nagłówku `Cookie`.
+4. **Zapytanie.** *Index Array* wartością enuma → ścieżka z zapytaniem; *HTTP Client* GET → ciało odpowiedzi jako string.
 5. **Parsowanie.** *Unflatten From JSON* do typedefu danego pakietu.
 
 ### VI polimorficzny
@@ -394,18 +383,19 @@ Polimorficzny VI wybiera instancję po **typie** podłączonych danych, nie po w
 
 ```text
 Get Package.vim
-  wejścia:  Package (enum REM102 Package), Type (dowolny typedef – specyfikator typu), Host, sesja
+  wejścia:  Package (enum REM102 Package), Type (dowolny typedef – specyfikator typu), Host, sesja (CGISESSID)
   wyjścia:  Data (typu Type), Raw Body (string), HTTP Status, error out
   wnętrze:  Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)
 ```
 
-Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Klasyczny polimorficzny `.vi` też zadziała, ale wymaga instancji na każdy typedef.
+Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` (poziom konta) i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
 
-Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem `collect.sh` na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
+## Założenia i do sprawdzenia
 
-## Założenia (do potwierdzenia)
+Ustalone z plików WWW urządzenia (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd`, ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`.
 
-1. **Logowanie.** Pliki JSON podają tylko `query=120`. Nazwy pól `username` i `pwd` pochodzą z konfiguracji LabVIEW (`data/modulesCfg.ts`), ciasteczka `CGIUSERNAME`/`CGIUSERLEVEL` również. Jeśli logowanie się nie uda, skrypt wypisze ostrzeżenie – wtedy przechwyć prawdziwe żądanie w DevTools i podaj je w `REM_LOGIN_BODY`.
-2. **GET vs POST.** Zapytania odczytowe wysyłane są GET-em. Jeśli urządzenie zwraca puste odpowiedzi, spróbuj POST (`-X POST --data-raw ...`) – zmień wywołanie w funkcji `q`.
-3. **Format odpowiedzi.** Nie wiadomo, czy urządzenie odpowiada JSON-em. Skrypt przyjmuje oba warianty (JSON → sparsowany, inne → surowy tekst w `body`).
-4. **Separator `~`.** W polu `query` w plikach menu oznacza `&`.
+1. **Treść odpowiedzi.** Format poszczególnych pakietów jest nieznany do czasu zebrania ich z urządzenia.
+2. **Separator `~`.** W plikach menu oznacza prawdopodobnie `&`; kod stron-iframe, który to przekształca, nie był jeszcze pobrany (nowy `-Discover` je pobiera).
+3. **Zapytania używane też do zapisu** (`advanced.information_events`, `home.ch_a_measures`, `home.ch_b_measures`): odczyt przez GET powinien być bezpieczny, bo strona robi to samo cyklicznie, ale do potwierdzenia.
+4. **Poziomy dostępu.** `show_level` rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu.
+5. **Odpowiedź 502 „The CGI was not CGI/1.1 compliant”** pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach i po zalogowaniu nie powinna występować.

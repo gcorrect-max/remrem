@@ -1,0 +1,24 @@
+[
+	{
+	"tag":"enVSHA",
+	"rules":
+		[
+			{"tag":"enVSHB", "action":"checked", "action_value": false}
+		]
+	},
+	{
+	"tag":"enVSHB",
+	"rules":
+		[
+			{"tag":"enVSHA", "action":"checked", "action_value": false}
+		]
+	},
+	{
+	"tag":"default",
+	"rules":
+		[
+			{"tag":"enVSHB", "action":"checked", "action_value": false},
+			{"tag":"enVSHA", "action":"checked", "action_value": false}
+		]
+	}
+]

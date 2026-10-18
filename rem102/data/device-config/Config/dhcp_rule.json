@@ -1,0 +1,23 @@
+[
+	{
+	"tag":"server",
+	"rules":
+		[
+			{"tag":"interface", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"ipstart", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"ipstop", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"lease", "action":"disabled", "action_value": false, "backcolor":"trasparent"}
+		]
+	},
+	{
+	"tag":"default",
+	"rules":
+		[
+			{"tag":"server", "action":"checked", "action_value": false},
+			{"tag":"interface", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"},
+			{"tag":"ipstart", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"},
+			{"tag":"ipstop", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"},
+			{"tag":"lease", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"}
+		]
+	}
+]	

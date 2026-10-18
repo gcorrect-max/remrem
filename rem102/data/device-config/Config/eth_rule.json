@@ -1,0 +1,47 @@
+[
+	{
+	"tag":"bonding",
+	"rules":
+		[
+			{"tag":"mirroring", "action":"checked", "action_value": false},
+			{"tag":"dhcp", "action":"checked", "action_value": false},
+			{"tag":"ip", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"mask", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"speed", "action":"disabled", "action_value": false, "backcolor":"trasparent"}
+		]
+	},
+	{	
+	"tag":"mirroring",
+	"rules":
+		[
+			{"tag":"bonding", "action":"checked", "action_value": false},
+			{"tag":"dhcp", "action":"checked", "action_value": false},
+			{"tag":"ip", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"mask", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"speed", "action":"disabled", "action_value": false, "backcolor":"trasparent"}
+		]
+	},
+	{
+	"tag":"dhcp",
+	"rules":
+		[
+			{"tag":"bonding", "action":"checked", "action_value": false},
+			{"tag":"mirroring", "action":"checked", "action_value": false},			
+			{"tag":"ip", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"},
+			{"tag":"mask", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"},
+			{"tag":"speed", "action":"disabled", "action_value": true, "backcolor":"#EAEAAE"}
+		]
+	},	
+	{
+	"tag":"default",
+	"rules":
+		[
+			{"tag":"bonding", "action":"checked", "action_value": false},
+			{"tag":"mirroring", "action":"checked", "action_value": false},
+			{"tag":"dhcp", "action":"checked", "action_value": false},
+			{"tag":"ip", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"mask", "action":"disabled", "action_value": false, "backcolor":"trasparent"},
+			{"tag":"speed", "action":"disabled", "action_value": false, "backcolor":"trasparent"}
+		]
+	}
+]	

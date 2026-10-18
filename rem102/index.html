@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>REM102 – odczyt informacji</title>
+<title>REM-102 – odczyt informacji</title>
 <style>
 :root{--bg:#f7f8fa;--panel:#fff;--text:#1b2230;--muted:#5d6779;--line:#dde1e8;--accent:#0b6bcb;--accent-bg:#e6f0fb;--code-bg:#f0f2f6;--warn:#b45309;--warn-bg:#fdf1de;--bad:#b42318;--bad-bg:#fdeceb;--get:#0a7a4b;--get-bg:#dff5ea}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131a;--panel:#171c25;--text:#e4e8ef;--muted:#9aa5b8;--line:#2a3140;--accent:#6aaaf0;--accent-bg:#17283d;--code-bg:#0c1016;--warn:#f0b35c;--warn-bg:#2d2312;--bad:#f5918a;--bad-bg:#2f1a19;--get:#5fd49b;--get-bg:#12281f}}
@@ -50,95 +50,90 @@ pre{margin:0;padding:12px 14px;background:var(--code-bg);border-radius:6px;overf
 .callout.bad{border-color:var(--bad);background:var(--bad-bg)}
 .hidden{display:none!important}
 @media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr)} h1,h2,h3{overflow-wrap:anywhere} aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)} .nav-i{display:none} main{padding:20px 16px 48px} .ep header{flex-direction:column}}
-.sub{margin:18px 0 6px;font-size:16px} .b.ok{background:var(--get-bg);color:var(--get)} ul.chk{list-style:none;padding-left:0} ul.chk li{margin:4px 0} main{margin:0 auto} a,code{overflow-wrap:anywhere}
+.sub{margin:18px 0 6px;font-size:16px}
+.lang{display:inline-block;margin-top:6px;font-size:13px}
+.sample summary{cursor:pointer;font-size:13px;color:var(--muted);margin:10px 0 6px}
+.tbd{font-style:italic}
+.b.ok{background:var(--get-bg);color:var(--get)}
+ul.chk{list-style:none;padding-left:0}
+ul.chk li{margin:4px 0}
+a,code{overflow-wrap:anywhere}
+main ol,main ul{padding-left:22px}
+ul.chk{padding-left:0}
+.code{margin:10px 0}
+
 </style>
 </head>
 <body>
-<main>
-<h1>REM102 – odczyt informacji o urządzeniu</h1>
+<main style="margin:0 auto">
+<h1>REM-102 – odczyt informacji o urządzeniu</h1>
 <p class="lead">Strona prowadząca do wątku, w którym powstał ten zestaw: <a href="https://claude.ai/code/session_01EnRG8vGUPDNmrrRkAUgc9q">https://claude.ai/code/session_01EnRG8vGUPDNmrrRkAUgc9q</a></p>
-<div class="callout"><strong>Stan:</strong> skrypty sprawdzono na atrapie serwera. Pierwsze uruchomienie na prawdziwym urządzeniu (18.10.2026) zakończyło się błędem HTTP 404 dla wszystkich pakietów – patrz <a href="#first-run">Pierwsze uruchomienie</a>. Przykładowe odpowiedzi w dokumentacji są puste, dopóki nie zostaną zebrane z urządzenia (poprawne odpowiedzi: 0 z 65 pakietów).</div>
+<div class="callout"><strong>Stan:</strong> znamy już prawdziwe API urządzenia (z jego własnych plików WWW), ale nie mamy jeszcze żadnej prawdziwej odpowiedzi pakietu. Skrypty sprawdzono na atrapie serwera. Poprawne odpowiedzi w dokumentacji: 0 z 66.</div>
 
 <h2>Cel</h2>
-<p>Pełny opis podłączonego urządzenia REM102 (model, numer seryjny, numer artykułu i reszta informacji z zakładek Home, Setup, Advanced, Monitoring) pobierany przez CGI przy użyciu curl, razem z dokumentacją tych zapytań i danymi do użycia w LabVIEW.</p>
+<p>Pełny opis podłączonego urządzenia REM-102 (model, numer seryjny, numer artykułu i reszta informacji z zakładek Home, Monitoring, Setup, Advanced) pobierany przez CGI, razem z dokumentacją tych zapytań i danymi do użycia w LabVIEW.</p>
 
-<h2 id="first-run">Pierwsze uruchomienie na urządzeniu (18.10.2026)</h2>
-<p>Wynik: <strong>65 z 65 pakietów i logowanie zwróciły HTTP 404</strong> (<code>text/html; charset=ISO-8859-1</code>). Dla każdego z czterech plików CGI serwer odpowiedział tak samo: <code>404 Not Found – The requested URL /cgi-bin/&lt;plik&gt;.fcgi was not found on this server.</code> (<a href="results/archive/collected-2026-10-18_all-404.json"><code>results/archive/collected-2026-10-18_all-404.json</code></a>).</p>
+<h2 id="found">Co ustaliliśmy z urządzenia (18.10.2026)</h2>
 <ul>
-<li><strong>Co z tego wynika:</strong> pod adresem <code>192.168.128.1</code> działa serwer WWW (odpowiada), ale ścieżki <code>/cgi-bin/*.fcgi</code> nie istnieją na tym adresie i porcie. Żadnej odpowiedzi z samego CGI jeszcze nie ma, więc dokumentacja nie dostała przykładów (odpowiedzi 404 nie są przykładami).</li>
-<li><strong>Możliwe przyczyny:</strong> interfejs WWW działa pod innym portem, schematem (HTTPS) albo prefiksem ścieżki; albo pod tym adresem odpowiada inne urządzenie niż to, z którego pochodzą pliki menu.</li>
-<li><strong>Następny krok:</strong> patrz „Wynik -Probe” niżej.</li>
-</ul>
-
-<h2 id="probe">Wynik <code>-Probe</code> (18.10.2026)</h2>
-<p>Plik: <a href="results/archive/probe-2026-10-18.json"><code>results/archive/probe-2026-10-18.json</code></a>.</p>
-<ul>
-<li><strong>Serwer:</strong> <code>Boa/0.94.14rc21</code> na porcie 80. Strona główna to ekran logowania („Log-in”, autor HaslerRail). Pozostałe porty (8080, 8000, 8081, 443, 8443) nie odpowiadały.</li>
-<li><strong>Kluczowe:</strong> <code>/Config/settings.json</code> jest dostępny bez logowania i wskazuje <code>"cgi": "cgi-bin/mpc105.cgi"</code> (typ <code>LoginOnStart</code>). To urządzenie używa więc <strong>.cgi, a nie .fcgi</strong>.</li>
-<li><code>GET /cgi-bin/mpc105.cgi?query=125</code> nie dał odpowiedzi HTTP (kod 0): CGI istnieje (nie ma 404), ale na takie żądanie bez logowania nie odpowiedziało. <code>/cgi-bin/mpc105.fcgi</code> i <code>/cgi-bin/rem.fcgi</code> to 404.</li>
-<li><strong>Wniosek:</strong> pliki menu, z których powstała lista 65 zapytań, pochodzą z innej wersji firmware niż to urządzenie (z <code>.fcgi</code>). Lista zapytań i format logowania mogą się różnić i trzeba je odczytać z samego urządzenia.</li>
-<li><strong>Następny krok (jedno uruchomienie, dwa pliki do wysłania):</strong>
-<pre><code>cd C:\rem102\scripts
-.\collect.cmd -DeviceHost 192.168.128.1 -Discover
-.\collect.cmd -DeviceHost 192.168.128.1 -CgiExt cgi -User "Super Admin" -Password "&lt;hasło&gt;"</code></pre>
-Wyślij <code>results\discover.json</code> i <code>results\collected.json</code>.</li>
+<li><strong>Serwer:</strong> <code>Boa/0.94.14rc21</code>, port 80, strona logowania („Log-in”, HaslerRail). Inne porty nie odpowiadały.</li>
+<li><strong>Pliki menu z pierwotnego zestawu były z innej wersji firmware.</strong> To urządzenie używa CGI <code>.cgi</code> (nie <code>.fcgi</code>), a lista zapytań jest inna: kanały A/B, archiwa, Ethernet 2, WLAN, HDLC i inne. Dlatego <code>-Discover</code> pobrał jego własne <code>Config/*.json</code>, a z nich odtworzono listę (66 pakietów).</li>
+<li><strong>Logowanie nie używa nazwy użytkownika.</strong> Formularz wysyła <code>query=120&amp;login=&lt;1|2|3&gt;&amp;pwd=&lt;hasło&gt;</code> (User, Admin, Super Admin) do <code>/cgi-bin/mpc105.cgi</code>. Sesję niesie ciasteczko <code>CGISESSID</code>, błąd to <code>{"value":"fail"}</code>.</li>
+<li><strong>Wcześniejsze 404 i 502:</strong> pierwotne zapytania szły na nieistniejące <code>.fcgi</code> (404); <code>rem.cgi</code> z nieznanym numerem zapytania daje 502 „The CGI was not CGI/1.1 compliant”. Biblioteka HTTP z PowerShella nie radziła sobie z odpowiedzią <code>mpc105.cgi</code> (kod 0), dlatego <code>collect.ps1</code> mówi teraz surowym HTTP przez TCP.</li>
+<li>Zapisy z tych prób są w <code>results/archive/</code>: <a href="results/archive/probe-2026-10-18.json">probe</a>, <a href="results/archive/discover-2026-10-18.json">discover</a>, <a href="results/archive/collected-2026-10-18_all-404.json">pierwsze zbieranie (wszystko 404)</a>.</li>
 </ul>
 
 <h2>Działania i po co</h2>
 <ul>
-<li><strong>Odczytano menu WWW urządzenia</strong> (<code>home/setup/advanced/monitoring/settings.json</code>) – żeby poznać zapytania CGI bez dokumentacji producenta.</li>
-<li><strong>Zebrano 65 zapytań tylko do odczytu</strong> i wykluczono zapis, reset, reboot oraz konta – żeby odczyt niczego nie zmieniał.</li>
-<li><strong>Napisano <code>collect.sh</code></strong> – pobiera wszystko po kolei i zapisuje do plików, z których uzupełnia się dokumentację.</li>
-<li><strong>Dokumentacja w md i HTML, PL i EN</strong> – opis API, sekwencja curl dla podstawowych informacji, przykłady.</li>
+<li><strong>Odczytano własne pliki WWW urządzenia</strong> (<code>-Probe</code>, <code>-Discover</code>) – żeby oprzeć dokumentację na tym, co urządzenie naprawdę udostępnia, a nie na zgadywaniu.</li>
+<li><strong>Odtworzono listę zapytań tylko do odczytu</strong> z <code>Config/*.json</code> i wykluczono zapis, reset, reboot, upload i wylogowanie – żeby odczyt niczego nie zmieniał.</li>
+<li><strong>Napisano skrypty zbierające</strong> (<code>collect.sh</code>, <code>collect.ps1</code>) – pobierają wszystko po kolei i zapisują do plików, z których uzupełnia się dokumentację.</li>
+<li><strong>Dokumentacja w HTML i md, PL i EN</strong> z jednego źródła – opis API, sekwencja curl dla podstawowych informacji, przykłady.</li>
 <li><strong>Tabele dla LabVIEW</strong> – nazwy do enuma i tablica zapytań, żeby jeden VI obsługiwał każdy pakiet.</li>
-<li><strong>Generator dokumentacji</strong> – przykłady odpowiedzi trafiają do dokumentów tylko z danych zebranych z urządzenia, nic nie jest zmyślone.</li>
+<li><strong>Generator</strong> – przykłady odpowiedzi trafiają do dokumentów tylko z danych zebranych z urządzenia, nic nie jest zmyślone.</li>
 </ul>
 
 <h2>Kolejność rozwiązań</h2>
 <ol>
-<li>Wyciągnięcie zapytań z plików menu i zamiana separatora <code>~</code> na <code>&amp;</code>.</li>
-<li>Logowanie <code>query=120</code> i ciasteczka <code>CGIUSERNAME</code>/<code>CGIUSERLEVEL</code>.</li>
-<li>Odczyt metodą GET; przy błędzie jednorazowa próba POST (<code>post_retry</code>).</li>
-<li>Wynik każdego pakietu w kopercie JSON: <code>http_status</code>, <code>content_type</code>, <code>body</code> (JSON albo tekst).</li>
-<li>Jedno źródło listy pakietów: <code>rem102-packages.tsv</code>; z niego nazwy, zapytania i dokumentacja.</li>
-<li>Generator wstawia do dokumentów wyłącznie zebrane próbki; reszta jest oznaczona „do uzupełnienia”.</li>
-<li>LabVIEW: enum wybiera zapytanie, a typ (typedef) wybiera parser – najlepiej malleable VI <code>Get Package.vim</code>.</li>
+<li>Sprawdzenie, co odpowiada na adresie (<code>-Probe</code>): Boa, port 80, strona logowania.</li>
+<li>Pobranie własnych plików WWW (<code>-Discover</code>): <code>Config/*.json</code> i skrypty JS.</li>
+<li>Odczytanie ze skryptów strony protokołu: logowanie poziomem i hasłem, ciasteczko, odczyty GET z JSON.</li>
+<li>Odtworzenie listy zapytań z menu urządzenia (<code>build-packages.py</code>) i wykluczenie zapisów.</li>
+<li>Zbieranie po kolei i zapis do <code>results/</code> (<code>collect.*</code>), z surowym HTTP w PowerShellu.</li>
+<li>Generator wstawia do dokumentów wyłącznie zebrane odpowiedzi; reszta jest oznaczona „do uzupełnienia”.</li>
+<li>LabVIEW: enum wybiera zapytanie, typ (typedef) wybiera parser – malleable VI <code>Get Package.vim</code>.</li>
 </ol>
 
 <h2>TODO</h2>
 <ul class="chk">
-<li>☑ Lista zapytań, skrypty, dokumentacja PL/EN, tabele dla LabVIEW, generator</li>
-<li>☑ Ustalić, gdzie jest CGI: <code>-Probe</code> pokazał, że to <code>/cgi-bin/*.cgi</code> (Boa), nie <code>.fcgi</code></li>
-<li>☐ Uruchomić <code>-Discover</code> i dostać własne pliki WWW urządzenia (<code>Config/*.json</code>, JS logowania) – z nich odtworzyć prawdziwą listę zapytań i format logowania</li>
-<li>☐ Uruchomić <code>collect.sh</code> (Windows: <code>collect.cmd</code>, w razie potrzeby z <code>-BaseUrl</code> i <code>-Insecure</code>) i dostać odpowiedzi HTTP 2xx (przykład: użytkownik <code>user</code>, hasło <code>password</code>)</li>
+<li>☑ Odczytać własne pliki WWW urządzenia i ustalić API (Boa, <code>.cgi</code>, logowanie poziomem)</li>
+<li>☑ Odtworzyć listę zapytań z <code>Config/*.json</code> urządzenia, przepisać skrypty i dokumentację</li>
+<li>☐ Uruchomić <code>collect.cmd</code> z poziomem Super Admin i hasłem – pierwsza prawdziwa odpowiedź (<code>results\\collected.json</code>)</li>
+<li>☐ Uruchomić ponownie <code>collect.cmd -Discover</code> – nowa wersja pobiera też strony <code>*.html</code> i ich skrypty (separator <code>~</code>, format odpowiedzi)</li>
+<li>☐ Przekazać <code>collected.json</code> i <code>discover.json</code> – dokumentację uzupełnia się z nich (<code>python3 rem102/scripts/build-docs.py</code>)</li>
 <li>☐ Sprawdzić <code>collect.ps1</code> w Windows PowerShell 5.1 (testowano w PowerShell 7 na atrapie)</li>
-<li>☐ Przekazać wynik: <code>results/collected.json</code> (commit na gałąź lub załącznik) – dokumentację uzupełnia się z niego</li>
-<li>☐ Uruchomić <code>python3 rem102/scripts/build-docs.py</code> – znikną oznaczenia „do uzupełnienia”</li>
-<li>☐ Potwierdzić format logowania (pola <code>username</code>/<code>pwd</code>) – pole <code>login</code> w <code>collected.json</code></li>
-<li>☐ Potwierdzić GET kontra POST – pola <code>post_retry</code> w pakietach</li>
-<li>☐ Sprawdzić format odpowiedzi (JSON czy tekst) – <code>content_type</code> i <code>body</code></li>
-<li>☐ Zweryfikować poziomy dostępu (<code>min_level</code>) i zależności modułów (<code>requires</code>) na tle <code>features.*</code></li>
-<li>☐ Potwierdzić, że odczyt <code>advanced.events</code> (<code>query=314</code>) jest bezpieczny – w menu to samo zapytanie służy też do zapisu</li>
+<li>☐ Potwierdzić format odpowiedzi poszczególnych pakietów i poziomy dostępu (<code>min_level</code>)</li>
+<li>☐ Potwierdzić, że odczyt <code>advanced.information_events</code> i <code>home.ch_*_measures</code> jest bezpieczny – w menu to samo zapytanie służy też do zapisu</li>
 <li>☐ LabVIEW: typedefy z próbek, <code>Get Package.vim</code> i <code>Get Package (Raw).vi</code></li>
 <li>☐ Opcjonalnie: wersja EN tej strony</li>
 </ul>
 
 <h2>Pliki</h2>
 <h3 class="sub">Wynikowe (zbierane z urządzenia) – <code>rem102/results/</code></h3>
-<div class="tablewrap"><table><tr><th>Plik</th><th>Opis</th><th>Stan</th></tr><tr><td><code>results/collected.json</code></td><td>wszystko z jednego uruchomienia w jednym pliku: <code>device</code>, <code>login</code>, 65 pakietów (<code>http_status</code>, <code>content_type</code>, <code>body</code>, ewentualnie <code>post_retry</code>). <strong>To wystarczy przekazać dalej.</strong></td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><code>results/samples/&lt;zakładka&gt;/&lt;id&gt;.json</code></td><td>ten sam wynik rozbity na pakiety; z nich generator wstawia przykłady do dokumentacji</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><code>results/discover.json</code></td><td>wynik <code>-Discover</code>: własne pliki WWW urządzenia (strona logowania, <code>Config/*.json</code>, JS), prawdziwe nazwy CGI</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><a href="results/archive/probe-2026-10-18.json"><code>results/archive/probe-2026-10-18.json</code></a></td><td>wynik <code>-Probe</code> z urządzenia (Boa, ekran logowania, <code>mpc105.cgi</code>)</td><td><span class="b ok">jest</span></td></tr><tr><td><code>results/probe.json</code></td><td>wynik <code>-Probe</code>: które porty i ścieżki odpowiadają (kod, serwer, początek treści)</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><a href="results/archive/collected-2026-10-18_all-404.json"><code>results/archive/collected-2026-10-18_all-404.json</code></a></td><td>pierwsze uruchomienie na urządzeniu: wszystko HTTP 404</td><td><span class="b ok">jest</span></td></tr><tr><td><code>results/collect.log</code></td><td>log przebiegu: numer, nazwa pakietu, kod HTTP, rozmiar (bez hasła)</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr></table></div>
+<div class="tablewrap"><table><tr><th>Plik</th><th>Opis</th><th>Stan</th></tr><tr><td><code>results/collected.json</code></td><td>wszystko z jednego uruchomienia w jednym pliku: <code>device</code>, <code>login</code>, pakiety. <strong>To wystarczy przekazać dalej.</strong></td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><code>results/samples/&lt;zakładka&gt;/&lt;id&gt;.json</code></td><td>ten sam wynik rozbity na pakiety; z nich generator wstawia przykłady do dokumentacji</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><code>results/collect.log</code></td><td>log przebiegu: numer, nazwa pakietu, kod HTTP, rozmiar (bez hasła)</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><code>results/discover.json</code></td><td>wynik <code>-Discover</code>: własne pliki WWW urządzenia (strony, skrypty JS, <code>Config/*.json</code>)</td><td><span class="b lvl">brak – powstaje po uruchomieniu na urządzeniu</span></td></tr><tr><td><a href="results/archive/"><code>results/archive/</code></a></td><td>zachowane wyniki wcześniejszych uruchomień na urządzeniu (probe, discover, nieudane próby)</td><td><span class="b ok">jest</span></td></tr></table></div>
 <h3 class="sub">Źródłowe i skrypty – <code>rem102/data/</code>, <code>rem102/scripts/</code></h3>
-<div class="tablewrap"><table><tr><th>Plik</th><th>Opis</th><th>Stan</th></tr><tr><td><a href="data/rem102-packages.tsv"><code>data/rem102-packages.tsv</code></a></td><td>lista 65 pakietów: nazwa, zakładka, id, zapytanie, poziom dostępu, wymagane moduły – jedno źródło prawdy</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="data/rem102-package-names.txt"><code>data/rem102-package-names.txt</code></a></td><td>nazwy pakietów (<code>tab.id</code>) – pozycje enuma w LabVIEW</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="data/rem102-package-requests.txt"><code>data/rem102-package-requests.txt</code></a></td><td>zapytania w tej samej kolejności – tablica stringów indeksowana enumem</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/collect.sh"><code>scripts/collect.sh</code></a></td><td>pobiera po kolei wszystkie pakiety i zapisuje wynik do <code>results/</code></td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/collect.ps1"><code>scripts/collect.ps1</code></a></td><td>wersja dla Windows (PowerShell 5.1+, bez bash/curl/jq): ten sam odczyt i te same pliki wynikowe</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/collect.cmd"><code>scripts/collect.cmd</code></a></td><td>launcher dla <code>collect.ps1</code> (bez zmiany polityki wykonywania skryptów)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/rem102-info.sh"><code>scripts/rem102-info.sh</code></a></td><td>skrót do <code>collect.sh</code>: ten sam odczyt, wynik JSON na stdout</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/build-docs.py"><code>scripts/build-docs.py</code></a></td><td>generuje strony HTML, sekcje „Przykłady odpowiedzi” w md i tę stronę</td><td><span class="b ok">jest</span></td></tr></table></div>
+<div class="tablewrap"><table><tr><th>Plik</th><th>Opis</th><th>Stan</th></tr><tr><td><a href="data/device-config/"><code>data/device-config/</code></a></td><td>pliki WWW pobrane z urządzenia (<code>Config/*.json</code>, <code>Script/*.js</code>, strona logowania) – źródło prawdy dla listy zapytań</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="data/rem102-packages.tsv"><code>data/rem102-packages.tsv</code></a></td><td>lista 66 pakietów: nazwa, zakładka, zapytanie, poziom dostępu, wymagane moduły</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="data/rem102-package-names.txt"><code>data/rem102-package-names.txt</code></a></td><td>nazwy pakietów (<code>tab.id</code>) – pozycje enuma w LabVIEW</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="data/rem102-package-requests.txt"><code>data/rem102-package-requests.txt</code></a></td><td>zapytania w tej samej kolejności – tablica stringów indeksowana enumem</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/build-packages.py"><code>scripts/build-packages.py</code></a></td><td>buduje listę pakietów z <code>data/device-config/Config/*.json</code></td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/collect.sh"><code>scripts/collect.sh</code></a></td><td>bash: pobiera po kolei wszystkie pakiety i zapisuje wynik do <code>results/</code></td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/collect.ps1"><code>scripts/collect.ps1</code></a></td><td>Windows (PowerShell 5.1+): to samo, plus <code>-Discover</code> i <code>-Probe</code></td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/collect.cmd"><code>scripts/collect.cmd</code></a></td><td>launcher dla <code>collect.ps1</code> (bez zmiany polityki wykonywania skryptów)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/rem102-info.sh"><code>scripts/rem102-info.sh</code></a></td><td>skrót do <code>collect.sh</code>: wynik JSON na stdout</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="scripts/build-docs.py"><code>scripts/build-docs.py</code></a></td><td>generuje dokumentację (HTML i md, PL i EN) oraz tę stronę</td><td><span class="b ok">jest</span></td></tr></table></div>
 <h3 class="sub">Dokumentacja – <code>rem102/docs/</code></h3>
-<div class="tablewrap"><table><tr><th>Plik</th><th>Opis</th><th>Stan</th></tr><tr><td><a href="docs/rem102-api.html"><code>docs/rem102-api.html</code></a></td><td>dokumentacja jak do API (PL)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="docs/rem102-api_en.html"><code>docs/rem102-api_en.html</code></a></td><td>dokumentacja jak do API (EN)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="docs/rem102-info.md"><code>docs/rem102-info.md</code></a></td><td>opis i przykłady (PL)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="docs/rem102-info_en.md"><code>docs/rem102-info_en.md</code></a></td><td>opis i przykłady (EN)</td><td><span class="b ok">jest</span></td></tr></table></div>
+<div class="tablewrap"><table><tr><th>Plik</th><th>Opis</th><th>Stan</th></tr><tr><td><a href="docs/rem102-api.html"><code>docs/rem102-api.html</code></a></td><td>dokumentacja jak do API (PL)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="docs/rem102-api_en.html"><code>docs/rem102-api_en.html</code></a></td><td>dokumentacja jak do API (EN)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="docs/rem102-info.md"><code>docs/rem102-info.md</code></a></td><td>ta sama treść w Markdown (PL)</td><td><span class="b ok">jest</span></td></tr><tr><td><a href="docs/rem102-info_en.md"><code>docs/rem102-info_en.md</code></a></td><td>ta sama treść w Markdown (EN)</td><td><span class="b ok">jest</span></td></tr></table></div>
 
 <h2>Uruchomienie</h2>
+<p>Windows (PowerShell) – plik <code>.sh</code> nie uruchomi się, użyj <code>collect.cmd</code> (nie wymaga bash, curl, jq ani Pythona):</p>
+<div class="code"><pre><code>cd C:\rem102\scripts
+.\collect.cmd -DeviceHost 192.168.128.1 -Discover
+.\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'hasło'</code></pre></div>
 <p>Linux / macOS / Git Bash:</p>
-<pre><code>REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh
-python3 rem102/scripts/build-docs.py</code></pre>
-<p>Windows (PowerShell) – <code>.sh</code> nie uruchomi się, użyj <code>collect.cmd</code> (nie wymaga bash, curl, jq ani Pythona):</p>
-<pre><code>cd C:\rem102\scripts
-.\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password</code></pre>
-<p class="muted">Wersja bash wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>; generator wymaga <code>python3</code> (uruchamiam go ja po otrzymaniu <code>collected.json</code>). Skrypt nie zapisuje hasła w plikach wynikowych ani w logu.</p>
+<div class="code"><pre><code>REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='hasło' ./rem102/scripts/collect.sh
+python3 rem102/scripts/build-docs.py</code></pre></div>
+<p class="muted">Wersja bash wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>; generator wymaga <code>python3</code> (uruchamiam go ja po otrzymaniu <code>collected.json</code>). Skrypty nie zapisują hasła w plikach wynikowych ani w logu.</p>
 </main>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>REM102 CGI API</title>
+<title>REM-102 CGI API</title>
 <style>
 :root{--bg:#f7f8fa;--panel:#fff;--text:#1b2230;--muted:#5d6779;--line:#dde1e8;--accent:#0b6bcb;--accent-bg:#e6f0fb;--code-bg:#f0f2f6;--warn:#b45309;--warn-bg:#fdf1de;--bad:#b42318;--bad-bg:#fdeceb;--get:#0a7a4b;--get-bg:#dff5ea}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f131a;--panel:#171c25;--text:#e4e8ef;--muted:#9aa5b8;--line:#2a3140;--accent:#6aaaf0;--accent-bg:#17283d;--code-bg:#0c1016;--warn:#f0b35c;--warn-bg:#2d2312;--bad:#f5918a;--bad-bg:#2f1a19;--get:#5fd49b;--get-bg:#12281f}}
@@ -50,675 +50,654 @@ pre{margin:0;padding:12px 14px;background:var(--code-bg);border-radius:6px;overf
 .callout.bad{border-color:var(--bad);background:var(--bad-bg)}
 .hidden{display:none!important}
 @media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr)} h1,h2,h3{overflow-wrap:anywhere} aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)} .nav-i{display:none} main{padding:20px 16px 48px} .ep header{flex-direction:column}}
-.sample summary{cursor:pointer;font-size:13px;color:var(--muted);margin:10px 0 6px} .tbd{font-style:italic} .sub{margin:18px 0 6px;font-size:16px} .lang{display:inline-block;margin-top:6px;font-size:13px}
+.sub{margin:18px 0 6px;font-size:16px}
+.lang{display:inline-block;margin-top:6px;font-size:13px}
+.sample summary{cursor:pointer;font-size:13px;color:var(--muted);margin:10px 0 6px}
+.tbd{font-style:italic}
+.b.ok{background:var(--get-bg);color:var(--get)}
+ul.chk{list-style:none;padding-left:0}
+ul.chk li{margin:4px 0}
+a,code{overflow-wrap:anywhere}
+main ol,main ul{padding-left:22px}
+ul.chk{padding-left:0}
+.code{margin:10px 0}
+
 </style>
 </head>
 <body>
 <div class="layout">
 <aside>
-<h1>REM102 CGI API</h1>
-<div class="muted small">odczyt informacji o urządzeniu · 65 pakietów</div>
+<h1>REM-102 CGI API</h1>
+<div class="muted small">odczyt informacji o urządzeniu · 66 pakietów</div>
 <a class="lang" href="rem102-api_en.html" hreflang="en">English ↗</a>
 <input id="filter" type="search" placeholder="Szukaj: id, query, opis…" aria-label="Szukaj: id, query, opis…">
-<div class="nav-group"><a class="nav-h" href="#overview">Wprowadzenie</a><a class="nav-i" href="#quick">Podstawowe informacje</a><a class="nav-i" href="#auth">Logowanie</a><a class="nav-i" href="#conv">Konwencje</a><a class="nav-i" href="#envelope">Format odpowiedzi</a></div>
-<div class="nav-group"><a class="nav-h" href="#tab-identity">Identyfikacja <span>6</span></a><a class="nav-i" href="#identity-device_settings" data-s="device_settings advanced &gt; information &gt; device settings (model, serial no., article no.) query=302">device_settings</a><a class="nav-i" href="#identity-version" data-s="version advanced &gt; information &gt; version (firmware/fpga/dsp) query=301">version</a><a class="nav-i" href="#identity-host" data-s="host settings.json &gt; host (hostname) query=126">host</a><a class="nav-i" href="#identity-auth_message" data-s="auth_message settings.json &gt; auth_message query=125">auth_message</a><a class="nav-i" href="#identity-meter_settings" data-s="meter_settings setup &gt; meter &gt; settings query=105">meter_settings</a><a class="nav-i" href="#identity-dmeter_serial" data-s="dmeter_serial setup &gt; dmeter &gt; dmeter serial number query=407">dmeter_serial</a></div><div class="nav-group"><a class="nav-h" href="#tab-home">Home <span>8</span></a><a class="nav-i" href="#home-meter_status" data-s="meter_status home &gt; summary &gt; meter status query=10">meter_status</a><a class="nav-i" href="#home-emf_status" data-s="emf_status home &gt; emf channels &gt; emf status query=406">emf_status</a><a class="nav-i" href="#home-emf_measures" data-s="emf_measures home &gt; emf channels &gt; emf measures query=407">emf_measures</a><a class="nav-i" href="#home-emf_cebd" data-s="emf_cebd home &gt; emf channels &gt; emf cebd query=409">emf_cebd</a><a class="nav-i" href="#home-dhs_memory" data-s="dhs_memory home &gt; data download &gt; dhs memory query=459">dhs_memory</a><a class="nav-i" href="#home-digital_io" data-s="digital_io home &gt; digital io query=11">digital_io</a><a class="nav-i" href="#home-net_interfaces" data-s="net_interfaces home &gt; networking &gt; interfaces query=500">net_interfaces</a><a class="nav-i" href="#home-net_services" data-s="net_services home &gt; networking &gt; services query=501">net_services</a></div><div class="nav-group"><a class="nav-h" href="#tab-setup">Setup <span>17</span></a><a class="nav-i" href="#setup-channels_configuration" data-s="channels_configuration setup &gt; meter &gt; channels configuration query=100">channels_configuration</a><a class="nav-i" href="#setup-dcs_user_1" data-s="dcs_user_1 setup &gt; dcs users &gt; dcs user 1 query=450&amp;user=1">dcs_user_1</a><a class="nav-i" href="#setup-dcs_user_2" data-s="dcs_user_2 setup &gt; dcs users &gt; dcs user 2 query=450&amp;user=2">dcs_user_2</a><a class="nav-i" href="#setup-dcs_user_3" data-s="dcs_user_3 setup &gt; dcs users &gt; dcs user 3 query=450&amp;user=3">dcs_user_3</a><a class="nav-i" href="#setup-dcs_user_4" data-s="dcs_user_4 setup &gt; dcs users &gt; dcs user 4 query=450&amp;user=4">dcs_user_4</a><a class="nav-i" href="#setup-dcs_communication" data-s="dcs_communication setup &gt; dcs communication query=452">dcs_communication</a><a class="nav-i" href="#setup-dcs_binding" data-s="dcs_binding setup &gt; dcs binding query=457">dcs_binding</a><a class="nav-i" href="#setup-dcs_conn_test" data-s="dcs_conn_test setup &gt; dcs binding &gt; connection test query=455">dcs_conn_test</a><a class="nav-i" href="#setup-ethernet_0" data-s="ethernet_0 setup &gt; ethernet interfaces &gt; ethernet 0 query=103">ethernet_0</a><a class="nav-i" href="#setup-ethernet_1" data-s="ethernet_1 setup &gt; ethernet interfaces &gt; ethernet 1 query=104">ethernet_1</a><a class="nav-i" href="#setup-mobile_settings" data-s="mobile_settings setup &gt; mobile interface &gt; mobile settings query=101">mobile_settings</a><a class="nav-i" href="#setup-dhcp_client" data-s="dhcp_client setup &gt; dhcp &gt; client settings query=200">dhcp_client</a><a class="nav-i" href="#setup-gateway_dns" data-s="gateway_dns setup &gt; services &gt; gateway &amp; dns query=201">gateway_dns</a><a class="nav-i" href="#setup-servers" data-s="servers setup &gt; services &gt; servers query=202">servers</a><a class="nav-i" href="#setup-ntp_servers" data-s="ntp_servers setup &gt; services &gt; ntp servers query=203">ntp_servers</a><a class="nav-i" href="#setup-ems_time_servers" data-s="ems_time_servers setup &gt; services &gt; ems time servers query=230">ems_time_servers</a><a class="nav-i" href="#setup-gps" data-s="gps setup &gt; services &gt; gps query=205">gps</a></div><div class="nav-group"><a class="nav-h" href="#tab-advanced">Advanced <span>2</span></a><a class="nav-i" href="#advanced-rtc_time" data-s="rtc_time advanced &gt; rtc &gt; time settings query=303">rtc_time</a><a class="nav-i" href="#advanced-events" data-s="events advanced &gt; information &gt; events query=314">events</a></div><div class="nav-group"><a class="nav-h" href="#tab-monitoring">Monitoring <span>21</span></a><a class="nav-i" href="#monitoring-eth_0" data-s="eth_0 monitoring &gt; network interfaces &gt; ethernet 0 query=3">eth_0</a><a class="nav-i" href="#monitoring-eth_1" data-s="eth_1 monitoring &gt; network interfaces &gt; ethernet 1 query=4">eth_1</a><a class="nav-i" href="#monitoring-mobile" data-s="mobile monitoring &gt; network interfaces &gt; mobile query=13">mobile</a><a class="nav-i" href="#monitoring-gps" data-s="gps monitoring &gt; network interfaces &gt; gps query=16">gps</a><a class="nav-i" href="#monitoring-dcs_stats_user_1" data-s="dcs_stats_user_1 monitoring &gt; dcs statistics &gt; dcs user 1 query=461&amp;user=1">dcs_stats_user_1</a><a class="nav-i" href="#monitoring-dcs_stats_user_2" data-s="dcs_stats_user_2 monitoring &gt; dcs statistics &gt; dcs user 2 query=461&amp;user=2">dcs_stats_user_2</a><a class="nav-i" href="#monitoring-dcs_stats_user_3" data-s="dcs_stats_user_3 monitoring &gt; dcs statistics &gt; dcs user 3 query=461&amp;user=3">dcs_stats_user_3</a><a class="nav-i" href="#monitoring-dcs_stats_user_4" data-s="dcs_stats_user_4 monitoring &gt; dcs statistics &gt; dcs user 4 query=461&amp;user=4">dcs_stats_user_4</a><a class="nav-i" href="#monitoring-dmeter_status" data-s="dmeter_status monitoring &gt; dmeter status query=409">dmeter_status</a><a class="nav-i" href="#monitoring-rtp100_vars" data-s="rtp100_vars monitoring &gt; rtp100 variables query=441">rtp100_vars</a><a class="nav-i" href="#monitoring-rtp100_files" data-s="rtp100_files monitoring &gt; rtp100 files query=444">rtp100_files</a><a class="nav-i" href="#monitoring-mem_nand" data-s="mem_nand monitoring &gt; memory &gt; nand query=23">mem_nand</a><a class="nav-i" href="#monitoring-mem_nor" data-s="mem_nor monitoring &gt; memory &gt; nor query=24">mem_nor</a><a class="nav-i" href="#monitoring-mem_ram" data-s="mem_ram monitoring &gt; memory &gt; ram query=25">mem_ram</a><a class="nav-i" href="#monitoring-dev_rtc" data-s="dev_rtc monitoring &gt; other devices &gt; rtc query=7">dev_rtc</a><a class="nav-i" href="#monitoring-dev_fpga" data-s="dev_fpga monitoring &gt; other devices &gt; fpga query=8">dev_fpga</a><a class="nav-i" href="#monitoring-dev_fram" data-s="dev_fram monitoring &gt; other devices &gt; fram query=9">dev_fram</a><a class="nav-i" href="#monitoring-dev_adc" data-s="dev_adc monitoring &gt; other devices &gt; adc query=10">dev_adc</a><a class="nav-i" href="#monitoring-dev_dsp" data-s="dev_dsp monitoring &gt; other devices &gt; dsp query=11">dev_dsp</a><a class="nav-i" href="#monitoring-dev_mvbcs" data-s="dev_mvbcs monitoring &gt; other devices &gt; mvbcs query=12">dev_mvbcs</a><a class="nav-i" href="#monitoring-dev_modem" data-s="dev_modem monitoring &gt; other devices &gt; modem query=17">dev_modem</a></div><div class="nav-group"><a class="nav-h" href="#tab-features">Features <span>11</span></a><a class="nav-i" href="#features-dcs" data-s="dcs dcs enabled? query=463">dcs</a><a class="nav-i" href="#features-dcs_user_1" data-s="dcs_user_1 dcs user 1 enabled? query=462&amp;user=1">dcs_user_1</a><a class="nav-i" href="#features-dcs_user_2" data-s="dcs_user_2 dcs user 2 enabled? query=462&amp;user=2">dcs_user_2</a><a class="nav-i" href="#features-dcs_user_3" data-s="dcs_user_3 dcs user 3 enabled? query=462&amp;user=3">dcs_user_3</a><a class="nav-i" href="#features-dcs_user_4" data-s="dcs_user_4 dcs user 4 enabled? query=462&amp;user=4">dcs_user_4</a><a class="nav-i" href="#features-dmeter_rem" data-s="dmeter_rem dmeter (rem) enabled? query=420">dmeter_rem</a><a class="nav-i" href="#features-dmeter_items" data-s="dmeter_items dmeter (items) enabled? query=400">dmeter_items</a><a class="nav-i" href="#features-rtp100" data-s="rtp100 rtp100 enabled? query=430">rtp100</a><a class="nav-i" href="#features-mobile" data-s="mobile modem/mobile enabled? query=14">mobile</a><a class="nav-i" href="#features-gps" data-s="gps gps enabled? query=15">gps</a><a class="nav-i" href="#features-dsp_digitalio" data-s="dsp_digitalio dsp/digital io enabled? query=18">dsp_digitalio</a></div>
-<div class="nav-group"><a class="nav-h" href="#excluded">Pominięte zapytania</a><a class="nav-h" href="#script">Skrypt</a><a class="nav-h" href="#labview">Integracja z LabVIEW</a><a class="nav-h" href="#assumptions">Założenia</a></div>
+<div class="nav-group"><a class="nav-h" href="#overview">Wprowadzenie</a><a class="nav-i" href="#quick">Podstawowe informacje – pełna sekwencja curl</a><a class="nav-i" href="#auth">Logowanie i poziomy dostępu</a><a class="nav-i" href="#conv">Konwencje</a><a class="nav-i" href="#response">Format wyniku skryptów</a></div><div class="nav-group"><a class="nav-h" href="#tab-home">Home <span>15</span></a><a class="nav-i" href="#home-summary_meter_status" data-s="summary_meter_status home &gt; summary &gt; meter status query=7&amp;block_offset=10240&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=17&amp;string_size=32">summary_meter_status</a><a class="nav-i" href="#home-ch_a_energy" data-s="ch_a_energy home &gt; ch a &gt; energy query=7&amp;block_offset=11264&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32">ch_a_energy</a><a class="nav-i" href="#home-ch_a_measures" data-s="ch_a_measures home &gt; ch a &gt; measures query=106&amp;channel=0">ch_a_measures</a><a class="nav-i" href="#home-ch_b_energy" data-s="ch_b_energy home &gt; ch b &gt; energy query=7&amp;block_offset=12288&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32">ch_b_energy</a><a class="nav-i" href="#home-ch_b_measures" data-s="ch_b_measures home &gt; ch b &gt; measures query=106&amp;channel=1">ch_b_measures</a><a class="nav-i" href="#home-digital_io" data-s="digital_io home &gt; digital io query=7&amp;block_offset=13312&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=12&amp;string_size=32">digital_io</a><a class="nav-i" href="#home-archive_1_waiting_files" data-s="archive_1_waiting_files home &gt; archive 1 &gt; waiting files query=107&amp;id=1">archive_1_waiting_files</a><a class="nav-i" href="#home-archive_1_sent_files" data-s="archive_1_sent_files home &gt; archive 1 &gt; sent files query=108&amp;id=1">archive_1_sent_files</a><a class="nav-i" href="#home-archive_1_test_files" data-s="archive_1_test_files home &gt; archive 1 &gt; test files query=112&amp;id=1">archive_1_test_files</a><a class="nav-i" href="#home-archive_2_waiting_files" data-s="archive_2_waiting_files home &gt; archive 2 &gt; waiting files query=107&amp;id=2">archive_2_waiting_files</a><a class="nav-i" href="#home-archive_2_sent_files" data-s="archive_2_sent_files home &gt; archive 2 &gt; sent files query=108&amp;id=2">archive_2_sent_files</a><a class="nav-i" href="#home-archive_2_test_files" data-s="archive_2_test_files home &gt; archive 2 &gt; test files query=112&amp;id=2">archive_2_test_files</a><a class="nav-i" href="#home-networking_interfaces" data-s="networking_interfaces home &gt; networking &gt; interfaces query=500">networking_interfaces</a><a class="nav-i" href="#home-networking_services" data-s="networking_services home &gt; networking &gt; services query=501">networking_services</a><a class="nav-i" href="#home-networking_redirection" data-s="networking_redirection home &gt; networking &gt; redirection query=502">networking_redirection</a></div><div class="nav-group"><a class="nav-h" href="#tab-monitoring">Monitoring <span>20</span></a><a class="nav-i" href="#monitoring-network_interfaces_ethernet_0" data-s="network_interfaces_ethernet_0 monitoring &gt; network interfaces &gt; ethernet 0 query=3">network_interfaces_ethernet_0</a><a class="nav-i" href="#monitoring-network_interfaces_ethernet_1" data-s="network_interfaces_ethernet_1 monitoring &gt; network interfaces &gt; ethernet 1 query=4">network_interfaces_ethernet_1</a><a class="nav-i" href="#monitoring-network_interfaces_ethernet_2" data-s="network_interfaces_ethernet_2 monitoring &gt; network interfaces &gt; ethernet 2 query=5">network_interfaces_ethernet_2</a><a class="nav-i" href="#monitoring-network_interfaces_wlan" data-s="network_interfaces_wlan monitoring &gt; network interfaces &gt; wlan query=6">network_interfaces_wlan</a><a class="nav-i" href="#monitoring-network_interfaces_mobile" data-s="network_interfaces_mobile monitoring &gt; network interfaces &gt; mobile query=13">network_interfaces_mobile</a><a class="nav-i" href="#monitoring-network_interfaces_ethernet_switch" data-s="network_interfaces_ethernet_switch monitoring &gt; network interfaces &gt; ethernet switch query=14">network_interfaces_ethernet_switch</a><a class="nav-i" href="#monitoring-network_interfaces_gps" data-s="network_interfaces_gps monitoring &gt; network interfaces &gt; gps query=16">network_interfaces_gps</a><a class="nav-i" href="#monitoring-rtp100_rtp100_variables" data-s="rtp100_rtp100_variables monitoring &gt; rtp100 &gt; rtp100 variables query=441">rtp100_rtp100_variables</a><a class="nav-i" href="#monitoring-rtp100_rtp100_files" data-s="rtp100_rtp100_files monitoring &gt; rtp100 &gt; rtp100 files query=444">rtp100_rtp100_files</a><a class="nav-i" href="#monitoring-memory_nand" data-s="memory_nand monitoring &gt; memory &gt; nand query=23">memory_nand</a><a class="nav-i" href="#monitoring-memory_nor" data-s="memory_nor monitoring &gt; memory &gt; nor query=24">memory_nor</a><a class="nav-i" href="#monitoring-memory_ram" data-s="memory_ram monitoring &gt; memory &gt; ram query=25">memory_ram</a><a class="nav-i" href="#monitoring-other_devices_rtc" data-s="other_devices_rtc monitoring &gt; other devices &gt; rtc query=7">other_devices_rtc</a><a class="nav-i" href="#monitoring-other_devices_fpga" data-s="other_devices_fpga monitoring &gt; other devices &gt; fpga query=8">other_devices_fpga</a><a class="nav-i" href="#monitoring-other_devices_fram" data-s="other_devices_fram monitoring &gt; other devices &gt; fram query=9">other_devices_fram</a><a class="nav-i" href="#monitoring-other_devices_adc" data-s="other_devices_adc monitoring &gt; other devices &gt; adc query=10">other_devices_adc</a><a class="nav-i" href="#monitoring-other_devices_hdlc" data-s="other_devices_hdlc monitoring &gt; other devices &gt; hdlc query=11">other_devices_hdlc</a><a class="nav-i" href="#monitoring-other_devices_mvbcs" data-s="other_devices_mvbcs monitoring &gt; other devices &gt; mvbcs query=12">other_devices_mvbcs</a><a class="nav-i" href="#monitoring-other_devices_modem" data-s="other_devices_modem monitoring &gt; other devices &gt; modem query=17">other_devices_modem</a><a class="nav-i" href="#monitoring-other_devices_wifi" data-s="other_devices_wifi monitoring &gt; other devices &gt; wifi query=18">other_devices_wifi</a></div><div class="nav-group"><a class="nav-h" href="#tab-setup">Setup <span>24</span></a><a class="nav-i" href="#setup-meter_settings" data-s="meter_settings setup &gt; meter &gt; settings query=105">meter_settings</a><a class="nav-i" href="#setup-meter_channels_configuration" data-s="meter_channels_configuration setup &gt; meter &gt; channels configuration query=100">meter_channels_configuration</a><a class="nav-i" href="#setup-meter_ftp_hosts" data-s="meter_ftp_hosts setup &gt; meter &gt; ftp hosts query=101">meter_ftp_hosts</a><a class="nav-i" href="#setup-meter_udp_clients" data-s="meter_udp_clients setup &gt; meter &gt; udp clients query=102">meter_udp_clients</a><a class="nav-i" href="#setup-meter_messages" data-s="meter_messages setup &gt; meter &gt; messages query=103">meter_messages</a><a class="nav-i" href="#setup-meter_calibration" data-s="meter_calibration setup &gt; meter &gt; calibration query=7&amp;block_offset=8192&amp;byte_offset=0&amp;data_size=1024&amp;type=dint&amp;name=energy&amp;memory=remshm&amp;number=2">meter_calibration</a><a class="nav-i" href="#setup-meter_thresholds_protection" data-s="meter_thresholds_protection setup &gt; meter &gt; thresholds protection query=111">meter_thresholds_protection</a><a class="nav-i" href="#setup-rtp100_rtp100_command" data-s="rtp100_rtp100_command setup &gt; rtp100 &gt; rtp100 command query=442">rtp100_rtp100_command</a><a class="nav-i" href="#setup-ethernet_interfaces_ethernet_0" data-s="ethernet_interfaces_ethernet_0 setup &gt; ethernet interfaces &gt; ethernet 0 query=103">ethernet_interfaces_ethernet_0</a><a class="nav-i" href="#setup-ethernet_interfaces_ethernet_1" data-s="ethernet_interfaces_ethernet_1 setup &gt; ethernet interfaces &gt; ethernet 1 query=104">ethernet_interfaces_ethernet_1</a><a class="nav-i" href="#setup-ethernet_interfaces_ethernet_2" data-s="ethernet_interfaces_ethernet_2 setup &gt; ethernet interfaces &gt; ethernet 2 query=105">ethernet_interfaces_ethernet_2</a><a class="nav-i" href="#setup-ethernet_interfaces_switch_ethernet" data-s="ethernet_interfaces_switch_ethernet setup &gt; ethernet interfaces &gt; switch ethernet query=107">ethernet_interfaces_switch_ethernet</a><a class="nav-i" href="#setup-mobile_interface_mobile_settings" data-s="mobile_interface_mobile_settings setup &gt; mobile interface &gt; mobile settings query=101">mobile_interface_mobile_settings</a><a class="nav-i" href="#setup-wireless_interface_wlan" data-s="wireless_interface_wlan setup &gt; wireless interface &gt; wlan query=106">wireless_interface_wlan</a><a class="nav-i" href="#setup-wireless_interface_client_access" data-s="wireless_interface_client_access setup &gt; wireless interface &gt; client access query=204">wireless_interface_client_access</a><a class="nav-i" href="#setup-dhcp_client_settings" data-s="dhcp_client_settings setup &gt; dhcp &gt; client settings query=200">dhcp_client_settings</a><a class="nav-i" href="#setup-dhcp_server_settings" data-s="dhcp_server_settings setup &gt; dhcp &gt; server settings query=208">dhcp_server_settings</a><a class="nav-i" href="#setup-dhcp_address_reservation" data-s="dhcp_address_reservation setup &gt; dhcp &gt; address reservation query=209">dhcp_address_reservation</a><a class="nav-i" href="#setup-services_gateway_dns" data-s="services_gateway_dns setup &gt; services &gt; gateway &amp; dns query=201">services_gateway_dns</a><a class="nav-i" href="#setup-services_servers" data-s="services_servers setup &gt; services &gt; servers query=202">services_servers</a><a class="nav-i" href="#setup-services_ntp_servers" data-s="services_ntp_servers setup &gt; services &gt; ntp servers query=203">services_ntp_servers</a><a class="nav-i" href="#setup-services_gps" data-s="services_gps setup &gt; services &gt; gps query=205">services_gps</a><a class="nav-i" href="#setup-services_port_forwarding" data-s="services_port_forwarding setup &gt; services &gt; port forwarding query=207">services_port_forwarding</a><a class="nav-i" href="#setup-services_proxy_settings" data-s="services_proxy_settings setup &gt; services &gt; proxy settings query=220">services_proxy_settings</a></div><div class="nav-group"><a class="nav-h" href="#tab-advanced">Advanced <span>6</span></a><a class="nav-i" href="#advanced-rtc_time_settings" data-s="rtc_time_settings advanced &gt; rtc &gt; time settings query=303">rtc_time_settings</a><a class="nav-i" href="#advanced-rtc_time_zones" data-s="rtc_time_zones advanced &gt; rtc &gt; time zones query=305">rtc_time_zones</a><a class="nav-i" href="#advanced-configuration_settings" data-s="configuration_settings advanced &gt; configuration &gt; settings query=113">configuration_settings</a><a class="nav-i" href="#advanced-information_device_settings" data-s="information_device_settings advanced &gt; information &gt; device settings query=302">information_device_settings</a><a class="nav-i" href="#advanced-information_events" data-s="information_events advanced &gt; information &gt; events query=314">information_events</a><a class="nav-i" href="#advanced-information_version" data-s="information_version advanced &gt; information &gt; version query=301">information_version</a></div><div class="nav-group"><a class="nav-h" href="#tab-features">Features <span>1</span></a><a class="nav-i" href="#features-rtp100" data-s="rtp100 rtp100 enabled? query=430">rtp100</a></div><div class="nav-group"><a class="nav-h" href="#excluded">Pominięte zapytania</a><a class="nav-h" href="#scripts">Skrypty</a><a class="nav-h" href="#labview">Użycie w LabVIEW</a><a class="nav-h" href="#assumptions">Założenia i do sprawdzenia</a></div>
 </aside>
 <main>
-<section id="overview"><h1>REM102 – CGI API (odczyt)</h1><p class="lead">Opis zapytań HTTP, którymi interfejs WWW urządzenia REM102 pobiera dane. Zestawione z plików <code>home.json</code>, <code>setup.json</code>, <code>advanced.json</code>, <code>monitoring.json</code> i <code>settings.json</code>. Uwzględnione są wyłącznie zapytania odczytowe.</p>
-<div class="callout"><strong>Status.</strong> Skrypt <code>rem102/scripts/rem102-info.sh</code> sprawdzono na atrapie serwera, nie na prawdziwym urządzeniu. Format ciał odpowiedzi i parametry logowania są założeniami – patrz <a href="#assumptions">Założenia</a>.</div>
-<div class="card"><strong>Base URL</strong><pre><code>http://&lt;HOST&gt;        # domyślnie 192.168.128.1</code></pre>
-<p>Urządzenie udostępnia cztery pliki CGI:</p>
-<div class="tablewrap"><table><tr><th>Plik CGI</th><th>Zakres</th></tr>
-<tr><td><code>/cgi-bin/mpc105.fcgi</code></td><td>platforma: logowanie, sieć, GPS, modem, RTC, informacje o urządzeniu, pamięci</td></tr>
-<tr><td><code>/cgi-bin/rem.fcgi</code></td><td>miernik REM: status, kanały EMF, DCS, Digital IO, konfiguracja kanałów</td></tr>
-<tr><td><code>/cgi-bin/items.fcgi</code></td><td>DMeter (iTEMS)</td></tr>
-<tr><td><code>/cgi-bin/rtp.fcgi</code></td><td>RTP100</td></tr></table></div></div></section>
-
-<section id="quick"><h2>Podstawowe informacje – pełna sekwencja curl</h2><p>Użytkownik <code>user</code>, hasło <code>password</code>, adres domyślny <code>192.168.128.1</code>. Kroki 2–6 zwracają model, numer seryjny, numer artykułu i pozostałe dane identyfikacyjne.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>HOST=192.168.128.1
+<section id="overview-top"><h1>REM-102 – CGI API (odczyt)</h1></section>
+<section id="overview"><h2>Wprowadzenie</h2><p>Opis zapytań CGI, którymi interfejs WWW urządzenia <strong>REM-102</strong> (serwer Boa, strona producenta HaslerRail) pobiera dane. Lista pochodzi z plików, które urządzenie samo udostępnia (<code>Config/*.json</code>), odczytanych skryptem <code>collect.ps1 -Discover</code>. Uwzględnione są wyłącznie zapytania odczytowe.</p>
+<div class="callout"><strong>Status.</strong> Logowanie, nazwy CGI, ciasteczko sesji i poziomy dostępu pochodzą ze skryptów strony urządzenia (<code>Script/mainParent.js</code>, <code>Script/globalFunc.js</code>). Skrypty zbierające sprawdzono na atrapie serwera, nie na prawdziwych odpowiedziach. <strong>Treści odpowiedzi poszczególnych pakietów nie znamy jeszcze</strong> – patrz sekcja „Przykłady odpowiedzi”.</div>
+<p>Adres bazowy: <code>http://&lt;HOST&gt;</code> (domyślnie <code>192.168.128.1</code>, port 80). Urządzenie udostępnia cztery pliki CGI:</p>
+<div class="tablewrap"><table><tr><th>Plik CGI</th><th>Zakres</th></tr><tr><td><code>/cgi-bin/mpc105.cgi</code></td><td>platforma: logowanie, sieć, GPS, modem, RTC, pamięci, informacje o urządzeniu</td></tr><tr><td><code>/cgi-bin/mpc105j.cgi</code></td><td>wylogowanie</td></tr><tr><td><code>/cgi-bin/rem.cgi</code></td><td>miernik: kanały A/B, energia, archiwa, konfiguracja</td></tr><tr><td><code>/cgi-bin/rtp.cgi</code></td><td>RTP100</td></tr></table></div></section>
+<section id="quick"><h2>Podstawowe informacje – pełna sekwencja curl</h2><p>Poziom Super Admin (<code>login=3</code>), hasło <code>password</code> (wpisz własne). Kroki 2–6 zwracają model, numer seryjny, numer artykułu i pozostałe dane identyfikacyjne oraz podstawową konfigurację.</p>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>HOST=192.168.128.1
 JAR=$(mktemp)
 
-# 1. login (cookies CGIUSERNAME / CGIUSERLEVEL are saved in $JAR)
-curl -sS -w &#x27;\n&#x27; -c &quot;$JAR&quot; -X POST &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=120&amp;username=user&amp;pwd=password&quot;
-cat &quot;$JAR&quot;    # powinny być widoczne CGIUSERNAME i CGIUSERLEVEL
+# 1. logowanie jako Super Admin (login=3); hasło kodowane jak w formularzu
+curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" \
+     --data "query=120" --data "login=3" --data-urlencode "pwd=password"
+cat "$JAR"    # powinno być widoczne ciasteczko CGISESSID
 
-# 2. model, numer seryjny, numer artykułu i pozostałe dane urządzenia
-curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; --data-raw &quot;query=302&quot;
+# 2. model, numer seryjny, numer artykułu i pozostałe dane urządzenia (Advanced &gt; Information &gt; Device Settings)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
 
-# 3. wersje oprogramowania (firmware, FPGA, DSP)
-curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; --data-raw &quot;query=301&quot;
+# 3. wersje oprogramowania (Advanced &gt; Information &gt; Version)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
 
-# 4. nazwa hosta
-curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; --data-raw &quot;query=126&quot;
+# 4. ustawienia miernika (Setup &gt; Meter &gt; Settings)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/rem.cgi?query=105"
 
-# 5. ustawienia miernika
-curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; --data-raw &quot;query=105&quot;
+# 5. konfiguracja kanałów (Setup &gt; Meter &gt; Channels Configuration)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/rem.cgi?query=100"
 
-# 6. numer seryjny DMeter (tylko jeśli moduł jest włączony)
-curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/items.fcgi&quot; --data-raw &quot;query=407&quot;
+# 6. stan Ethernet 0 (Monitoring &gt; Network Interfaces)
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=3"
 
 # 7. wylogowanie (opcjonalnie)
-curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; --data-raw &quot;query=1983&quot;
-rm -f &quot;$JAR&quot;</code></pre></div>
+curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+rm -f "$JAR"</code></pre></div>
 <p>Wszystko jednym poleceniem (bez wylogowania), z nagłówkiem przed każdą odpowiedzią:</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>HOST=192.168.128.1; JAR=$(mktemp)
-curl -sS -w &#x27;\n&#x27; -c &quot;$JAR&quot; -X POST &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; --data-raw &quot;query=120&amp;username=user&amp;pwd=password&quot;
-for r in mpc105.fcgi:302 mpc105.fcgi:301 mpc105.fcgi:126 rem.fcgi:105 items.fcgi:407; do
-  printf &#x27;\n== %s?query=%s ==\n&#x27; &quot;${r%%:*}&quot; &quot;${r##*:}&quot;
-  curl -sS -w &#x27;\n&#x27; -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/${r%%:*}&quot; --data-raw &quot;query=${r##*:}&quot;
-done; rm -f &quot;$JAR&quot;</code></pre></div>
-<p class="muted">Nazwy pól logowania (<code>username</code>, <code>pwd</code>) są założeniem – patrz <a href="#assumptions">Założenia</a>. Hasło ze znakami specjalnymi (<code>&amp;</code>, <code>+</code>, <code>%</code>) wymaga kodowania URL w <code>--data-raw</code> albo użycia <code>--data-urlencode "pwd=…"</code>.</p></section>
-
-<section id="auth"><h2>Logowanie</h2>
-<div class="url"><span class="m" style="background:var(--accent-bg);color:var(--accent)">POST</span><code>/cgi-bin/mpc105.fcgi</code></div>
-<pre><code>curl -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.fcgi" \
-     --data-raw "query=120&amp;username=Admin&amp;pwd=HASLO"</code></pre>
-<p>Po udanym logowaniu urządzenie ustawia ciasteczka <code>CGIUSERNAME</code> i <code>CGIUSERLEVEL</code>. Wszystkie dalsze zapytania wysyłaj z <code>-b "$JAR"</code>.</p>
-<div class="tablewrap"><table><tr><th>query</th><th>Funkcja</th></tr>
-<tr><td><code>query=120</code></td><td>logowanie</td></tr>
-<tr><td><code>query=125</code></td><td>komunikat uwierzytelniania (<code>identity.auth_message</code>)</td></tr>
-<tr><td><code>query=126</code></td><td>nazwa hosta (<code>identity.host</code>)</td></tr>
-<tr><td><code>query=121</code></td><td>zmiana hasła – zapis, nieużywane</td></tr>
-<tr><td><code>query=1983</code></td><td>wylogowanie</td></tr></table></div>
-<p class="muted">Strony z <code>show_level</code> 1 lub 2 mogą wymagać konta o wyższym poziomie (<code>CGIUSERLEVEL</code>).</p></section>
-
-<section id="conv"><h2>Konwencje</h2><ul>
-<li>Zapytania odczytowe wysyłane są metodą <strong>GET</strong>: <code>curl -G … --data-raw "query=…"</code> dołącza parametry do URL-a.</li>
-<li>W plikach menu parametry w polu <code>query</code> bywają rozdzielone znakiem <code>~</code> (np. <code>query=450~user=1</code>). W prawdziwym żądaniu to <code>&amp;</code>: <code>query=450&amp;user=1</code>.</li>
-<li>Pola <code>en_cgi</code>/<code>en_query</code> w menu sprawdzają, czy moduł jest włączony – to pakiety z zakładki <a href="#tab-features">Features</a>.</li>
-<li>Pola <code>set</code> i <code>set1</code> zapisują konfigurację – <strong>nie są</strong> używane.</li>
-</ul></section>
-
-<section id="envelope"><h2>Format odpowiedzi</h2><p>Skrypt zwraca jeden obiekt JSON: <code>device</code> (metadane), <code>login</code> (wynik logowania) + klucz na zakładkę + pakiety po <code>id</code>.</p>
-<pre><code>{
-  "device": { "host": "192.168.128.1", "collected_at": "2026-10-16T22:32:11Z" },
-  "identity": {
-    "device_settings": {
-      "label": "Advanced &gt; Information &gt; Device Settings (model, serial no., article no.)",
-      "cgi": "/cgi-bin/mpc105.fcgi",
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>HOST=192.168.128.1; JAR=$(mktemp)
+curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=3" --data-urlencode "pwd=password"
+for r in mpc105.cgi?query=302 mpc105.cgi?query=301 rem.cgi?query=105 rem.cgi?query=100; do
+  printf '\n== %s ==\n' "$r"
+  curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/$r"
+done; rm -f "$JAR"</code></pre></div>
+<p>Uwagi: <code>--data-urlencode</code> koduje hasło tak, jak robi to formularz strony (znaki <code>@</code>, <code>!</code>, <code>&amp;</code> są bezpieczne). W PowerShellu <code>curl</code> jest aliasem <code>Invoke-WebRequest</code>: używaj <code>curl.exe</code> albo skryptu <code>collect.cmd</code> (patrz „Skrypty”). Zła para poziom/hasło zwraca <code>{"value":"fail"}</code>.</p></section>
+<section id="auth"><h2>Logowanie i poziomy dostępu</h2><p>Logowanie wykonuje formularz strony (<code>Script/mainParent.js</code>): <code>POST /cgi-bin/mpc105.cgi</code> z polami formularza:</p>
+<div class="tablewrap"><table><tr><th>Pole</th><th>Znaczenie</th></tr><tr><td><code>query</code></td><td>zawsze <code>120</code> (z <code>Config/settings.json</code>, typ <code>LoginOnStart</code>)</td></tr><tr><td><code>login</code></td><td>poziom: <code>1</code> = User, <code>2</code> = Admin, <code>3</code> = Super Admin (nie nazwa użytkownika)</td></tr><tr><td><code>pwd</code></td><td>hasło, kodowane URL</td></tr><tr><td><code>change</code></td><td>zaznaczone tylko przy zmianie hasła</td></tr></table></div>
+<ul><li>Odpowiedź to JSON z polem <code>value</code>: <code>"fail"</code> = złe hasło, <code>"change"</code> = trzeba zmienić hasło, inna wartość = zalogowano.</li><li>Sesję niesie ciasteczko <code>CGISESSID</code>; poziom odczytuje strona z 5. znaku wartości (<code>A</code>..<code>D</code> = 0..3).</li><li>Wylogowanie: <code>GET /cgi-bin/mpc105j.cgi?query=122</code>, strona kasuje ciasteczko.</li><li>Strona pokazuje pozycję menu, gdy <code>show_level</code> ≤ poziom użytkownika; zapis wymaga <code>write_level</code>.</li><li>Według skryptów strony odpowiedź <code>{"value":"fail"}</code> na zapytanie odczytowe oznacza „Needed Authentication”.</li></ul></section>
+<section id="conv"><h2>Konwencje</h2><ul><li>Zapytania odczytowe to <code>GET &lt;cgi&gt;?&lt;query&gt;</code>, odpowiedzi są w JSON (strona używa <code>$.getJSON</code>).</li><li>W plikach menu parametry zapytań bywają rozdzielone znakiem <code>~</code> (np. <code>query=7~block_offset=10240~…</code>). W tabeli pakietów zapisano je jako <code>&amp;</code>; to założenie, patrz „Założenia”.</li><li>Pola <code>en_cgi</code>/<code>en_query</code> w menu sprawdzają, czy moduł jest włączony – to pakiety z zakładki Features.</li><li>Pola <code>set</code>, <code>set1</code>, <code>set2</code> zapisują konfigurację – <strong>nie są</strong> używane.</li></ul></section>
+<section id="response"><h2>Format wyniku skryptów</h2><p>Skrypty zbierające zwracają jeden obiekt JSON: <code>device</code> (metadane), <code>login</code> (wynik logowania) i klucz na zakładkę z pakietami po <code>id</code>.</p>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>{
+  "device": { "base_url": "http://192.168.128.1", "collected_at": "&lt;czas UTC&gt;", "packages_total": 66 },
+  "login": { "http_status": 200, "ok": true, "value": "&lt;odpowiedź&gt;", "level_requested": 3, "level_from_cookie": 3 },
+  "advanced": {
+    "information_device_settings": {
+      "label": "Advanced &gt; Information &gt; Device Settings",
+      "cgi": "/cgi-bin/mpc105.cgi",
       "query": "query=302",
       "http_status": 200,
-      "body": { "…": "odpowiedź urządzenia" }
+      "content_type": "&lt;nagłówek&gt;",
+      "body": "&lt;odpowiedź urządzenia – do uzupełnienia po podłączeniu&gt;"
     }
   }
-}</code></pre>
-<div class="tablewrap"><table><tr><th>Pole</th><th>Opis</th></tr><tr><td><code>label</code></td><td>ścieżka w menu WWW</td></tr><tr><td><code>cgi, query</code></td><td>dokładnie to, co poszło do urządzenia</td></tr><tr><td><code>http_status</code></td><td>kod HTTP; <code>0</code> = błąd połączenia lub timeout</td></tr><tr><td><code>content_type</code></td><td>nagłówek Content-Type odpowiedzi (<code>null</code>, jeśli go brak)</td></tr><tr><td><code>post_retry</code></td><td>tylko gdy GET zawiódł (kod inny niż 2xx lub pusta odpowiedź): wynik jednorazowej próby POST</td></tr><tr><td><code>body</code></td><td>JSON, jeśli odpowiedź się parsuje; inaczej surowy tekst; <code>null</code> gdy pusta</td></tr></table></div>
-<p class="muted">Błąd jednego pakietu (np. moduł wyłączony) nie przerywa zbierania pozostałych.</p></section>
-
-<section class="tab" id="tab-identity"><h2>Identyfikacja <code class="tabkey">identity</code></h2><p class="muted">Model, numer seryjny, numer artykułu i wersje oprogramowania.</p><article class="ep" id="identity-device_settings" data-s="device_settings advanced &gt; information &gt; device settings (model, serial no., article no.) query=302 /cgi-bin/mpc105.fcgi">
-<header><h3>Advanced &gt; Information &gt; Device Settings (model, serial no., article no.)</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=302</code></div>
-<p>Główne źródło: model, numer seryjny, numer artykułu i pozostałe dane urządzenia. W menu pole zapisu ma write_level 3, odczyt jest dostępny od poziomu 0.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=302&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.identity.device_settings</code></p>
-</article><article class="ep" id="identity-version" data-s="version advanced &gt; information &gt; version (firmware/fpga/dsp) query=301 /cgi-bin/mpc105.fcgi">
-<header><h3>Advanced &gt; Information &gt; Version (firmware/FPGA/DSP)</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=301</code></div>
-<p>Wersje oprogramowania (firmware, FPGA, DSP).</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=301&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.identity.version</code></p>
-</article><article class="ep" id="identity-host" data-s="host settings.json &gt; host (hostname) query=126 /cgi-bin/mpc105.fcgi">
-<header><h3>settings.json &gt; host (hostname)</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=126</code></div>
-<p>Nazwa hosta z settings.json. Nazwa projektu w settings.json: REM102-S2.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=126&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.identity.host</code></p>
-</article><article class="ep" id="identity-auth_message" data-s="auth_message settings.json &gt; auth_message query=125 /cgi-bin/mpc105.fcgi">
-<header><h3>settings.json &gt; auth_message</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=125</code></div>
-<p>Komunikat uwierzytelniania z settings.json.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=125&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.identity.auth_message</code></p>
-</article><article class="ep" id="identity-meter_settings" data-s="meter_settings setup &gt; meter &gt; settings query=105 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; Meter &gt; Settings</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=105</code></div>
-<p>Ustawienia miernika (strona Setup › Meter › Settings).</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=105&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.identity.meter_settings</code></p>
-</article><article class="ep" id="identity-dmeter_serial" data-s="dmeter_serial setup &gt; dmeter &gt; dmeter serial number query=407 /cgi-bin/items.fcgi">
-<header><h3>Setup &gt; DMeter &gt; DMeter Serial Number</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/items.fcgi?query=407</code></div>
-<p>Numer seryjny DMeter (iTEMS). Używa pliku items.fcgi.</p><p class="req">Wymaga włączonego modułu: <a href="#features-dmeter_rem"><code>features.dmeter_rem</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/items.fcgi&quot; \
-     --data-raw &quot;query=407&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.identity.dmeter_serial</code></p>
-</article></section><section class="tab" id="tab-home"><h2>Home <code class="tabkey">home</code></h2><p class="muted">Status miernika, kanały EMF, wejścia/wyjścia cyfrowe, sieć.</p><article class="ep" id="home-meter_status" data-s="meter_status home &gt; summary &gt; meter status query=10 /cgi-bin/rem.fcgi">
+}</code></pre></div>
+<div class="tablewrap"><table><tr><th>Pole</th><th>Opis</th></tr><tr><td><code>label</code></td><td>ścieżka w menu WWW</td></tr><tr><td><code>cgi</code>, <code>query</code></td><td>dokładnie to, co poszło do urządzenia</td></tr><tr><td><code>http_status</code></td><td>kod HTTP; <code>0</code> = brak odpowiedzi HTTP (pole <code>error</code> podaje powód)</td></tr><tr><td><code>content_type</code>, <code>server</code></td><td>nagłówki odpowiedzi</td></tr><tr><td><code>body</code></td><td>JSON, jeśli odpowiedź się parsuje; inaczej tekst; <code>null</code> gdy pusta</td></tr><tr><td><code>post_retry</code></td><td>tylko gdy GET zawiódł: wynik jednorazowej próby POST</td></tr></table></div>
+<p>Błąd jednego pakietu nie przerywa zbierania pozostałych.</p></section>
+<section class="tab" id="tab-home"><h2>Home <code class="tabkey">home</code></h2><p class="muted">Odczyty miernika: kanały A i B, energia, wejścia/wyjścia cyfrowe, archiwa, sieć.</p>
+<article class="ep" id="home-summary_meter_status" data-s="summary_meter_status home &gt; summary &gt; meter status /cgi-bin/rem.cgi?query=7&amp;block_offset=10240&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=17&amp;string_size=32">
 <header><h3>Home &gt; Summary &gt; Meter Status</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=10</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=7&amp;block_offset=10240&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=17&amp;string_size=32</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=10&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=7&amp;block_offset=10240&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=17&amp;string_size=32&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.meter_status</code></p>
-</article><article class="ep" id="home-emf_status" data-s="emf_status home &gt; emf channels &gt; emf status query=406 /cgi-bin/rem.fcgi">
-<header><h3>Home &gt; EMF channels &gt; EMF Status</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=406</code></div>
+<p class="muted small">W wyniku skryptu: <code>.home.summary_meter_status</code></p>
+</article>
+<article class="ep" id="home-ch_a_energy" data-s="ch_a_energy home &gt; ch a &gt; energy /cgi-bin/rem.cgi?query=7&amp;block_offset=11264&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32">
+<header><h3>Home &gt; CH A &gt; Energy</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=7&amp;block_offset=11264&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=406&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=7&amp;block_offset=11264&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.emf_status</code></p>
-</article><article class="ep" id="home-emf_measures" data-s="emf_measures home &gt; emf channels &gt; emf measures query=407 /cgi-bin/rem.fcgi">
-<header><h3>Home &gt; EMF channels &gt; EMF Measures</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=407</code></div>
+<p class="muted small">W wyniku skryptu: <code>.home.ch_a_energy</code></p>
+</article>
+<article class="ep" id="home-ch_a_measures" data-s="ch_a_measures home &gt; ch a &gt; measures /cgi-bin/rem.cgi?query=106&amp;channel=0">
+<header><h3>Home &gt; CH A &gt; Measures</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=106&amp;channel=0</code></div>
+<p>W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt.</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=106&amp;channel=0&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.ch_a_measures</code></p>
+</article>
+<article class="ep" id="home-ch_b_energy" data-s="ch_b_energy home &gt; ch b &gt; energy /cgi-bin/rem.cgi?query=7&amp;block_offset=12288&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32">
+<header><h3>Home &gt; CH B &gt; Energy</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=7&amp;block_offset=12288&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=407&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=7&amp;block_offset=12288&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=19&amp;string_size=32&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.emf_measures</code></p>
-</article><article class="ep" id="home-emf_cebd" data-s="emf_cebd home &gt; emf channels &gt; emf cebd query=409 /cgi-bin/rem.fcgi">
-<header><h3>Home &gt; EMF channels &gt; EMF CEBD</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=409</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=409&quot;</code></pre></div>
+<p class="muted small">W wyniku skryptu: <code>.home.ch_b_energy</code></p>
+</article>
+<article class="ep" id="home-ch_b_measures" data-s="ch_b_measures home &gt; ch b &gt; measures /cgi-bin/rem.cgi?query=106&amp;channel=1">
+<header><h3>Home &gt; CH B &gt; Measures</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=106&amp;channel=1</code></div>
+<p>W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt.</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=106&amp;channel=1&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.emf_cebd</code></p>
-</article><article class="ep" id="home-dhs_memory" data-s="dhs_memory home &gt; data download &gt; dhs memory query=459 /cgi-bin/rem.fcgi">
-<header><h3>Home &gt; Data Download &gt; DHS Memory</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=459</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=459&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.dhs_memory</code></p>
-</article><article class="ep" id="home-digital_io" data-s="digital_io home &gt; digital io query=11 /cgi-bin/rem.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.home.ch_b_measures</code></p>
+</article>
+<article class="ep" id="home-digital_io" data-s="digital_io home &gt; digital io /cgi-bin/rem.cgi?query=7&amp;block_offset=13312&amp;byte_offset=0&amp;data_size=1024&amp;type=string&amp;name=energy&amp;memory=remshm&amp;number=12&amp;string_size=32">
 <header><h3>Home &gt; Digital IO</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=11</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dsp_digitalio"><code>features.dsp_digitalio</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=11&quot;</code></pre></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=7&amp;block_offset=13312&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=12&amp;string_size=32</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=7&amp;block_offset=13312&amp;byte_offset=0&amp;data_size=1024&amp;type=STRING&amp;name=energy&amp;memory=remshm&amp;number=12&amp;string_size=32&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
 <p class="muted small">W wyniku skryptu: <code>.home.digital_io</code></p>
-</article><article class="ep" id="home-net_interfaces" data-s="net_interfaces home &gt; networking &gt; interfaces query=500 /cgi-bin/mpc105.fcgi">
+</article>
+<article class="ep" id="home-archive_1_waiting_files" data-s="archive_1_waiting_files home &gt; archive 1 &gt; waiting files /cgi-bin/rem.cgi?query=107&amp;id=1">
+<header><h3>Home &gt; Archive 1 &gt; Waiting files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=107&amp;id=1</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=107&amp;id=1&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.archive_1_waiting_files</code></p>
+</article>
+<article class="ep" id="home-archive_1_sent_files" data-s="archive_1_sent_files home &gt; archive 1 &gt; sent files /cgi-bin/rem.cgi?query=108&amp;id=1">
+<header><h3>Home &gt; Archive 1 &gt; Sent files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=108&amp;id=1</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=108&amp;id=1&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.archive_1_sent_files</code></p>
+</article>
+<article class="ep" id="home-archive_1_test_files" data-s="archive_1_test_files home &gt; archive 1 &gt; test files /cgi-bin/rem.cgi?query=112&amp;id=1">
+<header><h3>Home &gt; Archive 1 &gt; Test files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=112&amp;id=1</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=112&amp;id=1&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.archive_1_test_files</code></p>
+</article>
+<article class="ep" id="home-archive_2_waiting_files" data-s="archive_2_waiting_files home &gt; archive 2 &gt; waiting files /cgi-bin/rem.cgi?query=107&amp;id=2">
+<header><h3>Home &gt; Archive 2 &gt; Waiting files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=107&amp;id=2</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=107&amp;id=2&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.archive_2_waiting_files</code></p>
+</article>
+<article class="ep" id="home-archive_2_sent_files" data-s="archive_2_sent_files home &gt; archive 2 &gt; sent files /cgi-bin/rem.cgi?query=108&amp;id=2">
+<header><h3>Home &gt; Archive 2 &gt; Sent files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=108&amp;id=2</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=108&amp;id=2&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.archive_2_sent_files</code></p>
+</article>
+<article class="ep" id="home-archive_2_test_files" data-s="archive_2_test_files home &gt; archive 2 &gt; test files /cgi-bin/rem.cgi?query=112&amp;id=2">
+<header><h3>Home &gt; Archive 2 &gt; Test files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=112&amp;id=2</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=112&amp;id=2&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.home.archive_2_test_files</code></p>
+</article>
+<article class="ep" id="home-networking_interfaces" data-s="networking_interfaces home &gt; networking &gt; interfaces /cgi-bin/mpc105.cgi?query=500">
 <header><h3>Home &gt; Networking &gt; Interfaces</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=500</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=500</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=500&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=500&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.net_interfaces</code></p>
-</article><article class="ep" id="home-net_services" data-s="net_services home &gt; networking &gt; services query=501 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.home.networking_interfaces</code></p>
+</article>
+<article class="ep" id="home-networking_services" data-s="networking_services home &gt; networking &gt; services /cgi-bin/mpc105.cgi?query=501">
 <header><h3>Home &gt; Networking &gt; Services</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=501</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=501</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=501&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=501&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.home.net_services</code></p>
-</article></section><section class="tab" id="tab-setup"><h2>Setup <code class="tabkey">setup</code></h2><p class="muted">Konfiguracja miernika, DCS, interfejsów sieciowych i usług.</p><article class="ep" id="setup-channels_configuration" data-s="channels_configuration setup &gt; meter &gt; channels configuration query=100 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; Meter &gt; Channels Configuration</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=100</code></div>
+<p class="muted small">W wyniku skryptu: <code>.home.networking_services</code></p>
+</article>
+<article class="ep" id="home-networking_redirection" data-s="networking_redirection home &gt; networking &gt; redirection /cgi-bin/mpc105.cgi?query=502">
+<header><h3>Home &gt; Networking &gt; Redirection</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=502</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=100&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=502&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.channels_configuration</code></p>
-</article><article class="ep" id="setup-dcs_user_1" data-s="dcs_user_1 setup &gt; dcs users &gt; dcs user 1 query=450&amp;user=1 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Users &gt; DCS User 1</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=450&amp;user=1</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_1"><code>features.dcs_user_1</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=450&amp;user=1&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_user_1</code></p>
-</article><article class="ep" id="setup-dcs_user_2" data-s="dcs_user_2 setup &gt; dcs users &gt; dcs user 2 query=450&amp;user=2 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Users &gt; DCS User 2</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=450&amp;user=2</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_2"><code>features.dcs_user_2</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=450&amp;user=2&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_user_2</code></p>
-</article><article class="ep" id="setup-dcs_user_3" data-s="dcs_user_3 setup &gt; dcs users &gt; dcs user 3 query=450&amp;user=3 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Users &gt; DCS User 3</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=450&amp;user=3</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_3"><code>features.dcs_user_3</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=450&amp;user=3&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_user_3</code></p>
-</article><article class="ep" id="setup-dcs_user_4" data-s="dcs_user_4 setup &gt; dcs users &gt; dcs user 4 query=450&amp;user=4 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Users &gt; DCS User 4</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=450&amp;user=4</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_4"><code>features.dcs_user_4</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=450&amp;user=4&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_user_4</code></p>
-</article><article class="ep" id="setup-dcs_communication" data-s="dcs_communication setup &gt; dcs communication query=452 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Communication</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=452</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=452&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_communication</code></p>
-</article><article class="ep" id="setup-dcs_binding" data-s="dcs_binding setup &gt; dcs binding query=457 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Binding</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=457</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=457&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_binding</code></p>
-</article><article class="ep" id="setup-dcs_conn_test" data-s="dcs_conn_test setup &gt; dcs binding &gt; connection test query=455 /cgi-bin/rem.fcgi">
-<header><h3>Setup &gt; DCS Binding &gt; Connection Test</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=455</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=455&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dcs_conn_test</code></p>
-</article><article class="ep" id="setup-ethernet_0" data-s="ethernet_0 setup &gt; ethernet interfaces &gt; ethernet 0 query=103 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Ethernet Interfaces &gt; Ethernet 0</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=103</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=103&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.ethernet_0</code></p>
-</article><article class="ep" id="setup-ethernet_1" data-s="ethernet_1 setup &gt; ethernet interfaces &gt; ethernet 1 query=104 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Ethernet Interfaces &gt; Ethernet 1</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=104</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=104&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.ethernet_1</code></p>
-</article><article class="ep" id="setup-mobile_settings" data-s="mobile_settings setup &gt; mobile interface &gt; mobile settings query=101 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Mobile Interface &gt; Mobile Settings</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=101</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-mobile"><code>features.mobile</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=101&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.mobile_settings</code></p>
-</article><article class="ep" id="setup-dhcp_client" data-s="dhcp_client setup &gt; dhcp &gt; client settings query=200 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; DHCP &gt; Client Settings</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=200</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=200&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.dhcp_client</code></p>
-</article><article class="ep" id="setup-gateway_dns" data-s="gateway_dns setup &gt; services &gt; gateway &amp; dns query=201 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Services &gt; Gateway &amp; DNS</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=201</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=201&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.gateway_dns</code></p>
-</article><article class="ep" id="setup-servers" data-s="servers setup &gt; services &gt; servers query=202 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Services &gt; Servers</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=202</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=202&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.servers</code></p>
-</article><article class="ep" id="setup-ntp_servers" data-s="ntp_servers setup &gt; services &gt; ntp servers query=203 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Services &gt; NTP Servers</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=203</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=203&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.ntp_servers</code></p>
-</article><article class="ep" id="setup-ems_time_servers" data-s="ems_time_servers setup &gt; services &gt; ems time servers query=230 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Services &gt; EMS Time Servers</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=230</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=230&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.ems_time_servers</code></p>
-</article><article class="ep" id="setup-gps" data-s="gps setup &gt; services &gt; gps query=205 /cgi-bin/mpc105.fcgi">
-<header><h3>Setup &gt; Services &gt; GPS</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=205</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-gps"><code>features.gps</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=205&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.setup.gps</code></p>
-</article></section><section class="tab" id="tab-advanced"><h2>Advanced <code class="tabkey">advanced</code></h2><p class="muted">Czas RTC i zdarzenia.</p><article class="ep" id="advanced-rtc_time" data-s="rtc_time advanced &gt; rtc &gt; time settings query=303 /cgi-bin/mpc105.fcgi">
-<header><h3>Advanced &gt; RTC &gt; Time Settings</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=303</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=303&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.advanced.rtc_time</code></p>
-</article><article class="ep" id="advanced-events" data-s="events advanced &gt; information &gt; events query=314 /cgi-bin/mpc105.fcgi">
-<header><h3>Advanced &gt; Information &gt; Events</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=314</code></div>
-<p>W menu to samo zapytanie służy też do zapisu (set = query=314); skrypt wysyła tylko odczyt.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=314&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.advanced.events</code></p>
-</article></section><section class="tab" id="tab-monitoring"><h2>Monitoring <code class="tabkey">monitoring</code></h2><p class="muted">Stan interfejsów, statystyki DCS, pamięci i podzespołów.</p><article class="ep" id="monitoring-eth_0" data-s="eth_0 monitoring &gt; network interfaces &gt; ethernet 0 query=3 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.home.networking_redirection</code></p>
+</article>
+</section>
+<section class="tab" id="tab-monitoring"><h2>Monitoring <code class="tabkey">monitoring</code></h2><p class="muted">Stan interfejsów sieciowych, pamięci i podzespołów oraz RTP100.</p>
+<article class="ep" id="monitoring-network_interfaces_ethernet_0" data-s="network_interfaces_ethernet_0 monitoring &gt; network interfaces &gt; ethernet 0 /cgi-bin/mpc105.cgi?query=3">
 <header><h3>Monitoring &gt; Network Interfaces &gt; Ethernet 0</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=3</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=3</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=3&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=3&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.eth_0</code></p>
-</article><article class="ep" id="monitoring-eth_1" data-s="eth_1 monitoring &gt; network interfaces &gt; ethernet 1 query=4 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_ethernet_0</code></p>
+</article>
+<article class="ep" id="monitoring-network_interfaces_ethernet_1" data-s="network_interfaces_ethernet_1 monitoring &gt; network interfaces &gt; ethernet 1 /cgi-bin/mpc105.cgi?query=4">
 <header><h3>Monitoring &gt; Network Interfaces &gt; Ethernet 1</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=4</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=4</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=4&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=4&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.eth_1</code></p>
-</article><article class="ep" id="monitoring-mobile" data-s="mobile monitoring &gt; network interfaces &gt; mobile query=13 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_ethernet_1</code></p>
+</article>
+<article class="ep" id="monitoring-network_interfaces_ethernet_2" data-s="network_interfaces_ethernet_2 monitoring &gt; network interfaces &gt; ethernet 2 /cgi-bin/mpc105.cgi?query=5">
+<header><h3>Monitoring &gt; Network Interfaces &gt; Ethernet 2</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=5</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=5&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_ethernet_2</code></p>
+</article>
+<article class="ep" id="monitoring-network_interfaces_wlan" data-s="network_interfaces_wlan monitoring &gt; network interfaces &gt; wlan /cgi-bin/mpc105.cgi?query=6">
+<header><h3>Monitoring &gt; Network Interfaces &gt; WLAN</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=6</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=6&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_wlan</code></p>
+</article>
+<article class="ep" id="monitoring-network_interfaces_mobile" data-s="network_interfaces_mobile monitoring &gt; network interfaces &gt; mobile /cgi-bin/mpc105.cgi?query=13">
 <header><h3>Monitoring &gt; Network Interfaces &gt; Mobile</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=13</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=13</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=13&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=13&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.mobile</code></p>
-</article><article class="ep" id="monitoring-gps" data-s="gps monitoring &gt; network interfaces &gt; gps query=16 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_mobile</code></p>
+</article>
+<article class="ep" id="monitoring-network_interfaces_ethernet_switch" data-s="network_interfaces_ethernet_switch monitoring &gt; network interfaces &gt; ethernet switch /cgi-bin/mpc105.cgi?query=14">
+<header><h3>Monitoring &gt; Network Interfaces &gt; Ethernet Switch</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=14</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=14&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_ethernet_switch</code></p>
+</article>
+<article class="ep" id="monitoring-network_interfaces_gps" data-s="network_interfaces_gps monitoring &gt; network interfaces &gt; gps /cgi-bin/mpc105.cgi?query=16">
 <header><h3>Monitoring &gt; Network Interfaces &gt; GPS</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=16</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-gps"><code>features.gps</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=16&quot;</code></pre></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=16</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=16&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.gps</code></p>
-</article><article class="ep" id="monitoring-dcs_stats_user_1" data-s="dcs_stats_user_1 monitoring &gt; dcs statistics &gt; dcs user 1 query=461&amp;user=1 /cgi-bin/rem.fcgi">
-<header><h3>Monitoring &gt; DCS Statistics &gt; DCS User 1</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=461&amp;user=1</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_1"><code>features.dcs_user_1</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=461&amp;user=1&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dcs_stats_user_1</code></p>
-</article><article class="ep" id="monitoring-dcs_stats_user_2" data-s="dcs_stats_user_2 monitoring &gt; dcs statistics &gt; dcs user 2 query=461&amp;user=2 /cgi-bin/rem.fcgi">
-<header><h3>Monitoring &gt; DCS Statistics &gt; DCS User 2</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=461&amp;user=2</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_2"><code>features.dcs_user_2</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=461&amp;user=2&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dcs_stats_user_2</code></p>
-</article><article class="ep" id="monitoring-dcs_stats_user_3" data-s="dcs_stats_user_3 monitoring &gt; dcs statistics &gt; dcs user 3 query=461&amp;user=3 /cgi-bin/rem.fcgi">
-<header><h3>Monitoring &gt; DCS Statistics &gt; DCS User 3</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=461&amp;user=3</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_3"><code>features.dcs_user_3</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=461&amp;user=3&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dcs_stats_user_3</code></p>
-</article><article class="ep" id="monitoring-dcs_stats_user_4" data-s="dcs_stats_user_4 monitoring &gt; dcs statistics &gt; dcs user 4 query=461&amp;user=4 /cgi-bin/rem.fcgi">
-<header><h3>Monitoring &gt; DCS Statistics &gt; DCS User 4</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=461&amp;user=4</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dcs"><code>features.dcs</code></a>, <a href="#features-dcs_user_4"><code>features.dcs_user_4</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=461&amp;user=4&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dcs_stats_user_4</code></p>
-</article><article class="ep" id="monitoring-dmeter_status" data-s="dmeter_status monitoring &gt; dmeter status query=409 /cgi-bin/items.fcgi">
-<header><h3>Monitoring &gt; DMeter Status</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/items.fcgi?query=409</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dmeter_items"><code>features.dmeter_items</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/items.fcgi&quot; \
-     --data-raw &quot;query=409&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dmeter_status</code></p>
-</article><article class="ep" id="monitoring-rtp100_vars" data-s="rtp100_vars monitoring &gt; rtp100 variables query=441 /cgi-bin/rtp.fcgi">
-<header><h3>Monitoring &gt; RTP100 Variables</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rtp.fcgi?query=441</code></div>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.network_interfaces_gps</code></p>
+</article>
+<article class="ep" id="monitoring-rtp100_rtp100_variables" data-s="rtp100_rtp100_variables monitoring &gt; rtp100 &gt; rtp100 variables /cgi-bin/rtp.cgi?query=441">
+<header><h3>Monitoring &gt; RTP100 &gt; RTP100 Variables</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rtp.cgi?query=441</code></div>
 <p class="req">Wymaga włączonego modułu: <a href="#features-rtp100"><code>features.rtp100</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rtp.fcgi&quot; \
-     --data-raw &quot;query=441&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rtp.cgi?query=441&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.rtp100_vars</code></p>
-</article><article class="ep" id="monitoring-rtp100_files" data-s="rtp100_files monitoring &gt; rtp100 files query=444 /cgi-bin/rtp.fcgi">
-<header><h3>Monitoring &gt; RTP100 Files</h3><div class="badges"><span class="m">GET</span><span class="b lvl">show_level ≥ 1</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rtp.fcgi?query=444</code></div>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.rtp100_rtp100_variables</code></p>
+</article>
+<article class="ep" id="monitoring-rtp100_rtp100_files" data-s="rtp100_rtp100_files monitoring &gt; rtp100 &gt; rtp100 files /cgi-bin/rtp.cgi?query=444">
+<header><h3>Monitoring &gt; RTP100 &gt; RTP100 Files</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rtp.cgi?query=444</code></div>
 <p class="req">Wymaga włączonego modułu: <a href="#features-rtp100"><code>features.rtp100</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rtp.fcgi&quot; \
-     --data-raw &quot;query=444&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rtp.cgi?query=444&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.rtp100_files</code></p>
-</article><article class="ep" id="monitoring-mem_nand" data-s="mem_nand monitoring &gt; memory &gt; nand query=23 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.rtp100_rtp100_files</code></p>
+</article>
+<article class="ep" id="monitoring-memory_nand" data-s="memory_nand monitoring &gt; memory &gt; nand /cgi-bin/mpc105.cgi?query=23">
 <header><h3>Monitoring &gt; Memory &gt; NAND</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=23</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=23</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=23&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=23&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.mem_nand</code></p>
-</article><article class="ep" id="monitoring-mem_nor" data-s="mem_nor monitoring &gt; memory &gt; nor query=24 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.memory_nand</code></p>
+</article>
+<article class="ep" id="monitoring-memory_nor" data-s="memory_nor monitoring &gt; memory &gt; nor /cgi-bin/mpc105.cgi?query=24">
 <header><h3>Monitoring &gt; Memory &gt; NOR</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=24</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=24</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=24&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=24&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.mem_nor</code></p>
-</article><article class="ep" id="monitoring-mem_ram" data-s="mem_ram monitoring &gt; memory &gt; ram query=25 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.memory_nor</code></p>
+</article>
+<article class="ep" id="monitoring-memory_ram" data-s="memory_ram monitoring &gt; memory &gt; ram /cgi-bin/mpc105.cgi?query=25">
 <header><h3>Monitoring &gt; Memory &gt; RAM</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=25</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=25</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=25&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=25&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.mem_ram</code></p>
-</article><article class="ep" id="monitoring-dev_rtc" data-s="dev_rtc monitoring &gt; other devices &gt; rtc query=7 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.memory_ram</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_rtc" data-s="other_devices_rtc monitoring &gt; other devices &gt; rtc /cgi-bin/mpc105.cgi?query=7">
 <header><h3>Monitoring &gt; Other Devices &gt; RTC</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=7</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=7</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=7&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=7&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_rtc</code></p>
-</article><article class="ep" id="monitoring-dev_fpga" data-s="dev_fpga monitoring &gt; other devices &gt; fpga query=8 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_rtc</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_fpga" data-s="other_devices_fpga monitoring &gt; other devices &gt; fpga /cgi-bin/mpc105.cgi?query=8">
 <header><h3>Monitoring &gt; Other Devices &gt; FPGA</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=8</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=8</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=8&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=8&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_fpga</code></p>
-</article><article class="ep" id="monitoring-dev_fram" data-s="dev_fram monitoring &gt; other devices &gt; fram query=9 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_fpga</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_fram" data-s="other_devices_fram monitoring &gt; other devices &gt; fram /cgi-bin/mpc105.cgi?query=9">
 <header><h3>Monitoring &gt; Other Devices &gt; FRAM</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=9</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=9</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=9&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=9&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_fram</code></p>
-</article><article class="ep" id="monitoring-dev_adc" data-s="dev_adc monitoring &gt; other devices &gt; adc query=10 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_fram</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_adc" data-s="other_devices_adc monitoring &gt; other devices &gt; adc /cgi-bin/mpc105.cgi?query=10">
 <header><h3>Monitoring &gt; Other Devices &gt; ADC</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=10</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=10</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=10&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=10&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_adc</code></p>
-</article><article class="ep" id="monitoring-dev_dsp" data-s="dev_dsp monitoring &gt; other devices &gt; dsp query=11 /cgi-bin/mpc105.fcgi">
-<header><h3>Monitoring &gt; Other Devices &gt; DSP</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=11</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-dsp_digitalio"><code>features.dsp_digitalio</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=11&quot;</code></pre></div>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_adc</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_hdlc" data-s="other_devices_hdlc monitoring &gt; other devices &gt; hdlc /cgi-bin/mpc105.cgi?query=11">
+<header><h3>Monitoring &gt; Other Devices &gt; HDLC</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=11</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=11&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_dsp</code></p>
-</article><article class="ep" id="monitoring-dev_mvbcs" data-s="dev_mvbcs monitoring &gt; other devices &gt; mvbcs query=12 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_hdlc</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_mvbcs" data-s="other_devices_mvbcs monitoring &gt; other devices &gt; mvbcs /cgi-bin/mpc105.cgi?query=12">
 <header><h3>Monitoring &gt; Other Devices &gt; MVBCS</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=12</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=12</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=12&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=12&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_mvbcs</code></p>
-</article><article class="ep" id="monitoring-dev_modem" data-s="dev_modem monitoring &gt; other devices &gt; modem query=17 /cgi-bin/mpc105.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_mvbcs</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_modem" data-s="other_devices_modem monitoring &gt; other devices &gt; modem /cgi-bin/mpc105.cgi?query=17">
 <header><h3>Monitoring &gt; Other Devices &gt; MODEM</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=17</code></div>
-<p class="req">Wymaga włączonego modułu: <a href="#features-mobile"><code>features.mobile</code></a>.</p>
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=17&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.monitoring.dev_modem</code></p>
-</article></section><section class="tab" id="tab-features"><h2>Features <code class="tabkey">features</code></h2><p class="muted">Flagi włączenia modułów (en_query) – wyjaśniają puste pakiety.</p><article class="ep" id="features-dcs" data-s="dcs dcs enabled? query=463 /cgi-bin/rem.fcgi">
-<header><h3>DCS enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=463</code></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=17</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=463&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=17&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dcs</code></p>
-</article><article class="ep" id="features-dcs_user_1" data-s="dcs_user_1 dcs user 1 enabled? query=462&amp;user=1 /cgi-bin/rem.fcgi">
-<header><h3>DCS User 1 enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=462&amp;user=1</code></div>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_modem</code></p>
+</article>
+<article class="ep" id="monitoring-other_devices_wifi" data-s="other_devices_wifi monitoring &gt; other devices &gt; wifi /cgi-bin/mpc105.cgi?query=18">
+<header><h3>Monitoring &gt; Other Devices &gt; WIFI</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=18</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=462&amp;user=1&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=18&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dcs_user_1</code></p>
-</article><article class="ep" id="features-dcs_user_2" data-s="dcs_user_2 dcs user 2 enabled? query=462&amp;user=2 /cgi-bin/rem.fcgi">
-<header><h3>DCS User 2 enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=462&amp;user=2</code></div>
+<p class="muted small">W wyniku skryptu: <code>.monitoring.other_devices_wifi</code></p>
+</article>
+</section>
+<section class="tab" id="tab-setup"><h2>Setup <code class="tabkey">setup</code></h2><p class="muted">Konfiguracja miernika, interfejsów sieciowych, DHCP i usług.</p>
+<article class="ep" id="setup-meter_settings" data-s="meter_settings setup &gt; meter &gt; settings /cgi-bin/rem.cgi?query=105">
+<header><h3>Setup &gt; Meter &gt; Settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=105</code></div>
+<p>Ustawienia miernika (rem.cgi, nie mpc105.cgi).</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=105&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_settings</code></p>
+</article>
+<article class="ep" id="setup-meter_channels_configuration" data-s="meter_channels_configuration setup &gt; meter &gt; channels configuration /cgi-bin/rem.cgi?query=100">
+<header><h3>Setup &gt; Meter &gt; Channels Configuration</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=100</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=462&amp;user=2&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=100&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dcs_user_2</code></p>
-</article><article class="ep" id="features-dcs_user_3" data-s="dcs_user_3 dcs user 3 enabled? query=462&amp;user=3 /cgi-bin/rem.fcgi">
-<header><h3>DCS User 3 enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=462&amp;user=3</code></div>
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_channels_configuration</code></p>
+</article>
+<article class="ep" id="setup-meter_ftp_hosts" data-s="meter_ftp_hosts setup &gt; meter &gt; ftp hosts /cgi-bin/rem.cgi?query=101">
+<header><h3>Setup &gt; Meter &gt; FTP Hosts</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=101</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=462&amp;user=3&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=101&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dcs_user_3</code></p>
-</article><article class="ep" id="features-dcs_user_4" data-s="dcs_user_4 dcs user 4 enabled? query=462&amp;user=4 /cgi-bin/rem.fcgi">
-<header><h3>DCS User 4 enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=462&amp;user=4</code></div>
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_ftp_hosts</code></p>
+</article>
+<article class="ep" id="setup-meter_udp_clients" data-s="meter_udp_clients setup &gt; meter &gt; udp clients /cgi-bin/rem.cgi?query=102">
+<header><h3>Setup &gt; Meter &gt; UDP Clients</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=102</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=462&amp;user=4&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=102&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dcs_user_4</code></p>
-</article><article class="ep" id="features-dmeter_rem" data-s="dmeter_rem dmeter (rem) enabled? query=420 /cgi-bin/rem.fcgi">
-<header><h3>DMeter (rem) enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=420</code></div>
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_udp_clients</code></p>
+</article>
+<article class="ep" id="setup-meter_messages" data-s="meter_messages setup &gt; meter &gt; messages /cgi-bin/rem.cgi?query=103">
+<header><h3>Setup &gt; Meter &gt; Messages</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=103</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=420&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=103&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dmeter_rem</code></p>
-</article><article class="ep" id="features-dmeter_items" data-s="dmeter_items dmeter (items) enabled? query=400 /cgi-bin/items.fcgi">
-<header><h3>DMeter (items) enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/items.fcgi?query=400</code></div>
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_messages</code></p>
+</article>
+<article class="ep" id="setup-meter_calibration" data-s="meter_calibration setup &gt; meter &gt; calibration /cgi-bin/rem.cgi?query=7&amp;block_offset=8192&amp;byte_offset=0&amp;data_size=1024&amp;type=dint&amp;name=energy&amp;memory=remshm&amp;number=2">
+<header><h3>Setup &gt; Meter &gt; Calibration</h3><div class="badges"><span class="m">GET</span><span class="b lvl">min. poziom 3</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=7&amp;block_offset=8192&amp;byte_offset=0&amp;data_size=1024&amp;type=DINT&amp;name=energy&amp;memory=remshm&amp;number=2</code></div>
+<p>Odczyt pamięci współdzielonej; w menu show_level 3 (Super Admin).</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=7&amp;block_offset=8192&amp;byte_offset=0&amp;data_size=1024&amp;type=DINT&amp;name=energy&amp;memory=remshm&amp;number=2&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_calibration</code></p>
+</article>
+<article class="ep" id="setup-meter_thresholds_protection" data-s="meter_thresholds_protection setup &gt; meter &gt; thresholds protection /cgi-bin/rem.cgi?query=111">
+<header><h3>Setup &gt; Meter &gt; Thresholds Protection</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=111</code></div>
 
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/items.fcgi&quot; \
-     --data-raw &quot;query=400&quot;</code></pre></div>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=111&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dmeter_items</code></p>
-</article><article class="ep" id="features-rtp100" data-s="rtp100 rtp100 enabled? query=430 /cgi-bin/rem.fcgi">
+<p class="muted small">W wyniku skryptu: <code>.setup.meter_thresholds_protection</code></p>
+</article>
+<article class="ep" id="setup-rtp100_rtp100_command" data-s="rtp100_rtp100_command setup &gt; rtp100 &gt; rtp100 command /cgi-bin/rtp.cgi?query=442">
+<header><h3>Setup &gt; RTP100 &gt; RTP100 Command</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rtp.cgi?query=442</code></div>
+<p class="req">Wymaga włączonego modułu: <a href="#features-rtp100"><code>features.rtp100</code></a>.</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rtp.cgi?query=442&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.rtp100_rtp100_command</code></p>
+</article>
+<article class="ep" id="setup-ethernet_interfaces_ethernet_0" data-s="ethernet_interfaces_ethernet_0 setup &gt; ethernet interfaces &gt; ethernet 0 /cgi-bin/mpc105.cgi?query=103">
+<header><h3>Setup &gt; Ethernet Interfaces &gt; Ethernet 0</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=103</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=103&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.ethernet_interfaces_ethernet_0</code></p>
+</article>
+<article class="ep" id="setup-ethernet_interfaces_ethernet_1" data-s="ethernet_interfaces_ethernet_1 setup &gt; ethernet interfaces &gt; ethernet 1 /cgi-bin/mpc105.cgi?query=104">
+<header><h3>Setup &gt; Ethernet Interfaces &gt; Ethernet 1</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=104</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=104&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.ethernet_interfaces_ethernet_1</code></p>
+</article>
+<article class="ep" id="setup-ethernet_interfaces_ethernet_2" data-s="ethernet_interfaces_ethernet_2 setup &gt; ethernet interfaces &gt; ethernet 2 /cgi-bin/mpc105.cgi?query=105">
+<header><h3>Setup &gt; Ethernet Interfaces &gt; Ethernet 2</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=105</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=105&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.ethernet_interfaces_ethernet_2</code></p>
+</article>
+<article class="ep" id="setup-ethernet_interfaces_switch_ethernet" data-s="ethernet_interfaces_switch_ethernet setup &gt; ethernet interfaces &gt; switch ethernet /cgi-bin/mpc105.cgi?query=107">
+<header><h3>Setup &gt; Ethernet Interfaces &gt; Switch Ethernet</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=107</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=107&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.ethernet_interfaces_switch_ethernet</code></p>
+</article>
+<article class="ep" id="setup-mobile_interface_mobile_settings" data-s="mobile_interface_mobile_settings setup &gt; mobile interface &gt; mobile settings /cgi-bin/mpc105.cgi?query=101">
+<header><h3>Setup &gt; Mobile Interface &gt; Mobile Settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=101</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=101&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.mobile_interface_mobile_settings</code></p>
+</article>
+<article class="ep" id="setup-wireless_interface_wlan" data-s="wireless_interface_wlan setup &gt; wireless interface &gt; wlan /cgi-bin/mpc105.cgi?query=106">
+<header><h3>Setup &gt; Wireless Interface &gt; WLAN</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=106</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=106&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.wireless_interface_wlan</code></p>
+</article>
+<article class="ep" id="setup-wireless_interface_client_access" data-s="wireless_interface_client_access setup &gt; wireless interface &gt; client access /cgi-bin/mpc105.cgi?query=204">
+<header><h3>Setup &gt; Wireless Interface &gt; Client Access</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=204</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=204&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.wireless_interface_client_access</code></p>
+</article>
+<article class="ep" id="setup-dhcp_client_settings" data-s="dhcp_client_settings setup &gt; dhcp &gt; client settings /cgi-bin/mpc105.cgi?query=200">
+<header><h3>Setup &gt; DHCP &gt; Client Settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=200</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=200&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.dhcp_client_settings</code></p>
+</article>
+<article class="ep" id="setup-dhcp_server_settings" data-s="dhcp_server_settings setup &gt; dhcp &gt; server settings /cgi-bin/mpc105.cgi?query=208">
+<header><h3>Setup &gt; DHCP &gt; Server Settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=208</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=208&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.dhcp_server_settings</code></p>
+</article>
+<article class="ep" id="setup-dhcp_address_reservation" data-s="dhcp_address_reservation setup &gt; dhcp &gt; address reservation /cgi-bin/mpc105.cgi?query=209">
+<header><h3>Setup &gt; DHCP &gt; Address Reservation</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=209</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=209&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.dhcp_address_reservation</code></p>
+</article>
+<article class="ep" id="setup-services_gateway_dns" data-s="services_gateway_dns setup &gt; services &gt; gateway &amp; dns /cgi-bin/mpc105.cgi?query=201">
+<header><h3>Setup &gt; Services &gt; Gateway &amp; DNS</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=201</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=201&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.services_gateway_dns</code></p>
+</article>
+<article class="ep" id="setup-services_servers" data-s="services_servers setup &gt; services &gt; servers /cgi-bin/mpc105.cgi?query=202">
+<header><h3>Setup &gt; Services &gt; Servers</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=202</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=202&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.services_servers</code></p>
+</article>
+<article class="ep" id="setup-services_ntp_servers" data-s="services_ntp_servers setup &gt; services &gt; ntp servers /cgi-bin/mpc105.cgi?query=203">
+<header><h3>Setup &gt; Services &gt; NTP Servers</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=203</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=203&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.services_ntp_servers</code></p>
+</article>
+<article class="ep" id="setup-services_gps" data-s="services_gps setup &gt; services &gt; gps /cgi-bin/mpc105.cgi?query=205">
+<header><h3>Setup &gt; Services &gt; GPS</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=205</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=205&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.services_gps</code></p>
+</article>
+<article class="ep" id="setup-services_port_forwarding" data-s="services_port_forwarding setup &gt; services &gt; port forwarding /cgi-bin/mpc105.cgi?query=207">
+<header><h3>Setup &gt; Services &gt; Port Forwarding</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=207</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=207&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.services_port_forwarding</code></p>
+</article>
+<article class="ep" id="setup-services_proxy_settings" data-s="services_proxy_settings setup &gt; services &gt; proxy settings /cgi-bin/mpc105.cgi?query=220">
+<header><h3>Setup &gt; Services &gt; Proxy settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=220</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=220&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.setup.services_proxy_settings</code></p>
+</article>
+</section>
+<section class="tab" id="tab-advanced"><h2>Advanced <code class="tabkey">advanced</code></h2><p class="muted">Czas RTC, konfiguracja i informacje o urządzeniu (model, numer seryjny, wersje, zdarzenia).</p>
+<article class="ep" id="advanced-rtc_time_settings" data-s="rtc_time_settings advanced &gt; rtc &gt; time settings /cgi-bin/mpc105.cgi?query=303">
+<header><h3>Advanced &gt; RTC &gt; Time Settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=303</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=303&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.advanced.rtc_time_settings</code></p>
+</article>
+<article class="ep" id="advanced-rtc_time_zones" data-s="rtc_time_zones advanced &gt; rtc &gt; time zones /cgi-bin/mpc105.cgi?query=305">
+<header><h3>Advanced &gt; RTC &gt; Time Zones</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=305</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=305&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.advanced.rtc_time_zones</code></p>
+</article>
+<article class="ep" id="advanced-configuration_settings" data-s="configuration_settings advanced &gt; configuration &gt; settings /cgi-bin/rem.cgi?query=113">
+<header><h3>Advanced &gt; Configuration &gt; Settings</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=113</code></div>
+
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=113&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.advanced.configuration_settings</code></p>
+</article>
+<article class="ep" id="advanced-information_device_settings" data-s="information_device_settings advanced &gt; information &gt; device settings /cgi-bin/mpc105.cgi?query=302">
+<header><h3>Advanced &gt; Information &gt; Device Settings</h3><div class="badges"><span class="m">GET</span><span class="b lvl">min. poziom 1</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=302</code></div>
+<p>Model, numer seryjny, numer artykułu i pozostałe dane urządzenia. W menu: show_level 1, write_level 3.</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=302&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.advanced.information_device_settings</code></p>
+</article>
+<article class="ep" id="advanced-information_events" data-s="information_events advanced &gt; information &gt; events /cgi-bin/mpc105.cgi?query=314">
+<header><h3>Advanced &gt; Information &gt; Events</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=314</code></div>
+<p>W menu to samo zapytanie służy też do zapisu (set = query=314); skrypt wysyła tylko odczyt.</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=314&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.advanced.information_events</code></p>
+</article>
+<article class="ep" id="advanced-information_version" data-s="information_version advanced &gt; information &gt; version /cgi-bin/mpc105.cgi?query=301">
+<header><h3>Advanced &gt; Information &gt; Version</h3><div class="badges"><span class="m">GET</span></div></header>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.cgi?query=301</code></div>
+<p>Wersje oprogramowania.</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/mpc105.cgi?query=301&quot;</code></pre></div>
+<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
+<p class="muted small">W wyniku skryptu: <code>.advanced.information_version</code></p>
+</article>
+</section>
+<section class="tab" id="tab-features"><h2>Features <code class="tabkey">features</code></h2><p class="muted">Flagi włączenia modułów (<code>en_query</code> z menu).</p>
+<article class="ep" id="features-rtp100" data-s="rtp100 rtp100 enabled? /cgi-bin/rem.cgi?query=430">
 <header><h3>RTP100 enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.fcgi?query=430</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/rem.fcgi&quot; \
-     --data-raw &quot;query=430&quot;</code></pre></div>
+<div class="url"><span class="m">GET</span><code>/cgi-bin/rem.cgi?query=430</code></div>
+<p>Odpowiedź to tablica obiektów; <code>{"type":"enable","value":"true"}</code> oznacza włączony moduł (reguła ze skryptu strony).</p>
+<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -sS -b &quot;$JAR&quot; &quot;http://$HOST/cgi-bin/rem.cgi?query=430&quot;</code></pre></div>
 <p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
 <p class="muted small">W wyniku skryptu: <code>.features.rtp100</code></p>
-</article><article class="ep" id="features-mobile" data-s="mobile modem/mobile enabled? query=14 /cgi-bin/mpc105.fcgi">
-<header><h3>Modem/Mobile enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=14</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=14&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.mobile</code></p>
-</article><article class="ep" id="features-gps" data-s="gps gps enabled? query=15 /cgi-bin/mpc105.fcgi">
-<header><h3>GPS enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=15</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=15&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.gps</code></p>
-</article><article class="ep" id="features-dsp_digitalio" data-s="dsp_digitalio dsp/digital io enabled? query=18 /cgi-bin/mpc105.fcgi">
-<header><h3>DSP/Digital IO enabled?</h3><div class="badges"><span class="m">GET</span></div></header>
-<div class="url"><span class="m">GET</span><code>/cgi-bin/mpc105.fcgi?query=18</code></div>
-
-<div class="code"><button class="copy" type="button" aria-label="Kopiuj">Kopiuj</button><pre><code>curl -b &quot;$JAR&quot; -G &quot;http://$HOST/cgi-bin/mpc105.fcgi&quot; \
-     --data-raw &quot;query=18&quot;</code></pre></div>
-<p class="muted small tbd">Przykładowa odpowiedź: do uzupełnienia po podłączeniu do urządzenia.</p>
-<p class="muted small">W wyniku skryptu: <code>.features.dsp_digitalio</code></p>
-</article></section>
-
-<section id="excluded"><h2>Pominięte zapytania</h2>
-<div class="callout bad">Poniższych zapytań skrypt <strong>nie</strong> wysyła – zmieniają stan urządzenia lub ujawniają dane kont.</div>
-<div class="tablewrap"><table><tr><th>Zapytanie</th><th>Powód</th></tr><tr><td><code>rem.fcgi?query=440</code></td><td>Restore Factory Default – przywraca ustawienia fabryczne</td></tr><tr><td><code>mpc105.fcgi?query=1982</code></td><td>restart urządzenia</td></tr><tr><td><code>rem.fcgi?query=402</code></td><td>Export SIC Configuration – akcja eksportu</td></tr><tr><td><code>mpc105.fcgi?query=122</code></td><td>Accounts Management – dane kont użytkowników</td></tr><tr><td><code>items.fcgi?query=410, rtp.fcgi?query=442/443/445</code></td><td>zapis/komendy DMeter i RTP100</td></tr><tr><td><code>wszystkie pola set / set1</code></td><td>zapis konfiguracji</td></tr></table></div></section>
-
-<section id="script"><h2>Skrypt</h2>
-<pre><code>REM_HOST=192.168.128.1 REM_USER=Admin REM_PASS='…' ./scripts/rem102-info.sh &gt; rem102.json
-
-# zapis do plików (domyślnie rem102/results/): collected.json, samples/&lt;zakładka&gt;/&lt;id&gt;.json, collect.log
-REM_HOST=… REM_USER=… REM_PASS=… ./rem102/scripts/collect.sh</code></pre>
-<div class="tablewrap"><table><tr><th>Zmienna</th><th>Znaczenie</th><th>Domyślnie</th></tr><tr><td><code>REM_HOST</code></td><td>adres urządzenia (może zawierać port)</td><td><code>192.168.128.1</code></td></tr><tr><td><code>REM_USER</code></td><td>login</td><td>wymagana</td></tr><tr><td><code>REM_PASS</code></td><td>hasło</td><td>wymagana</td></tr><tr><td><code>REM_LOGIN_BODY</code></td><td>pełne ciało żądania logowania</td><td><code>query=120&amp;username=…&amp;pwd=…</code></td></tr><tr><td><code>REM_OUT_DIR</code></td><td>katalog wynikowy (collected.json, samples/, collect.log)</td><td>rem102/results/</td></tr><tr><td><code>REM_TIMEOUT</code></td><td>limit czasu jednego zapytania, s</td><td>10</td></tr><tr><td><code>REM_DELAY</code></td><td>przerwa między zapytaniami, s</td><td>0</td></tr></table></div>
-<p>Wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>. Przykłady <code>jq</code>:</p>
-<pre><code># identyfikacja urządzenia
-jq '.identity | {device_settings: .device_settings.body, version: .version.body}' rem102.json
-
-# pakiety, które się nie udały
-jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
-       | select(.value.http_status != 200) | "\($t)/\(.key): HTTP \(.value.http_status)"' rem102.json</code></pre>
-<h3 class="sub">Windows (PowerShell)</h3><p>Pliki <code>.sh</code> nie uruchomią się w Windows (system pyta, czym otworzyć plik). Użyj wersji PowerShell: <code>rem102\scripts\collect.ps1</code>. Nie wymaga ani basha, ani <code>curl</code>, ani <code>jq</code>, ani Pythona – wystarcza Windows PowerShell 5.1.</p><pre><code>cd C:\rem102\scripts
-.\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password</code></pre><ul><li>Bez <code>-Password</code> skrypt zapyta o hasło.</li><li><code>collect.cmd</code> uruchamia <code>collect.ps1</code> z <code>-ExecutionPolicy Bypass</code>, więc nie trzeba zmieniać ustawień PowerShell. Jeśli uruchamiasz <code>.ps1</code> bezpośrednio i dostajesz błąd o zablokowanych skryptach, wykonaj <code>Unblock-File .\collect.ps1</code>.</li><li>Wynik jest w <code>rem102\results\</code> (<code>collected.json</code>, <code>samples\</code>, <code>collect.log</code>), w tym samym formacie co z <code>collect.sh</code>.</li><li>Parametry odpowiadają zmiennym <code>REM_*</code>: <code>-DeviceHost</code>, <code>-User</code>, <code>-Password</code>, <code>-LoginBody</code>, <code>-OutDir</code>, <code>-TimeoutSec</code>, <code>-DelayMs</code>, <code>-StdOut</code>.</li><li>W PowerShellu <code>curl</code> jest aliasem <code>Invoke-WebRequest</code>. Polecenia curl z tej dokumentacji uruchamiaj jako <code>curl.exe</code> (Windows 10 i nowsze); składnia powłoki (<code>\</code>, <code>$HOST</code>) też się różni, więc do zbierania danych użyj <code>collect.cmd</code>.</li><li>Nazwę użytkownika ze spacją podaj w cudzysłowie: <code>-User "Super Admin"</code> (bez cudzysłowu druga część trafia do innego parametru). To samo dotyczy hasła ze znakami specjalnymi.</li><li>Gdy wszystko zwraca HTTP 404 (jak przy pierwszym uruchomieniu), uruchom <code>.\collect.cmd -DeviceHost 192.168.128.1 -Probe</code>. Tryb <code>-Probe</code> nie wysyła danych logowania; sprawdza porty 80/8080/8000/8081/443/8443 i kilka ścieżek, a wynik zapisuje w <code>results\probe.json</code>.</li><li>Gdy CGI jest pod innym adresem, podaj go: <code>-BaseUrl https://192.168.128.1:8443</code> (albo <code>http://host:port/prefiks</code>); <code>-Insecure</code> akceptuje certyfikat self-signed.</li><li>Gdy urządzenie używa <code>.cgi</code> zamiast <code>.fcgi</code> (tak jest w firmware, który odpowiedział w teście), dodaj <code>-CgiExt cgi</code>. Wtedy login i wszystkie zapytania idą na <code>/cgi-bin/*.cgi</code>.</li><li><code>-Discover</code> czyta własne pliki WWW urządzenia (strona logowania, <code>Config/*.json</code>, skrypty JS), bez logowania, i zapisuje <code>results\discover.json</code>. Pokazuje prawdziwe nazwy CGI i format logowania.</li><li><code>collect.ps1</code> sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.</li></ul></section>
-
-<section id="labview"><h2>Integracja z LabVIEW</h2><p>Lista zapytań jest dostępna jako pliki w <code>rem102/data/</code>, gotowe do wczytania w LabVIEW. Kolejność wierszy jest we wszystkich plikach taka sama.</p>
-<div class="tablewrap"><table><tr><th>Plik</th><th>Zawartość</th><th>Użycie</th></tr>
-<tr><td><code>rem102-package-names.txt</code></td><td>jedna nazwa pakietu w wierszu (<code>tab.id</code>)</td><td>pozycje enuma (typedef)</td></tr>
-<tr><td><code>rem102-package-requests.txt</code></td><td>jedno zapytanie w wierszu: <code>/cgi-bin/mpc105.fcgi?query=302</code></td><td>tablica stringów indeksowana wartością enuma</td></tr>
-<tr><td><code>rem102-packages.tsv</code></td><td>wszystkie kolumny z nagłówkiem: <code>index, name, tab, id, cgi, query, request, method, min_level, requires, label</code></td><td>wyszukiwanie po nazwie, bramkowanie po <code>min_level</code> i <code>requires</code></td></tr></table></div>
-<p>Nazwy mają postać <code>tab.id</code>, bo samo <code>id</code> się powtarza (np. <code>gps</code> występuje w Setup, Monitoring i Features).</p>
-<h3 class="sub">Przepływ</h3>
-<ol>
-<li><strong>Enum.</strong> Utwórz typedef <code>REM102 Package</code>; pozycje z <code>rem102-package-names.txt</code>. Wartość enuma to 0-based numer wiersza.</li>
-<li><strong>Tablica zapytań.</strong> <em>Read from Text File</em> (z konwersją końców linii) rozbij na wiersze do <code>String[]</code>. Wczytaj raz przy starcie (functional global albo DVR).</li>
-<li><strong>Zapytanie.</strong> <em>Index Array</em> wartością enuma → ścieżka. Dopisz <code>http://</code> + host.</li>
-<li><strong>GET.</strong> <em>HTTP Client</em> z ciasteczkami sesji po logowaniu (<code>query=120</code>) → ciało odpowiedzi jako string.</li>
-<li><strong>Parsowanie.</strong> <em>Unflatten From JSON</em> do typedefu danego pakietu.</li>
-</ol>
+</article>
+</section>
+<section id="excluded"><h2>Pominięte zapytania</h2><div class="callout">Poniższych zapytań skrypty <strong>nie</strong> wysyłają – zmieniają stan urządzenia, kończą sesję albo służą do przesyłania plików.</div>
+<div class="tablewrap"><table><tr><th>Zapytanie</th><th>Powód</th></tr><tr><td><code>rem.cgi?query=440</code></td><td>Restore Factory Default – przywraca ustawienia fabryczne</td></tr><tr><td><code>mpc105.cgi?query=1982</code></td><td>restart urządzenia</td></tr><tr><td><code>mpc105j.cgi?query=122</code></td><td>wylogowanie (kończy sesję)</td></tr><tr><td><code>mpc105.cgi?query=121</code></td><td>zmiana hasła</td></tr><tr><td><code>rem.cgi?query=402</code></td><td>Export (akcja pobrania konfiguracji)</td></tr><tr><td><code>rem.cgi?query=401</code>, <code>mpc105.cgi?query=310</code></td><td>Import konfiguracji i Firmware Upgrade (upload plików)</td></tr><tr><td><code>rtp.cgi?query=440</code>, <code>443</code>, <code>445</code></td><td>zapis i komendy RTP100</td></tr><tr><td>wszystkie pola <code>set</code>, <code>set1</code>, <code>set2</code></td><td>zapis konfiguracji</td></tr></table></div></section>
+<section id="scripts"><h2>Skrypty</h2><p>Zbieranie wszystkich pakietów po kolei: <code>rem102/scripts/collect.sh</code> (bash, curl, jq) albo <code>rem102/scripts/collect.ps1</code> (Windows PowerShell 5.1+, bez dodatkowych narzędzi). Oba zapisują <code>collected.json</code>, <code>samples/&lt;zakładka&gt;/&lt;id&gt;.json</code> i <code>collect.log</code> w <code>rem102/results/</code>. <code>rem102-info.sh</code> to skrót do <code>collect.sh</code> z wynikiem na stdout.</p>
+<h3 class="sub">Linux / macOS / Git Bash</h3>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='password' ./rem102/scripts/collect.sh
+python3 rem102/scripts/build-docs.py</code></pre></div>
+<div class="tablewrap"><table><tr><th>Zmienna</th><th>Znaczenie</th><th>Domyślnie</th></tr><tr><td><code>REM_HOST</code></td><td>adres urządzenia</td><td><code>192.168.128.1</code></td></tr><tr><td><code>REM_USER</code> / <code>REM_LEVEL</code></td><td><code>User</code>, <code>Admin</code>, <code>Super Admin</code> albo poziom <code>1</code>, <code>2</code>, <code>3</code></td><td>– (wymagane jedno z dwóch)</td></tr><tr><td><code>REM_PASS</code></td><td>hasło</td><td>– (wymagane)</td></tr><tr><td><code>REM_BASE_URL</code></td><td>pełny adres bazowy (inny port, HTTPS, prefiks)</td><td><code>http://$REM_HOST</code></td></tr><tr><td><code>REM_INSECURE</code></td><td><code>1</code> = akceptuj certyfikat self-signed</td><td>–</td></tr><tr><td><code>REM_OUT_DIR</code></td><td>katalog wynikowy</td><td><code>rem102/results/</code></td></tr><tr><td><code>REM_TIMEOUT</code>, <code>REM_DELAY</code></td><td>limit czasu zapytania i przerwa między zapytaniami, s</td><td><code>10</code>, <code>0</code></td></tr><tr><td><code>REM_LOGIN_BODY</code></td><td>pełne ciało logowania (nadpisuje domyślne)</td><td>–</td></tr></table></div>
+<h3 class="sub">Windows (PowerShell)</h3>
+<p>Pliki <code>.sh</code> nie uruchomią się w Windows. Użyj <code>collect.cmd</code> (uruchamia <code>collect.ps1</code> z <code>-ExecutionPolicy Bypass</code>):</p>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>cd C:\rem102\scripts
+.\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'password'</code></pre></div>
+<ul><li>Bez <code>-Password</code> skrypt zapyta o hasło. Nazwę ze spacją podaj w cudzysłowie; zamiast nazwy można podać <code>-Level 3</code>.</li><li><code>-Discover</code> czyta własne pliki WWW urządzenia (bez logowania) i zapisuje <code>results\discover.json</code>; <code>-Probe</code> sprawdza porty i ścieżki (<code>results\probe.json</code>).</li><li><code>-BaseUrl https://192.168.128.1:8443 -Insecure</code> – inny adres bazowy lub certyfikat self-signed.</li><li>Zwykły HTTP idzie surowym połączeniem TCP, więc nietypowe odpowiedzi CGI też zostają zapisane (z powodem w polu <code>error</code>).</li><li>Jeśli uruchamiasz <code>.ps1</code> bezpośrednio i dostajesz błąd o zablokowanych skryptach: <code>Unblock-File .\collect.ps1</code>.</li><li><code>collect.ps1</code> sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.</li></ul></section>
+<section id="labview"><h2>Użycie w LabVIEW</h2><p>Lista zapytań jest dostępna jako pliki w <code>rem102/data/</code>. Kolejność wierszy jest we wszystkich plikach taka sama.</p>
+<div class="tablewrap"><table><tr><th>Plik</th><th>Zawartość</th><th>Użycie</th></tr><tr><td><code>rem102-package-names.txt</code></td><td>jedna nazwa pakietu w wierszu (<code>tab.id</code>)</td><td>pozycje enuma (typedef)</td></tr><tr><td><code>rem102-package-requests.txt</code></td><td>jedno zapytanie w wierszu, np. <code>/cgi-bin/mpc105.cgi?query=302</code></td><td>tablica stringów indeksowana wartością enuma</td></tr><tr><td><code>rem102-packages.tsv</code></td><td>kolumny z nagłówkiem: <code>index, name, tab, id, cgi, query, request, method, min_level, requires, label, cyclic_ms, note</code></td><td>wyszukiwanie po nazwie, bramkowanie po <code>min_level</code> i <code>requires</code></td></tr></table></div>
+<p>Nazwy mają postać <code>tab.id</code>, bo samo <code>id</code> mogłoby się powtarzać między zakładkami.</p>
+<ol><li><strong>Enum.</strong> Typedef <code>REM102 Package</code> z pozycjami z <code>rem102-package-names.txt</code>; wartość enuma to numer wiersza liczony od 0.</li><li><strong>Tablica zapytań.</strong> *Read from Text File* (z konwersją końców linii), rozbicie na wiersze do <code>String[]</code>; wczytaj raz przy starcie.</li><li><strong>Logowanie.</strong> <code>POST /cgi-bin/mpc105.cgi</code> z <code>query=120&amp;login=&lt;1|2|3&gt;&amp;pwd=&lt;hasło&gt;</code>; zachowaj ciasteczko <code>CGISESSID</code> i wysyłaj je w nagłówku <code>Cookie</code>.</li><li><strong>Zapytanie.</strong> *Index Array* wartością enuma → ścieżka z zapytaniem; *HTTP Client* GET → ciało odpowiedzi jako string.</li><li><strong>Parsowanie.</strong> *Unflatten From JSON* do typedefu danego pakietu.</li></ol>
 <h3 class="sub">VI polimorficzny</h3>
 <p>Polimorficzny VI wybiera instancję po <strong>typie</strong> podłączonych danych, nie po wartości enuma. Enum wybiera więc zapytanie, a typ wybiera parser. Dla jednego VI obsługującego każdy pakiet najlepiej pasuje <strong>malleable VI</strong> (<code>.vim</code>, LabVIEW 2017 lub nowszy):</p>
-<pre><code>Get Package.vim
-  wejścia:  Package (enum REM102 Package), Type (dowolny typedef – specyfikator typu), Host, sesja
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>Get Package.vim
+  wejścia:  Package (enum REM102 Package), Type (dowolny typedef – specyfikator typu), Host, sesja (CGISESSID)
   wyjścia:  Data (typu Type), Raw Body (string), HTTP Status, error out
-  wnętrze:  Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)</code></pre>
-<p>Dla każdego pakietu wystarczy osobny typedef klastra – nie trzeba osobnej instancji. Klasyczny polimorficzny <code>.vi</code> też zadziała, ale wymaga instancji na każdy typedef.</p>
-<p>Dopóki nie znasz prawdziwych odpowiedzi, użyj <code>Get Package (Raw).vi</code> zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem <code>collect.sh</code> na prawdziwym urządzeniu.</p>
-<p class="muted">Przed odczytem sprawdź w tsv kolumny <code>min_level</code> (poziom konta) i <code>requires</code> (pakiet <code>features.*</code>, który mówi, czy moduł jest włączony).</p></section>
-
-<section id="assumptions"><h2>Założenia</h2><ol>
-<li><strong>Logowanie.</strong> Pliki menu podają tylko <code>query=120</code>. Nazwy pól <code>username</code> i <code>pwd</code> oraz nazwy ciasteczek pochodzą z konfiguracji LabVIEW (<code>data/modulesCfg.ts</code>). Jeśli logowanie się nie uda, przechwyć prawdziwe żądanie w DevTools i podaj je w <code>REM_LOGIN_BODY</code>.</li>
-<li><strong>GET kontra POST.</strong> Odczyty idą GET-em. Przy pustych odpowiedziach spróbuj POST.</li>
-<li><strong>Format odpowiedzi.</strong> Nie wiadomo, czy urządzenie odpowiada JSON-em. Skrypt obsługuje JSON i zwykły tekst.</li>
-<li><strong>Poziomy dostępu.</strong> Znaczenie <code>show_level</code> przyjęto jako minimalny poziom użytkownika do wyświetlenia strony.</li>
-</ol></section>
+  wnętrze:  Index Array(requests, Package) → HTTP GET → Unflatten From JSON(Type)</code></pre></div>
+<p>Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Dopóki nie znasz prawdziwych odpowiedzi, użyj <code>Get Package (Raw).vi</code> zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny <code>min_level</code> (poziom konta) i <code>requires</code> (pakiet <code>features.*</code> mówi, czy moduł jest włączony).</p></section>
+<section id="assumptions"><h2>Założenia i do sprawdzenia</h2><p>Ustalone z plików WWW urządzenia (nie są już założeniami): logowanie <code>query=120</code> z polami <code>login</code> (poziom) i <code>pwd</code>, ciasteczko <code>CGISESSID</code>, odczyty przez GET z odpowiedziami JSON, nazwy CGI <code>.cgi</code>, lista zapytań z <code>Config/*.json</code>.</p>
+<ol><li><strong>Treść odpowiedzi.</strong> Format poszczególnych pakietów jest nieznany do czasu zebrania ich z urządzenia.</li><li><strong>Separator <code>~</code>.</strong> W plikach menu oznacza prawdopodobnie <code>&amp;</code>; kod stron-iframe, który to przekształca, nie był jeszcze pobrany (nowy <code>-Discover</code> je pobiera).</li><li><strong>Zapytania używane też do zapisu</strong> (<code>advanced.information_events</code>, <code>home.ch_a_measures</code>, <code>home.ch_b_measures</code>): odczyt przez GET powinien być bezpieczny, bo strona robi to samo cyklicznie, ale do potwierdzenia.</li><li><strong>Poziomy dostępu.</strong> <code>show_level</code> rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu.</li><li><strong>Odpowiedź 502 „The CGI was not CGI/1.1 compliant”</strong> pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach i po zalogowaniu nie powinna występować.</li></ol></section>
 </main>
 </div>
 <script>

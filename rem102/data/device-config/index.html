@@ -1,0 +1,67 @@
+<!DOCTYPE html>		
+<html>
+	<head>
+		<!-- META tag -->
+		<meta charset="UTF-8" />
+		<meta name="author" content="HaslerRail">
+		<title> Log-in </title>
+		
+		<!-- Style sheet -->
+		<link rel="stylesheet" type="text/css" href="Style/mainStyle.css" />
+
+		<!-- Script -->
+		<script type="text/javascript" src="Script/jquery.js"></script>
+		<script type="text/javascript" src="Script/jquery.cookie.js"></script>
+		<script type="text/javascript" src="Script/globalFunc.js"></script>
+		<script type="text/javascript" src="Script/mainParent.js"></script>
+	</head>
+	<body id="main">
+		<div id="container">		
+			<!-- Header -->
+			<div id="header">
+				<div class="loghi">
+					<div class="header_head_left">
+						<img src="../Images/company_logo.png" alt="HASLERRAIL" >
+					</div>
+				</div>
+				<div id="navigator">
+					<div class="nav">
+						<ul></ul>
+					</div>
+				</div>
+			</div>
+			<!-- FINE Header -->
+			<!-- Article -->			
+			<div id="article">
+				<div id="log">
+					<div id="log-container">
+						<h1>Log In</h1>
+						<div id="login-Index">
+							<form id="formlogin">
+								<fieldset id="inputs">
+									<select id="login" name="login">
+										<option value="1">User</option>
+										<option value="2">Admin</option>
+										<option value="3">Super Admin</option>
+									</select>
+									<input id="pwd" type="password" name="pwd" placeholder="Password" required>
+									<p><span>Change Password&nbsp;</span><input id="change" type="checkbox" name="change"></p>
+								</fieldset>
+								<fieldset id="actions">
+									<input type="submit" id="submit" value="Log in">
+								</fieldset>
+							</form>
+						</div>
+						<div id="resultLogin"></div>	
+					</div>				
+				</div>
+			</div>			
+			<!-- FINE Article -->
+			<!-- Footer -->
+			<div id="foot">
+				<div id="footer"><h1></h1></div>
+			</div>
+			<!-- FINE Footer -->
+		</div>
+	</body>
+</html>

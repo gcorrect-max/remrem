@@ -1,66 +1,67 @@
-index	name	tab	id	cgi	query	request	method	min_level	requires	label
-0	identity.device_settings	identity	device_settings	/cgi-bin/mpc105.fcgi	query=302	/cgi-bin/mpc105.fcgi?query=302	GET	0		Advanced > Information > Device Settings (model, serial no., article no.)
-1	identity.version	identity	version	/cgi-bin/mpc105.fcgi	query=301	/cgi-bin/mpc105.fcgi?query=301	GET	0		Advanced > Information > Version (firmware/FPGA/DSP)
-2	identity.host	identity	host	/cgi-bin/mpc105.fcgi	query=126	/cgi-bin/mpc105.fcgi?query=126	GET	0		settings.json > host (hostname)
-3	identity.auth_message	identity	auth_message	/cgi-bin/mpc105.fcgi	query=125	/cgi-bin/mpc105.fcgi?query=125	GET	0		settings.json > auth_message
-4	identity.meter_settings	identity	meter_settings	/cgi-bin/rem.fcgi	query=105	/cgi-bin/rem.fcgi?query=105	GET	0		Setup > Meter > Settings
-5	identity.dmeter_serial	identity	dmeter_serial	/cgi-bin/items.fcgi	query=407	/cgi-bin/items.fcgi?query=407	GET	0	features.dmeter_rem	Setup > DMeter > DMeter Serial Number
-6	home.meter_status	home	meter_status	/cgi-bin/rem.fcgi	query=10	/cgi-bin/rem.fcgi?query=10	GET	0		Home > Summary > Meter Status
-7	home.emf_status	home	emf_status	/cgi-bin/rem.fcgi	query=406	/cgi-bin/rem.fcgi?query=406	GET	0		Home > EMF channels > EMF Status
-8	home.emf_measures	home	emf_measures	/cgi-bin/rem.fcgi	query=407	/cgi-bin/rem.fcgi?query=407	GET	0		Home > EMF channels > EMF Measures
-9	home.emf_cebd	home	emf_cebd	/cgi-bin/rem.fcgi	query=409	/cgi-bin/rem.fcgi?query=409	GET	0	features.dcs	Home > EMF channels > EMF CEBD
-10	home.dhs_memory	home	dhs_memory	/cgi-bin/rem.fcgi	query=459	/cgi-bin/rem.fcgi?query=459	GET	1	features.dcs	Home > Data Download > DHS Memory
-11	home.digital_io	home	digital_io	/cgi-bin/rem.fcgi	query=11	/cgi-bin/rem.fcgi?query=11	GET	0	features.dsp_digitalio	Home > Digital IO
-12	home.net_interfaces	home	net_interfaces	/cgi-bin/mpc105.fcgi	query=500	/cgi-bin/mpc105.fcgi?query=500	GET	0		Home > Networking > Interfaces
-13	home.net_services	home	net_services	/cgi-bin/mpc105.fcgi	query=501	/cgi-bin/mpc105.fcgi?query=501	GET	0		Home > Networking > Services
-14	setup.channels_configuration	setup	channels_configuration	/cgi-bin/rem.fcgi	query=100	/cgi-bin/rem.fcgi?query=100	GET	0		Setup > Meter > Channels Configuration
-15	setup.dcs_user_1	setup	dcs_user_1	/cgi-bin/rem.fcgi	query=450&user=1	/cgi-bin/rem.fcgi?query=450&user=1	GET	1	features.dcs;features.dcs_user_1	Setup > DCS Users > DCS User 1
-16	setup.dcs_user_2	setup	dcs_user_2	/cgi-bin/rem.fcgi	query=450&user=2	/cgi-bin/rem.fcgi?query=450&user=2	GET	1	features.dcs;features.dcs_user_2	Setup > DCS Users > DCS User 2
-17	setup.dcs_user_3	setup	dcs_user_3	/cgi-bin/rem.fcgi	query=450&user=3	/cgi-bin/rem.fcgi?query=450&user=3	GET	1	features.dcs;features.dcs_user_3	Setup > DCS Users > DCS User 3
-18	setup.dcs_user_4	setup	dcs_user_4	/cgi-bin/rem.fcgi	query=450&user=4	/cgi-bin/rem.fcgi?query=450&user=4	GET	1	features.dcs;features.dcs_user_4	Setup > DCS Users > DCS User 4
-19	setup.dcs_communication	setup	dcs_communication	/cgi-bin/rem.fcgi	query=452	/cgi-bin/rem.fcgi?query=452	GET	1	features.dcs	Setup > DCS Communication
-20	setup.dcs_binding	setup	dcs_binding	/cgi-bin/rem.fcgi	query=457	/cgi-bin/rem.fcgi?query=457	GET	1	features.dcs	Setup > DCS Binding
-21	setup.dcs_conn_test	setup	dcs_conn_test	/cgi-bin/rem.fcgi	query=455	/cgi-bin/rem.fcgi?query=455	GET	1	features.dcs	Setup > DCS Binding > Connection Test
-22	setup.ethernet_0	setup	ethernet_0	/cgi-bin/mpc105.fcgi	query=103	/cgi-bin/mpc105.fcgi?query=103	GET	0		Setup > Ethernet Interfaces > Ethernet 0
-23	setup.ethernet_1	setup	ethernet_1	/cgi-bin/mpc105.fcgi	query=104	/cgi-bin/mpc105.fcgi?query=104	GET	0		Setup > Ethernet Interfaces > Ethernet 1
-24	setup.mobile_settings	setup	mobile_settings	/cgi-bin/mpc105.fcgi	query=101	/cgi-bin/mpc105.fcgi?query=101	GET	0	features.mobile	Setup > Mobile Interface > Mobile Settings
-25	setup.dhcp_client	setup	dhcp_client	/cgi-bin/mpc105.fcgi	query=200	/cgi-bin/mpc105.fcgi?query=200	GET	0		Setup > DHCP > Client Settings
-26	setup.gateway_dns	setup	gateway_dns	/cgi-bin/mpc105.fcgi	query=201	/cgi-bin/mpc105.fcgi?query=201	GET	0		Setup > Services > Gateway & DNS
-27	setup.servers	setup	servers	/cgi-bin/mpc105.fcgi	query=202	/cgi-bin/mpc105.fcgi?query=202	GET	0		Setup > Services > Servers
-28	setup.ntp_servers	setup	ntp_servers	/cgi-bin/mpc105.fcgi	query=203	/cgi-bin/mpc105.fcgi?query=203	GET	0		Setup > Services > NTP Servers
-29	setup.ems_time_servers	setup	ems_time_servers	/cgi-bin/mpc105.fcgi	query=230	/cgi-bin/mpc105.fcgi?query=230	GET	0		Setup > Services > EMS Time Servers
-30	setup.gps	setup	gps	/cgi-bin/mpc105.fcgi	query=205	/cgi-bin/mpc105.fcgi?query=205	GET	0	features.gps	Setup > Services > GPS
-31	advanced.rtc_time	advanced	rtc_time	/cgi-bin/mpc105.fcgi	query=303	/cgi-bin/mpc105.fcgi?query=303	GET	0		Advanced > RTC > Time Settings
-32	advanced.events	advanced	events	/cgi-bin/mpc105.fcgi	query=314	/cgi-bin/mpc105.fcgi?query=314	GET	1		Advanced > Information > Events
-33	monitoring.eth_0	monitoring	eth_0	/cgi-bin/mpc105.fcgi	query=3	/cgi-bin/mpc105.fcgi?query=3	GET	0		Monitoring > Network Interfaces > Ethernet 0
-34	monitoring.eth_1	monitoring	eth_1	/cgi-bin/mpc105.fcgi	query=4	/cgi-bin/mpc105.fcgi?query=4	GET	0		Monitoring > Network Interfaces > Ethernet 1
-35	monitoring.mobile	monitoring	mobile	/cgi-bin/mpc105.fcgi	query=13	/cgi-bin/mpc105.fcgi?query=13	GET	0		Monitoring > Network Interfaces > Mobile
-36	monitoring.gps	monitoring	gps	/cgi-bin/mpc105.fcgi	query=16	/cgi-bin/mpc105.fcgi?query=16	GET	0	features.gps	Monitoring > Network Interfaces > GPS
-37	monitoring.dcs_stats_user_1	monitoring	dcs_stats_user_1	/cgi-bin/rem.fcgi	query=461&user=1	/cgi-bin/rem.fcgi?query=461&user=1	GET	1	features.dcs;features.dcs_user_1	Monitoring > DCS Statistics > DCS User 1
-38	monitoring.dcs_stats_user_2	monitoring	dcs_stats_user_2	/cgi-bin/rem.fcgi	query=461&user=2	/cgi-bin/rem.fcgi?query=461&user=2	GET	1	features.dcs;features.dcs_user_2	Monitoring > DCS Statistics > DCS User 2
-39	monitoring.dcs_stats_user_3	monitoring	dcs_stats_user_3	/cgi-bin/rem.fcgi	query=461&user=3	/cgi-bin/rem.fcgi?query=461&user=3	GET	1	features.dcs;features.dcs_user_3	Monitoring > DCS Statistics > DCS User 3
-40	monitoring.dcs_stats_user_4	monitoring	dcs_stats_user_4	/cgi-bin/rem.fcgi	query=461&user=4	/cgi-bin/rem.fcgi?query=461&user=4	GET	1	features.dcs;features.dcs_user_4	Monitoring > DCS Statistics > DCS User 4
-41	monitoring.dmeter_status	monitoring	dmeter_status	/cgi-bin/items.fcgi	query=409	/cgi-bin/items.fcgi?query=409	GET	1	features.dmeter_items	Monitoring > DMeter Status
-42	monitoring.rtp100_vars	monitoring	rtp100_vars	/cgi-bin/rtp.fcgi	query=441	/cgi-bin/rtp.fcgi?query=441	GET	0	features.rtp100	Monitoring > RTP100 Variables
-43	monitoring.rtp100_files	monitoring	rtp100_files	/cgi-bin/rtp.fcgi	query=444	/cgi-bin/rtp.fcgi?query=444	GET	1	features.rtp100	Monitoring > RTP100 Files
-44	monitoring.mem_nand	monitoring	mem_nand	/cgi-bin/mpc105.fcgi	query=23	/cgi-bin/mpc105.fcgi?query=23	GET	0		Monitoring > Memory > NAND
-45	monitoring.mem_nor	monitoring	mem_nor	/cgi-bin/mpc105.fcgi	query=24	/cgi-bin/mpc105.fcgi?query=24	GET	0		Monitoring > Memory > NOR
-46	monitoring.mem_ram	monitoring	mem_ram	/cgi-bin/mpc105.fcgi	query=25	/cgi-bin/mpc105.fcgi?query=25	GET	0		Monitoring > Memory > RAM
-47	monitoring.dev_rtc	monitoring	dev_rtc	/cgi-bin/mpc105.fcgi	query=7	/cgi-bin/mpc105.fcgi?query=7	GET	0		Monitoring > Other Devices > RTC
-48	monitoring.dev_fpga	monitoring	dev_fpga	/cgi-bin/mpc105.fcgi	query=8	/cgi-bin/mpc105.fcgi?query=8	GET	0		Monitoring > Other Devices > FPGA
-49	monitoring.dev_fram	monitoring	dev_fram	/cgi-bin/mpc105.fcgi	query=9	/cgi-bin/mpc105.fcgi?query=9	GET	0		Monitoring > Other Devices > FRAM
-50	monitoring.dev_adc	monitoring	dev_adc	/cgi-bin/mpc105.fcgi	query=10	/cgi-bin/mpc105.fcgi?query=10	GET	0		Monitoring > Other Devices > ADC
-51	monitoring.dev_dsp	monitoring	dev_dsp	/cgi-bin/mpc105.fcgi	query=11	/cgi-bin/mpc105.fcgi?query=11	GET	0	features.dsp_digitalio	Monitoring > Other Devices > DSP
-52	monitoring.dev_mvbcs	monitoring	dev_mvbcs	/cgi-bin/mpc105.fcgi	query=12	/cgi-bin/mpc105.fcgi?query=12	GET	0		Monitoring > Other Devices > MVBCS
-53	monitoring.dev_modem	monitoring	dev_modem	/cgi-bin/mpc105.fcgi	query=17	/cgi-bin/mpc105.fcgi?query=17	GET	0	features.mobile	Monitoring > Other Devices > MODEM
-54	features.dcs	features	dcs	/cgi-bin/rem.fcgi	query=463	/cgi-bin/rem.fcgi?query=463	GET	0		DCS enabled?
-55	features.dcs_user_1	features	dcs_user_1	/cgi-bin/rem.fcgi	query=462&user=1	/cgi-bin/rem.fcgi?query=462&user=1	GET	0		DCS User 1 enabled?
-56	features.dcs_user_2	features	dcs_user_2	/cgi-bin/rem.fcgi	query=462&user=2	/cgi-bin/rem.fcgi?query=462&user=2	GET	0		DCS User 2 enabled?
-57	features.dcs_user_3	features	dcs_user_3	/cgi-bin/rem.fcgi	query=462&user=3	/cgi-bin/rem.fcgi?query=462&user=3	GET	0		DCS User 3 enabled?
-58	features.dcs_user_4	features	dcs_user_4	/cgi-bin/rem.fcgi	query=462&user=4	/cgi-bin/rem.fcgi?query=462&user=4	GET	0		DCS User 4 enabled?
-59	features.dmeter_rem	features	dmeter_rem	/cgi-bin/rem.fcgi	query=420	/cgi-bin/rem.fcgi?query=420	GET	0		DMeter (rem) enabled?
-60	features.dmeter_items	features	dmeter_items	/cgi-bin/items.fcgi	query=400	/cgi-bin/items.fcgi?query=400	GET	0		DMeter (items) enabled?
-61	features.rtp100	features	rtp100	/cgi-bin/rem.fcgi	query=430	/cgi-bin/rem.fcgi?query=430	GET	0		RTP100 enabled?
-62	features.mobile	features	mobile	/cgi-bin/mpc105.fcgi	query=14	/cgi-bin/mpc105.fcgi?query=14	GET	0		Modem/Mobile enabled?
-63	features.gps	features	gps	/cgi-bin/mpc105.fcgi	query=15	/cgi-bin/mpc105.fcgi?query=15	GET	0		GPS enabled?
-64	features.dsp_digitalio	features	dsp_digitalio	/cgi-bin/mpc105.fcgi	query=18	/cgi-bin/mpc105.fcgi?query=18	GET	0		DSP/Digital IO enabled?
+index	name	tab	id	cgi	query	request	method	min_level	requires	label	cyclic_ms	note
+0	home.summary_meter_status	home	summary_meter_status	/cgi-bin/rem.cgi	query=7&block_offset=10240&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=17&string_size=32	/cgi-bin/rem.cgi?query=7&block_offset=10240&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=17&string_size=32	GET	0		Home > Summary > Meter Status	1000	
+1	home.ch_a_energy	home	ch_a_energy	/cgi-bin/rem.cgi	query=7&block_offset=11264&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32	/cgi-bin/rem.cgi?query=7&block_offset=11264&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32	GET	0		Home > CH A > Energy	1000	
+2	home.ch_a_measures	home	ch_a_measures	/cgi-bin/rem.cgi	query=106&channel=0	/cgi-bin/rem.cgi?query=106&channel=0	GET	0		Home > CH A > Measures	0	the menu also uses the same query for writing (set)
+3	home.ch_b_energy	home	ch_b_energy	/cgi-bin/rem.cgi	query=7&block_offset=12288&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32	/cgi-bin/rem.cgi?query=7&block_offset=12288&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32	GET	0		Home > CH B > Energy	1000	
+4	home.ch_b_measures	home	ch_b_measures	/cgi-bin/rem.cgi	query=106&channel=1	/cgi-bin/rem.cgi?query=106&channel=1	GET	0		Home > CH B > Measures	0	the menu also uses the same query for writing (set)
+5	home.digital_io	home	digital_io	/cgi-bin/rem.cgi	query=7&block_offset=13312&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=12&string_size=32	/cgi-bin/rem.cgi?query=7&block_offset=13312&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=12&string_size=32	GET	0		Home > Digital IO	1000	
+6	home.archive_1_waiting_files	home	archive_1_waiting_files	/cgi-bin/rem.cgi	query=107&id=1	/cgi-bin/rem.cgi?query=107&id=1	GET	0		Home > Archive 1 > Waiting files	0	
+7	home.archive_1_sent_files	home	archive_1_sent_files	/cgi-bin/rem.cgi	query=108&id=1	/cgi-bin/rem.cgi?query=108&id=1	GET	0		Home > Archive 1 > Sent files	0	
+8	home.archive_1_test_files	home	archive_1_test_files	/cgi-bin/rem.cgi	query=112&id=1	/cgi-bin/rem.cgi?query=112&id=1	GET	0		Home > Archive 1 > Test files	0	
+9	home.archive_2_waiting_files	home	archive_2_waiting_files	/cgi-bin/rem.cgi	query=107&id=2	/cgi-bin/rem.cgi?query=107&id=2	GET	0		Home > Archive 2 > Waiting files	0	
+10	home.archive_2_sent_files	home	archive_2_sent_files	/cgi-bin/rem.cgi	query=108&id=2	/cgi-bin/rem.cgi?query=108&id=2	GET	0		Home > Archive 2 > Sent files	0	
+11	home.archive_2_test_files	home	archive_2_test_files	/cgi-bin/rem.cgi	query=112&id=2	/cgi-bin/rem.cgi?query=112&id=2	GET	0		Home > Archive 2 > Test files	0	
+12	home.networking_interfaces	home	networking_interfaces	/cgi-bin/mpc105.cgi	query=500	/cgi-bin/mpc105.cgi?query=500	GET	0		Home > Networking > Interfaces	0	
+13	home.networking_services	home	networking_services	/cgi-bin/mpc105.cgi	query=501	/cgi-bin/mpc105.cgi?query=501	GET	0		Home > Networking > Services	0	
+14	home.networking_redirection	home	networking_redirection	/cgi-bin/mpc105.cgi	query=502	/cgi-bin/mpc105.cgi?query=502	GET	0		Home > Networking > Redirection	0	
+15	monitoring.network_interfaces_ethernet_0	monitoring	network_interfaces_ethernet_0	/cgi-bin/mpc105.cgi	query=3	/cgi-bin/mpc105.cgi?query=3	GET	0		Monitoring > Network Interfaces > Ethernet 0	1000	
+16	monitoring.network_interfaces_ethernet_1	monitoring	network_interfaces_ethernet_1	/cgi-bin/mpc105.cgi	query=4	/cgi-bin/mpc105.cgi?query=4	GET	0		Monitoring > Network Interfaces > Ethernet 1	1000	
+17	monitoring.network_interfaces_ethernet_2	monitoring	network_interfaces_ethernet_2	/cgi-bin/mpc105.cgi	query=5	/cgi-bin/mpc105.cgi?query=5	GET	0		Monitoring > Network Interfaces > Ethernet 2	1000	
+18	monitoring.network_interfaces_wlan	monitoring	network_interfaces_wlan	/cgi-bin/mpc105.cgi	query=6	/cgi-bin/mpc105.cgi?query=6	GET	0		Monitoring > Network Interfaces > WLAN	1000	
+19	monitoring.network_interfaces_mobile	monitoring	network_interfaces_mobile	/cgi-bin/mpc105.cgi	query=13	/cgi-bin/mpc105.cgi?query=13	GET	0		Monitoring > Network Interfaces > Mobile	1000	
+20	monitoring.network_interfaces_ethernet_switch	monitoring	network_interfaces_ethernet_switch	/cgi-bin/mpc105.cgi	query=14	/cgi-bin/mpc105.cgi?query=14	GET	0		Monitoring > Network Interfaces > Ethernet Switch	1000	
+21	monitoring.network_interfaces_gps	monitoring	network_interfaces_gps	/cgi-bin/mpc105.cgi	query=16	/cgi-bin/mpc105.cgi?query=16	GET	0		Monitoring > Network Interfaces > GPS	4000	
+22	monitoring.rtp100_rtp100_variables	monitoring	rtp100_rtp100_variables	/cgi-bin/rtp.cgi	query=441	/cgi-bin/rtp.cgi?query=441	GET	0	features.rtp100	Monitoring > RTP100 > RTP100 Variables	1000	
+23	monitoring.rtp100_rtp100_files	monitoring	rtp100_rtp100_files	/cgi-bin/rtp.cgi	query=444	/cgi-bin/rtp.cgi?query=444	GET	0	features.rtp100	Monitoring > RTP100 > RTP100 Files	1000	
+24	monitoring.memory_nand	monitoring	memory_nand	/cgi-bin/mpc105.cgi	query=23	/cgi-bin/mpc105.cgi?query=23	GET	0		Monitoring > Memory > NAND	0	
+25	monitoring.memory_nor	monitoring	memory_nor	/cgi-bin/mpc105.cgi	query=24	/cgi-bin/mpc105.cgi?query=24	GET	0		Monitoring > Memory > NOR	0	
+26	monitoring.memory_ram	monitoring	memory_ram	/cgi-bin/mpc105.cgi	query=25	/cgi-bin/mpc105.cgi?query=25	GET	0		Monitoring > Memory > RAM	0	
+27	monitoring.other_devices_rtc	monitoring	other_devices_rtc	/cgi-bin/mpc105.cgi	query=7	/cgi-bin/mpc105.cgi?query=7	GET	0		Monitoring > Other Devices > RTC	1000	
+28	monitoring.other_devices_fpga	monitoring	other_devices_fpga	/cgi-bin/mpc105.cgi	query=8	/cgi-bin/mpc105.cgi?query=8	GET	0		Monitoring > Other Devices > FPGA	0	
+29	monitoring.other_devices_fram	monitoring	other_devices_fram	/cgi-bin/mpc105.cgi	query=9	/cgi-bin/mpc105.cgi?query=9	GET	0		Monitoring > Other Devices > FRAM	0	
+30	monitoring.other_devices_adc	monitoring	other_devices_adc	/cgi-bin/mpc105.cgi	query=10	/cgi-bin/mpc105.cgi?query=10	GET	0		Monitoring > Other Devices > ADC	1000	
+31	monitoring.other_devices_hdlc	monitoring	other_devices_hdlc	/cgi-bin/mpc105.cgi	query=11	/cgi-bin/mpc105.cgi?query=11	GET	0		Monitoring > Other Devices > HDLC	0	
+32	monitoring.other_devices_mvbcs	monitoring	other_devices_mvbcs	/cgi-bin/mpc105.cgi	query=12	/cgi-bin/mpc105.cgi?query=12	GET	0		Monitoring > Other Devices > MVBCS	0	
+33	monitoring.other_devices_modem	monitoring	other_devices_modem	/cgi-bin/mpc105.cgi	query=17	/cgi-bin/mpc105.cgi?query=17	GET	0		Monitoring > Other Devices > MODEM	3000	
+34	monitoring.other_devices_wifi	monitoring	other_devices_wifi	/cgi-bin/mpc105.cgi	query=18	/cgi-bin/mpc105.cgi?query=18	GET	0		Monitoring > Other Devices > WIFI	8000	
+35	setup.meter_settings	setup	meter_settings	/cgi-bin/rem.cgi	query=105	/cgi-bin/rem.cgi?query=105	GET	0		Setup > Meter > Settings	0	
+36	setup.meter_channels_configuration	setup	meter_channels_configuration	/cgi-bin/rem.cgi	query=100	/cgi-bin/rem.cgi?query=100	GET	0		Setup > Meter > Channels Configuration	0	
+37	setup.meter_ftp_hosts	setup	meter_ftp_hosts	/cgi-bin/rem.cgi	query=101	/cgi-bin/rem.cgi?query=101	GET	0		Setup > Meter > FTP Hosts	0	
+38	setup.meter_udp_clients	setup	meter_udp_clients	/cgi-bin/rem.cgi	query=102	/cgi-bin/rem.cgi?query=102	GET	0		Setup > Meter > UDP Clients	0	
+39	setup.meter_messages	setup	meter_messages	/cgi-bin/rem.cgi	query=103	/cgi-bin/rem.cgi?query=103	GET	0		Setup > Meter > Messages	0	
+40	setup.meter_calibration	setup	meter_calibration	/cgi-bin/rem.cgi	query=7&block_offset=8192&byte_offset=0&data_size=1024&type=DINT&name=energy&memory=remshm&number=2	/cgi-bin/rem.cgi?query=7&block_offset=8192&byte_offset=0&data_size=1024&type=DINT&name=energy&memory=remshm&number=2	GET	3		Setup > Meter > Calibration	5000	
+41	setup.meter_thresholds_protection	setup	meter_thresholds_protection	/cgi-bin/rem.cgi	query=111	/cgi-bin/rem.cgi?query=111	GET	0		Setup > Meter > Thresholds Protection	0	
+42	setup.rtp100_rtp100_command	setup	rtp100_rtp100_command	/cgi-bin/rtp.cgi	query=442	/cgi-bin/rtp.cgi?query=442	GET	0	features.rtp100	Setup > RTP100 > RTP100 Command	1000	
+43	setup.ethernet_interfaces_ethernet_0	setup	ethernet_interfaces_ethernet_0	/cgi-bin/mpc105.cgi	query=103	/cgi-bin/mpc105.cgi?query=103	GET	0		Setup > Ethernet Interfaces > Ethernet 0	0	
+44	setup.ethernet_interfaces_ethernet_1	setup	ethernet_interfaces_ethernet_1	/cgi-bin/mpc105.cgi	query=104	/cgi-bin/mpc105.cgi?query=104	GET	0		Setup > Ethernet Interfaces > Ethernet 1	0	
+45	setup.ethernet_interfaces_ethernet_2	setup	ethernet_interfaces_ethernet_2	/cgi-bin/mpc105.cgi	query=105	/cgi-bin/mpc105.cgi?query=105	GET	0		Setup > Ethernet Interfaces > Ethernet 2	0	
+46	setup.ethernet_interfaces_switch_ethernet	setup	ethernet_interfaces_switch_ethernet	/cgi-bin/mpc105.cgi	query=107	/cgi-bin/mpc105.cgi?query=107	GET	0		Setup > Ethernet Interfaces > Switch Ethernet	0	
+47	setup.mobile_interface_mobile_settings	setup	mobile_interface_mobile_settings	/cgi-bin/mpc105.cgi	query=101	/cgi-bin/mpc105.cgi?query=101	GET	0		Setup > Mobile Interface > Mobile Settings	0	
+48	setup.wireless_interface_wlan	setup	wireless_interface_wlan	/cgi-bin/mpc105.cgi	query=106	/cgi-bin/mpc105.cgi?query=106	GET	0		Setup > Wireless Interface > WLAN	0	
+49	setup.wireless_interface_client_access	setup	wireless_interface_client_access	/cgi-bin/mpc105.cgi	query=204	/cgi-bin/mpc105.cgi?query=204	GET	0		Setup > Wireless Interface > Client Access	0	
+50	setup.dhcp_client_settings	setup	dhcp_client_settings	/cgi-bin/mpc105.cgi	query=200	/cgi-bin/mpc105.cgi?query=200	GET	0		Setup > DHCP > Client Settings	0	
+51	setup.dhcp_server_settings	setup	dhcp_server_settings	/cgi-bin/mpc105.cgi	query=208	/cgi-bin/mpc105.cgi?query=208	GET	0		Setup > DHCP > Server Settings	0	
+52	setup.dhcp_address_reservation	setup	dhcp_address_reservation	/cgi-bin/mpc105.cgi	query=209	/cgi-bin/mpc105.cgi?query=209	GET	0		Setup > DHCP > Address Reservation	0	
+53	setup.services_gateway_dns	setup	services_gateway_dns	/cgi-bin/mpc105.cgi	query=201	/cgi-bin/mpc105.cgi?query=201	GET	0		Setup > Services > Gateway & DNS	0	
+54	setup.services_servers	setup	services_servers	/cgi-bin/mpc105.cgi	query=202	/cgi-bin/mpc105.cgi?query=202	GET	0		Setup > Services > Servers	0	
+55	setup.services_ntp_servers	setup	services_ntp_servers	/cgi-bin/mpc105.cgi	query=203	/cgi-bin/mpc105.cgi?query=203	GET	0		Setup > Services > NTP Servers	0	
+56	setup.services_gps	setup	services_gps	/cgi-bin/mpc105.cgi	query=205	/cgi-bin/mpc105.cgi?query=205	GET	0		Setup > Services > GPS	0	
+57	setup.services_port_forwarding	setup	services_port_forwarding	/cgi-bin/mpc105.cgi	query=207	/cgi-bin/mpc105.cgi?query=207	GET	0		Setup > Services > Port Forwarding	0	
+58	setup.services_proxy_settings	setup	services_proxy_settings	/cgi-bin/mpc105.cgi	query=220	/cgi-bin/mpc105.cgi?query=220	GET	0		Setup > Services > Proxy settings	0	
+59	advanced.rtc_time_settings	advanced	rtc_time_settings	/cgi-bin/mpc105.cgi	query=303	/cgi-bin/mpc105.cgi?query=303	GET	0		Advanced > RTC > Time Settings	1000	
+60	advanced.rtc_time_zones	advanced	rtc_time_zones	/cgi-bin/mpc105.cgi	query=305	/cgi-bin/mpc105.cgi?query=305	GET	0		Advanced > RTC > Time Zones	0	
+61	advanced.configuration_settings	advanced	configuration_settings	/cgi-bin/rem.cgi	query=113	/cgi-bin/rem.cgi?query=113	GET	0		Advanced > Configuration > Settings	0	
+62	advanced.information_device_settings	advanced	information_device_settings	/cgi-bin/mpc105.cgi	query=302	/cgi-bin/mpc105.cgi?query=302	GET	1		Advanced > Information > Device Settings	0	
+63	advanced.information_events	advanced	information_events	/cgi-bin/mpc105.cgi	query=314	/cgi-bin/mpc105.cgi?query=314	GET	0		Advanced > Information > Events	0	the menu also uses the same query for writing (set)
+64	advanced.information_version	advanced	information_version	/cgi-bin/mpc105.cgi	query=301	/cgi-bin/mpc105.cgi?query=301	GET	0		Advanced > Information > Version	0	
+65	features.rtp100	features	rtp100	/cgi-bin/rem.cgi	query=430	/cgi-bin/rem.cgi?query=430	GET	0		RTP100 enabled?	0	

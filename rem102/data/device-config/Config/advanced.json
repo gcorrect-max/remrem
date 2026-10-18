@@ -1,0 +1,135 @@
+[
+	{
+		"type": "menu",
+		"label": "Firmware",
+		"submenu": [
+			{
+				"label": "Firmware Upgrade",
+				"extra": "File Type allowed: sh. | Maximum Size 30 MB",
+				"color": "black",
+				"web": "upload.html",
+				"cgi": "/cgi-bin/mpc105.cgi",
+				"query": "query=0",
+				"set": "query=310&filter=sh",
+				"show_level": 2,
+				"write_level": 2,
+				"reboot": 4,
+				"cyclicTime": 0
+			}
+		]
+	},
+	{
+		"type": "menu",
+		"label": "RTC",
+		"submenu": [
+			{
+				"label": "Time Settings",
+				"color": "black",
+				"web": "rtc.html",
+				"cgi": "/cgi-bin/mpc105.cgi",
+				"query": "query=303",
+				"set": "query=313",
+				"cyclicTime": 1000
+			},
+			{
+				"label": "Time Zones",
+				"color": "black",
+				"web": "default.html",
+				"cgi": "/cgi-bin/mpc105.cgi",
+				"query": "query=305",
+				"set": "query=315",
+				"reboot": 1,
+				"cyclicTime": 0
+			}
+		]
+	},
+	{
+		"type": "menu",
+		"label": "Configuration",
+		"submenu": [
+			{
+				"label": "Settings",
+				"color":"black",
+				"web":"default.html",
+				"cgi":"/cgi-bin/rem.cgi",
+				"query":"query=113",
+				"set":"query=213",
+				"reboot":1,
+				"cyclicTime":0
+			},
+			{
+				"label": "Import",
+				"extra": "File Type allowed: sh. | Maximum Size 30 MB",
+				"color": "black",
+				"web": "upload.html",
+				"cgi": "/cgi-bin/rem.cgi",
+				"query": "query=0",
+				"set": "query=401&filter=cfg",
+				"show_level": 2,
+				"reboot": 1,
+				"cyclicTime": 0
+			},
+			{
+				"label": "Export",
+				"color": "black",
+				"web": "/cgi-bin/rem.cgi?query=402",
+				"cgi": "",
+				"query": "",
+				"set": "",
+				"show_level": 2,
+				"reboot": 1,
+				"cyclicTime": 0
+			},
+			{
+				"label": "Restore Factory Default",
+				"color": "black",
+				"web": "setdefault.html",
+				"cgi": "/cgi-bin/rem.cgi",
+				"set": "query=440",
+				"show_level": 2,
+				"reboot": 1,
+				"cyclicTime": 0
+			},
+			{
+				"label": "Reboot",
+				"web": "ifamereboot.html"
+			}
+		]
+	},
+	{
+		"type": "menu",
+		"label": "Information",
+		"submenu": [
+			{
+				"label": "Device Settings",
+				"color": "black",
+				"web": "default.html",
+				"cgi": "/cgi-bin/mpc105.cgi",
+				"query": "query=302",
+				"set": "query=312",
+				"show_level": 1,
+				"write_level": 3,
+				"reboot": 1,
+				"cyclicTime": 0
+			},
+			{
+				"label": "Events",
+				"color": "black",
+				"web": "database.html",
+				"cgi": "/cgi-bin/mpc105.cgi",
+				"query": "query=314",
+				"set": "query=314",
+				"reboot": 0,
+				"cyclicTime": 0
+			},
+			{
+				"label": "Version",
+				"color": "black",
+				"web": "default.html",
+				"cgi": "/cgi-bin/mpc105.cgi",
+				"query": "query=301",
+				"cyclicTime": 0
+			}
+		]
+	}
+]
