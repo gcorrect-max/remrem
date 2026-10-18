@@ -50,6 +50,9 @@ cd C:\rem102\scripts
 - Wynik jest w `rem102\results\` (`collected.json`, `samples\`, `collect.log`), w tym samym formacie co z `collect.sh`.
 - Parametry odpowiadają zmiennym `REM_*`: `-DeviceHost`, `-User`, `-Password`, `-LoginBody`, `-OutDir`, `-TimeoutSec`, `-DelayMs`, `-StdOut`.
 - W PowerShellu `curl` jest aliasem `Invoke-WebRequest`. Polecenia curl z tej dokumentacji uruchamiaj jako `curl.exe` (Windows 10 i nowsze); składnia powłoki (`\`, `$HOST`) też się różni, więc do zbierania danych użyj `collect.cmd`.
+- Nazwę użytkownika ze spacją podaj w cudzysłowie: `-User "Super Admin"` (bez cudzysłowu druga część trafia do innego parametru). To samo dotyczy hasła ze znakami specjalnymi.
+- Gdy wszystko zwraca HTTP 404 (jak przy pierwszym uruchomieniu), uruchom `.\collect.cmd -DeviceHost 192.168.128.1 -Probe`. Tryb `-Probe` nie wysyła danych logowania; sprawdza porty 80/8080/8000/8081/443/8443 i kilka ścieżek, a wynik zapisuje w `results\probe.json`.
+- Gdy CGI jest pod innym adresem, podaj go: `-BaseUrl https://192.168.128.1:8443` (albo `http://host:port/prefiks`); `-Insecure` akceptuje certyfikat self-signed.
 - `collect.ps1` sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.
 
 ## Podstawowe informacje – pełna sekwencja curl

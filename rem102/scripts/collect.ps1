@@ -35,6 +35,9 @@ param(
   [int]$TimeoutSec    = 10,
   [int]$DelayMs       = 0,
   [string]$Tsv        = $env:REM_TSV,
+  [string]$BaseUrl    = $env:REM_BASE_URL,
+  [switch]$Insecure,
+  [switch]$Probe,
   [switch]$StdOut
 )
 
@@ -42,16 +45,20 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 
 $Base = Split-Path -Parent $PSScriptRoot
+if (-not $BaseUrl) { $BaseUrl = "http://$DeviceHost" }
+$BaseUrl = $BaseUrl.TrimEnd('/')
 if (-not $Tsv)    { $Tsv = Join-Path $Base 'data\rem102-packages.tsv' }
 if (-not $OutDir -and -not $StdOut) { $OutDir = Join-Path $Base 'results' }
-if (-not $User)   { $User = Read-Host 'User' }
-if (-not $Password) {
-  $sec = Read-Host 'Password' -AsSecureString
-  $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec)
-  try { $Password = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
-  finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+if (-not $Probe) {   # -Probe sends no credentials
+  if (-not $User)   { $User = Read-Host 'User' }
+  if (-not $Password) {
+    $sec = Read-Host 'Password' -AsSecureString
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec)
+    try { $Password = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
+    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+  }
+  if (-not $LoginBody) { $LoginBody = "query=120&username=$User&pwd=$Password" }
 }
-if (-not $LoginBody) { $LoginBody = "query=120&username=$User&pwd=$Password" }
 if (-not (Test-Path -LiteralPath $Tsv)) { throw "Package list not found: $Tsv" }
 
 Add-Type -AssemblyName System.Net.Http
@@ -78,12 +85,17 @@ $Handler = New-Object System.Net.Http.HttpClientHandler
 $Handler.CookieContainer = $Jar
 $Handler.UseCookies = $true
 $Handler.UseProxy = $false          # the device is on the local network; ignore system proxy
+if ($Insecure) {   # self-signed HTTPS on the device
+  [Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+  try { $Handler.ServerCertificateCustomValidationCallback = [System.Net.Http.HttpClientHandler]::DangerousAcceptAnyServerCertificateValidator } catch { }
+}
+try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]'Tls,Tls11,Tls12' } catch { }
 $Client = New-Object System.Net.Http.HttpClient($Handler)
 $Client.Timeout = [TimeSpan]::FromSeconds($TimeoutSec)
 
 # Send-Req <GET|POST> <path-with-optional-query> [body]  ->  @{ Code; ContentType; Body }
 function Send-Req([string]$Method, [string]$PathAndQuery, [string]$PostBody) {
-  $url = "http://$DeviceHost$PathAndQuery"
+  $url = "$BaseUrl$PathAndQuery"
   try {
     if ($Method -eq 'GET') {
       $resp = $Client.GetAsync($url).Result
@@ -93,28 +105,75 @@ function Send-Req([string]$Method, [string]$PathAndQuery, [string]$PostBody) {
     }
     $ct = $null
     if ($resp.Content.Headers.ContentType) { $ct = $resp.Content.Headers.ContentType.ToString() }
-    return @{ Code = [int]$resp.StatusCode; ContentType = $ct; Body = $resp.Content.ReadAsStringAsync().Result }
+    $srv = $null
+    if ($resp.Headers.Server) { $srv = ($resp.Headers.Server | ForEach-Object { $_.ToString() }) -join ' ' }
+    return @{ Code = [int]$resp.StatusCode; ContentType = $ct; Server = $srv; Body = $resp.Content.ReadAsStringAsync().Result }
   } catch {
-    return @{ Code = 0; ContentType = $null; Body = '' }
+    return @{ Code = 0; ContentType = $null; Server = $null; Body = '' }
   }
 }
 
 function RespJson($r) {
-  return ('{{"http_status":{0},"content_type":{1},"body":{2}}}' -f $r.Code, (J $r.ContentType), (BodyJson $r.Body))
+  return ('{{"http_status":{0},"content_type":{1},"server":{2},"body":{3}}}' -f $r.Code, (J $r.ContentType), (J $r.Server), (BodyJson $r.Body))
+}
+
+# ---------- -Probe: find where the CGI really is (no login, harmless GETs only) ----------
+if ($Probe) {
+  $hostOnly = ($DeviceHost -replace ':\d+$', '')
+  $bases = @($BaseUrl, "http://$hostOnly", "http://${hostOnly}:8080", "http://${hostOnly}:8000", "http://${hostOnly}:8081",
+             "https://$hostOnly", "https://${hostOnly}:8443") | Select-Object -Unique
+  $paths = @('/', '/index.html', '/Config/settings.json', '/cgi-bin/mpc105.fcgi?query=125', '/mpc105.fcgi?query=125',
+             '/cgi-bin/mpc105.cgi?query=125', '/cgi-bin/rem.fcgi?query=10')
+  Log "== probe: looking for the web interface on $hostOnly (no credentials are sent)"
+  $ph = New-Object System.Net.Http.HttpClientHandler
+  $ph.UseProxy = $false; $ph.AllowAutoRedirect = $false
+  try { $ph.ServerCertificateCustomValidationCallback = [System.Net.Http.HttpClientHandler]::DangerousAcceptAnyServerCertificateValidator } catch { }
+  [Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+  $pc = New-Object System.Net.Http.HttpClient($ph); $pc.Timeout = [TimeSpan]::FromSeconds(5)
+  $rowsJson = New-Object System.Collections.Generic.List[string]
+  foreach ($b in $bases) {
+    $u = [Uri]$b; $open = $false
+    try { $tc = New-Object System.Net.Sockets.TcpClient; $open = $tc.ConnectAsync($u.Host, $u.Port).Wait(2000); $tc.Close() } catch { }
+    if (-not $open) { Log ("{0}  port closed / no answer" -f $b); continue }
+    foreach ($path in $paths) {
+      $code = 0; $ct = $null; $srv = $null; $loc = $null; $text = ''
+      try {
+        $r = $pc.GetAsync("$b$path").Result
+        $code = [int]$r.StatusCode
+        if ($r.Content.Headers.ContentType) { $ct = $r.Content.Headers.ContentType.ToString() }
+        if ($r.Headers.Server) { $srv = ($r.Headers.Server | ForEach-Object { $_.ToString() }) -join ' ' }
+        if ($r.Headers.Location) { $loc = $r.Headers.Location.ToString() }
+        $text = $r.Content.ReadAsStringAsync().Result
+      } catch { }
+      $snippet = ($text -replace '\s+', ' ')
+      if ($snippet.Length -gt 160) { $snippet = $snippet.Substring(0, 160) }
+      Log ("{0}{1}  HTTP {2}  {3}  server={4}  {5}" -f $b, $path, $code, $ct, $srv, $snippet)
+      $rowsJson.Add(('{{"base":{0},"path":{1},"http_status":{2},"content_type":{3},"server":{4},"location":{5},"bytes":{6},"snippet":{7}}}' -f `
+        (J $b), (J $path), $code, (J $ct), (J $srv), (J $loc), $Utf8.GetByteCount($text), (J $snippet)))
+    }
+  }
+  if ($OutDir) {
+    $null = New-Item -ItemType Directory -Force -Path $OutDir
+    [IO.File]::WriteAllText((Join-Path $OutDir 'probe.json'), ('{{"host":{0},"probed_at":{1},"results":[{2}]}}' -f (J $hostOnly), (J (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')), ($rowsJson -join ',')), $Utf8)
+    [IO.File]::WriteAllText((Join-Path $OutDir 'probe.log'), (($LogLines -join "`r`n") + "`r`n"), $Utf8)
+    Write-Host "Saved: $OutDir\probe.json, $OutDir\probe.log  (send probe.json)"
+  }
+  $pc.Dispose(); $Client.Dispose()
+  return
 }
 
 # ---------- login ----------
-Log "== login: POST http://$DeviceHost/cgi-bin/mpc105.fcgi (query=120), user: $User"
+Log "== login: POST $BaseUrl/cgi-bin/mpc105.fcgi (query=120), user: $User"
 $loginPath = '/cgi-bin/mpc105.fcgi'
 $lr = Send-Req 'POST' $loginPath $LoginBody
-$cookies = @($Jar.GetCookies([Uri]"http://$DeviceHost$loginPath") | ForEach-Object { $_ })
+$cookies = @($Jar.GetCookies([Uri]"$BaseUrl$loginPath") | ForEach-Object { $_ })
 $cookieNames = @($cookies | ForEach-Object { $_.Name })
 $loginOk = ($cookieNames | Where-Object { $_ -like 'CGIUSER*' } | Measure-Object).Count -gt 0
 $level = $cookies | Where-Object { $_.Name -eq 'CGIUSERLEVEL' } | Select-Object -First 1
 $levelJson = if ($level) { J $level.Value } else { 'null' }
 $namesJson = '[' + (($cookieNames | ForEach-Object { J $_ }) -join ',') + ']'
-$loginJson = ('{{"http_status":{0},"content_type":{1},"body":{2},"ok":{3},"cookie_names":{4},"user_level":{5}}}' -f `
-  $lr.Code, (J $lr.ContentType), (BodyJson $lr.Body), $loginOk.ToString().ToLower(), $namesJson, $levelJson)
+$loginJson = ('{{"http_status":{0},"content_type":{1},"server":{2},"body":{3},"ok":{4},"cookie_names":{5},"user_level":{6}}}' -f `
+  $lr.Code, (J $lr.ContentType), (J $lr.Server), (BodyJson $lr.Body), $loginOk.ToString().ToLower(), $namesJson, $levelJson)
 if ($loginOk) { Log ("   OK (HTTP {0}); cookies: {1}" -f $lr.Code, ($cookieNames -join ', ')) }
 else { Log ("   WARNING: no CGIUSER* cookies (HTTP {0}) - login may have failed; check -LoginBody. Continuing." -f $lr.Code) }
 
@@ -150,8 +209,8 @@ foreach ($row in $rows) {
 
 # ---------- assemble: { device, login, <tab>: { <id>: package } } ----------
 $ts = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
-$dev = ('{{"host":{0},"collected_at":{1},"script":"collect.ps1","packages_total":{2},"packages_http_2xx":{3},"packages_failed":{4},"packages_skipped":{5}}}' -f `
-  (J $DeviceHost), (J $ts), $total, $ok, $bad, $skipped)
+$dev = ('{{"base_url":{0},"collected_at":{1},"script":"collect.ps1","packages_total":{2},"packages_http_2xx":{3},"packages_failed":{4},"packages_skipped":{5}}}' -f `
+  (J $BaseUrl), (J $ts), $total, $ok, $bad, $skipped)
 $parts = New-Object System.Collections.Generic.List[string]
 $parts.Add('"device":' + $dev); $parts.Add('"login":' + $loginJson)
 foreach ($tab in ($entries | ForEach-Object { $_.Tab } | Select-Object -Unique)) {

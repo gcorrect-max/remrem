@@ -50,6 +50,9 @@ cd C:\rem102\scripts
 - The result is in `rem102\results\` (`collected.json`, `samples\`, `collect.log`), in the same format as from `collect.sh`.
 - The parameters match the `REM_*` variables: `-DeviceHost`, `-User`, `-Password`, `-LoginBody`, `-OutDir`, `-TimeoutSec`, `-DelayMs`, `-StdOut`.
 - In PowerShell `curl` is an alias of `Invoke-WebRequest`. Run the curl commands from this documentation as `curl.exe` (Windows 10 and later); shell syntax (`\`, `$HOST`) differs too, so use `collect.cmd` to collect data.
+- Quote a user name that contains a space: `-User "Super Admin"` (without quotes the second word is bound to another parameter). The same applies to passwords with special characters.
+- If everything returns HTTP 404 (as on the first run), run `.\collect.cmd -DeviceHost 192.168.128.1 -Probe`. `-Probe` sends no credentials; it checks ports 80/8080/8000/8081/443/8443 and a few paths and writes the result to `results\probe.json`.
+- If the CGI is at a different address, pass it: `-BaseUrl https://192.168.128.1:8443` (or `http://host:port/prefix`); `-Insecure` accepts a self-signed certificate.
 - `collect.ps1` was tested in PowerShell 7 against a mock server, not yet in Windows PowerShell 5.1.
 
 ## Basic information – full curl sequence

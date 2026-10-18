@@ -21,3 +21,6 @@ Windows (PowerShell): `cd rem102\scripts` i `.\collect.cmd -DeviceHost 192.168.1
 Generator (`rem102/scripts/build-docs.py`) czyta `samples/` albo `collected.json` i wstawia dane do `rem102/docs/` oraz `rem102/index.html`.
 Przed zacommitowaniem sprawdź, czy dane nie zawierają informacji, których nie chcesz publikować (numery seryjne, adresy, hasła).
 Check the data for anything you do not want to publish (serial numbers, addresses, passwords) before committing.
+
+Gdy wszystko zwraca HTTP 404 / If everything returns HTTP 404: `.\collect.cmd -DeviceHost 192.168.128.1 -Probe` → `probe.json`.
+`archive/` – zachowane wyniki wcześniejszych uruchomień / kept results of earlier runs.
