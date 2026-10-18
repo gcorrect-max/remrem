@@ -15,7 +15,8 @@
 # Zmienne: REM_HOST (192.168.128.1), REM_USER, REM_PASS (wymagane), REM_LOGIN_BODY, REM_OUT_DIR,
 #          REM_TIMEOUT (10 s na zapytanie), REM_DELAY (przerwa między zapytaniami, s; domyślnie 0),
 #          REM_TSV (inna lista pakietów), REM_BASE_URL (pełny adres bazowy, np. https://192.168.128.1:8443 lub http://host/prefix;
-#          domyślnie http://$REM_HOST), REM_INSECURE=1 (akceptuj certyfikat self-signed)
+#          domyślnie http://$REM_HOST), REM_INSECURE=1 (akceptuj certyfikat self-signed),
+#          REM_CGI_EXT=cgi (rozszerzenie CGI; to urządzenie używa .cgi, a nie .fcgi)
 # Wymaga: bash, curl, jq.
 #
 # Założenia (do potwierdzenia właśnie tym zbiorem danych – patrz pole "login" i "post_retry"):
@@ -35,6 +36,7 @@ PASS="${REM_PASS:?ustaw REM_PASS}"
 LOGIN_BODY="${REM_LOGIN_BODY:-query=120&username=${USER_NAME}&pwd=${PASS}}"
 BASE_URL="${REM_BASE_URL:-http://${HOST}}"; BASE_URL="${BASE_URL%/}"
 CURL_X=(); [ -n "${REM_INSECURE:-}" ] && CURL_X=(-k)
+CGI_EXT="${REM_CGI_EXT:-}"   # np. cgi: zamienia .fcgi na .cgi w loginie i zapytaniach
 TIMEOUT="${REM_TIMEOUT:-10}"
 DELAY="${REM_DELAY:-0}"
 
@@ -83,7 +85,7 @@ resp_json() {
 # ---------- logowanie ----------
 log "== logowanie: POST ${BASE_URL}/cgi-bin/mpc105.fcgi (query=120), użytkownik: ${USER_NAME}"
 : > "$WORK/resp.tmp"
-res="$(curl -sS ${CURL_X[@]+"${CURL_X[@]}"} --max-time "$TIMEOUT" -c "$JAR" -X POST "${BASE_URL}/cgi-bin/mpc105.fcgi" --data-raw "$LOGIN_BODY" \
+res="$(curl -sS ${CURL_X[@]+"${CURL_X[@]}"} --max-time "$TIMEOUT" -c "$JAR" -X POST "${BASE_URL}/cgi-bin/mpc105.${CGI_EXT:-fcgi}" --data-raw "$LOGIN_BODY" \
        -o "$WORK/resp.tmp" -w '%{http_code}\t%{content_type}')" || res=$'0\t'
 F_CODE="${res%%$'\t'*}"; F_CTYPE="${res#*$'\t'}"
 LOGIN_OK=false
@@ -105,6 +107,7 @@ N=0; OK=0; BAD=0; SKIPPED=0
 log "== pobieranie ${TOTAL} pakietów (lista: ${TSV})"
 while IFS=$'\t' read -r name tab id request label; do
   N=$((N+1))
+  [ -n "$CGI_EXT" ] && request="${request/.fcgi?/.${CGI_EXT}?}"
   cgi="${request%%\?*}"; query="${request#*\?}"
   if [[ "$query" =~ $DENY ]]; then
     log "[$N/$TOTAL] $name  POMINIĘTO (lista zakazanych zapytań)"; SKIPPED=$((SKIPPED+1)); continue

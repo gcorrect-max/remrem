@@ -37,7 +37,9 @@ param(
   [string]$Tsv        = $env:REM_TSV,
   [string]$BaseUrl    = $env:REM_BASE_URL,
   [switch]$Insecure,
+  [string]$CgiExt     = $env:REM_CGI_EXT,
   [switch]$Probe,
+  [switch]$Discover,
   [switch]$StdOut
 )
 
@@ -49,7 +51,7 @@ if (-not $BaseUrl) { $BaseUrl = "http://$DeviceHost" }
 $BaseUrl = $BaseUrl.TrimEnd('/')
 if (-not $Tsv)    { $Tsv = Join-Path $Base 'data\rem102-packages.tsv' }
 if (-not $OutDir -and -not $StdOut) { $OutDir = Join-Path $Base 'results' }
-if (-not $Probe) {   # -Probe sends no credentials
+if (-not $Probe -and -not $Discover) {   # -Probe and -Discover send no credentials
   if (-not $User)   { $User = Read-Host 'User' }
   if (-not $Password) {
     $sec = Read-Host 'Password' -AsSecureString
@@ -107,13 +109,18 @@ function Send-Req([string]$Method, [string]$PathAndQuery, [string]$PostBody) {
     if ($resp.Content.Headers.ContentType) { $ct = $resp.Content.Headers.ContentType.ToString() }
     $srv = $null
     if ($resp.Headers.Server) { $srv = ($resp.Headers.Server | ForEach-Object { $_.ToString() }) -join ' ' }
-    return @{ Code = [int]$resp.StatusCode; ContentType = $ct; Server = $srv; Body = $resp.Content.ReadAsStringAsync().Result }
+    return @{ Code = [int]$resp.StatusCode; ContentType = $ct; Server = $srv; Error = $null; Body = $resp.Content.ReadAsStringAsync().Result }
   } catch {
-    return @{ Code = 0; ContentType = $null; Server = $null; Body = '' }
+    $msg = $_.Exception.Message
+    if ($_.Exception.InnerException) { $msg = $_.Exception.InnerException.Message }
+    return @{ Code = 0; ContentType = $null; Server = $null; Error = $msg; Body = '' }
   }
 }
 
 function RespJson($r) {
+  if ($r.Code -eq 0) {   # no HTTP answer at all: keep the reason (timeout, connection closed, ...)
+    return ('{{"http_status":0,"content_type":null,"server":null,"error":{0},"body":null}}' -f (J $r.Error))
+  }
   return ('{{"http_status":{0},"content_type":{1},"server":{2},"body":{3}}}' -f $r.Code, (J $r.ContentType), (J $r.Server), (BodyJson $r.Body))
 }
 
@@ -162,9 +169,71 @@ if ($Probe) {
   return
 }
 
+# ---------- -Discover: read the device's OWN web files (no login) to learn the real CGI names and login format ----------
+if ($Discover) {
+  Log "== discover: reading the device web files from $BaseUrl (no credentials are sent)"
+  $maxBytes = 1048576
+  $files = New-Object System.Collections.Generic.List[string]
+  $seen = @{}
+  $queue = New-Object System.Collections.Queue
+  foreach ($f in @('/', '/Config/settings.json', '/Config/home.json', '/Config/monitoring.json', '/Config/setup.json', '/Config/advanced.json')) { $queue.Enqueue($f) }
+  $foundCgi = @{}; $foundCfg = @{}
+  while ($queue.Count -gt 0 -and $seen.Count -lt 60) {
+    $path = [string]$queue.Dequeue()
+    if ($seen.ContainsKey($path)) { continue }
+    $seen[$path] = $true
+    $r = Send-Req 'GET' $path ''
+    $bytes = $Utf8.GetByteCount([string]$r.Body)
+    $bodyJson = 'null'
+    if ($bytes -le $maxBytes) { $bodyJson = if ([string]::IsNullOrEmpty($r.Body)) { 'null' } else { J $r.Body } }
+    Log ("{0}  HTTP {1}  {2}  {3} B" -f $path, $r.Code, $r.ContentType, $bytes)
+    $files.Add(('{{"path":{0},"http_status":{1},"content_type":{2},"server":{3},"bytes":{4},"error":{5},"body":{6}}}' -f `
+      (J $path), $r.Code, (J $r.ContentType), (J $r.Server), $bytes, (J $r.Error), $bodyJson))
+    if ($r.Code -ne 200 -or $bytes -gt $maxBytes) { continue }
+    $text = [string]$r.Body
+    # scripts referenced by pages, config files and CGI names mentioned anywhere
+    foreach ($m in [regex]::Matches($text, '(?i)<script[^>]+src\s*=\s*[''"]([^''"]+)[''"]')) {
+      $u = $m.Groups[1].Value
+      if ($u -notmatch '^(https?:)?//') { $queue.Enqueue($(if ($u.StartsWith('/')) { $u } else { '/' + $u })) }
+    }
+    foreach ($m in [regex]::Matches($text, '(?i)Config/[A-Za-z0-9_./-]+\.json')) {
+      $foundCfg[$m.Value] = $true; $queue.Enqueue('/' + $m.Value)
+    }
+    foreach ($m in [regex]::Matches($text, '(?i)(cgi-bin/[A-Za-z0-9_.-]+|/file_upload)')) { $foundCgi[$m.Value] = $true }
+  }
+  # does each CGI name exist? try both extensions; keep the failure reason when there is no HTTP answer
+  $checks = New-Object System.Collections.Generic.List[string]
+  foreach ($name in @('mpc105', 'rem', 'items', 'rtp')) {
+    foreach ($ext in @('cgi', 'fcgi')) {
+      $p = "/cgi-bin/$name.$ext"
+      foreach ($method in @('GET', 'POST')) {
+        $q = if ($name -eq 'mpc105') { '?query=125' } else { '?query=10' }
+        if ($method -eq 'GET') { $r = Send-Req 'GET' ($p + $q) '' } else { $r = Send-Req 'POST' $p 'query=125' }
+        Log ("{0} {1}  HTTP {2}  {3}" -f $method, $p, $r.Code, $r.Error)
+        $checks.Add(('{{"method":{0},"path":{1},"http_status":{2},"content_type":{3},"server":{4},"error":{5},"bytes":{6}}}' -f `
+          (J $method), (J $p), $r.Code, (J $r.ContentType), (J $r.Server), (J $r.Error), $Utf8.GetByteCount([string]$r.Body)))
+      }
+    }
+  }
+  $cgiJson = '[' + ((($foundCgi.Keys | Sort-Object) | ForEach-Object { J $_ }) -join ',') + ']'
+  $cfgJson = '[' + ((($foundCfg.Keys | Sort-Object) | ForEach-Object { J $_ }) -join ',') + ']'
+  $out = ('{{"base_url":{0},"discovered_at":{1},"cgi_paths_mentioned":{2},"config_files_mentioned":{3},"cgi_checks":[{4}],"files":[{5}]}}' -f `
+    (J $BaseUrl), (J (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')), $cgiJson, $cfgJson, ($checks -join ','), ($files -join ','))
+  if ($StdOut) { Write-Output $out }
+  if ($OutDir) {
+    $null = New-Item -ItemType Directory -Force -Path $OutDir
+    [IO.File]::WriteAllText((Join-Path $OutDir 'discover.json'), $out, $Utf8)
+    [IO.File]::WriteAllText((Join-Path $OutDir 'discover.log'), (($LogLines -join "`r`n") + "`r`n"), $Utf8)
+    Write-Host "Saved: $OutDir\discover.json, $OutDir\discover.log  (send discover.json)"
+  }
+  $Client.Dispose()
+  return
+}
+
 # ---------- login ----------
-Log "== login: POST $BaseUrl/cgi-bin/mpc105.fcgi (query=120), user: $User"
 $loginPath = '/cgi-bin/mpc105.fcgi'
+if ($CgiExt) { $loginPath = $loginPath -replace '\.fcgi$', ("." + $CgiExt) }
+Log "== login: POST $BaseUrl$loginPath (query=120), user: $User"
 $lr = Send-Req 'POST' $loginPath $LoginBody
 $cookies = @($Jar.GetCookies([Uri]"$BaseUrl$loginPath") | ForEach-Object { $_ })
 $cookieNames = @($cookies | ForEach-Object { $_.Name })
@@ -186,6 +255,7 @@ $n = 0; $ok = 0; $bad = 0; $skipped = 0
 foreach ($row in $rows) {
   $n++
   $request = $row.request
+  if ($CgiExt) { $request = $request -replace '\.fcgi(\?|$)', ('.' + $CgiExt + '$1') }
   $q = $request.IndexOf('?')
   $cgi = $request.Substring(0, $q); $query = $request.Substring($q + 1)
   if ($query -match $Deny) {

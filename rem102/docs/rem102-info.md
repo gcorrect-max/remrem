@@ -53,6 +53,8 @@ cd C:\rem102\scripts
 - Nazwę użytkownika ze spacją podaj w cudzysłowie: `-User "Super Admin"` (bez cudzysłowu druga część trafia do innego parametru). To samo dotyczy hasła ze znakami specjalnymi.
 - Gdy wszystko zwraca HTTP 404 (jak przy pierwszym uruchomieniu), uruchom `.\collect.cmd -DeviceHost 192.168.128.1 -Probe`. Tryb `-Probe` nie wysyła danych logowania; sprawdza porty 80/8080/8000/8081/443/8443 i kilka ścieżek, a wynik zapisuje w `results\probe.json`.
 - Gdy CGI jest pod innym adresem, podaj go: `-BaseUrl https://192.168.128.1:8443` (albo `http://host:port/prefiks`); `-Insecure` akceptuje certyfikat self-signed.
+- Gdy urządzenie używa `.cgi` zamiast `.fcgi` (tak jest w firmware, który odpowiedział w teście), dodaj `-CgiExt cgi`. Wtedy login i wszystkie zapytania idą na `/cgi-bin/*.cgi`.
+- `-Discover` czyta własne pliki WWW urządzenia (strona logowania, `Config/*.json`, skrypty JS), bez logowania, i zapisuje `results\discover.json`. Pokazuje prawdziwe nazwy CGI i format logowania.
 - `collect.ps1` sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.
 
 ## Podstawowe informacje – pełna sekwencja curl

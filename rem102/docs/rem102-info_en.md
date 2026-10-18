@@ -53,6 +53,8 @@ cd C:\rem102\scripts
 - Quote a user name that contains a space: `-User "Super Admin"` (without quotes the second word is bound to another parameter). The same applies to passwords with special characters.
 - If everything returns HTTP 404 (as on the first run), run `.\collect.cmd -DeviceHost 192.168.128.1 -Probe`. `-Probe` sends no credentials; it checks ports 80/8080/8000/8081/443/8443 and a few paths and writes the result to `results\probe.json`.
 - If the CGI is at a different address, pass it: `-BaseUrl https://192.168.128.1:8443` (or `http://host:port/prefix`); `-Insecure` accepts a self-signed certificate.
+- If the device uses `.cgi` instead of `.fcgi` (the firmware that answered in the test does), add `-CgiExt cgi`. Login and all requests then go to `/cgi-bin/*.cgi`.
+- `-Discover` reads the device's own web files (login page, `Config/*.json`, JS files) without logging in and writes `results\discover.json`. It shows the real CGI names and the login format.
 - `collect.ps1` was tested in PowerShell 7 against a mock server, not yet in Windows PowerShell 5.1.
 
 ## Basic information – full curl sequence
