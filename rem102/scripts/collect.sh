@@ -83,7 +83,7 @@ resp_json() {
 }
 
 # ---------- logowanie ----------
-log "== logowanie: POST ${BASE_URL}/cgi-bin/mpc105.fcgi (query=120), użytkownik: ${USER_NAME}"
+log "== logowanie: POST ${BASE_URL}/cgi-bin/mpc105.${CGI_EXT:-fcgi} (query=120), użytkownik: ${USER_NAME}"
 : > "$WORK/resp.tmp"
 res="$(curl -sS ${CURL_X[@]+"${CURL_X[@]}"} --max-time "$TIMEOUT" -c "$JAR" -X POST "${BASE_URL}/cgi-bin/mpc105.${CGI_EXT:-fcgi}" --data-raw "$LOGIN_BODY" \
        -o "$WORK/resp.tmp" -w '%{http_code}\t%{content_type}')" || res=$'0\t'
