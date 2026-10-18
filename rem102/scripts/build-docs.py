@@ -38,14 +38,14 @@ def req_of(e):
 
 _collected = None
 if os.path.isfile(COLLECTED):
-    with open(COLLECTED, encoding="utf-8") as f:
+    with open(COLLECTED, encoding="utf-8-sig") as f:
         _collected = json.load(f)
 
 def load_sample(e):
     """Captured package (envelope with http_status/body) or None. A per-package file wins over collected.json."""
     p = os.path.join(SAMPLES, e["tab"], e["id"] + ".json")
     if os.path.isfile(p):
-        with open(p, encoding="utf-8") as f:
+        with open(p, encoding="utf-8-sig") as f:
             return json.load(f)
     d = (_collected or {}).get(e["tab"], {}).get(e["id"])
     return d if isinstance(d, dict) and "http_status" in d else None
@@ -157,6 +157,7 @@ L = {
  script_vars=[("REM_HOST","adres urządzenia (może zawierać port)","192.168.128.1"),("REM_USER","login","wymagana"),("REM_PASS","hasło","wymagana"),("REM_LOGIN_BODY","pełne ciało żądania logowania","query=120&amp;username=…&amp;pwd=…"),("REM_OUT_DIR","katalog wynikowy (collected.json, samples/, collect.log)","rem102/results/"),("REM_TIMEOUT","limit czasu jednego zapytania, s","10"),("REM_DELAY","przerwa między zapytaniami, s","0")],
  script_dump="# zapis do plików (domyślnie rem102/results/): collected.json, samples/&lt;zakładka&gt;/&lt;id&gt;.json, collect.log",
  script_req="Wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>. Przykłady <code>jq</code>:",
+ win_html='<h3 class="sub">Windows (PowerShell)</h3><p>Pliki <code>.sh</code> nie uruchomią się w Windows (system pyta, czym otworzyć plik). Użyj wersji PowerShell: <code>rem102\\scripts\\collect.ps1</code>. Nie wymaga ani basha, ani <code>curl</code>, ani <code>jq</code>, ani Pythona – wystarcza Windows PowerShell 5.1.</p><pre><code>cd C:\\rem102\\scripts\n.\\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password</code></pre><ul><li>Bez <code>-Password</code> skrypt zapyta o hasło.</li><li><code>collect.cmd</code> uruchamia <code>collect.ps1</code> z <code>-ExecutionPolicy Bypass</code>, więc nie trzeba zmieniać ustawień PowerShell. Jeśli uruchamiasz <code>.ps1</code> bezpośrednio i dostajesz błąd o zablokowanych skryptach, wykonaj <code>Unblock-File .\\collect.ps1</code>.</li><li>Wynik jest w <code>rem102\\results\\</code> (<code>collected.json</code>, <code>samples\\</code>, <code>collect.log</code>), w tym samym formacie co z <code>collect.sh</code>.</li><li>Parametry odpowiadają zmiennym <code>REM_*</code>: <code>-DeviceHost</code>, <code>-User</code>, <code>-Password</code>, <code>-LoginBody</code>, <code>-OutDir</code>, <code>-TimeoutSec</code>, <code>-DelayMs</code>, <code>-StdOut</code>.</li><li>W PowerShellu <code>curl</code> jest aliasem <code>Invoke-WebRequest</code>. Polecenia curl z tej dokumentacji uruchamiaj jako <code>curl.exe</code> (Windows 10 i nowsze); składnia powłoki (<code>\\</code>, <code>$HOST</code>) też się różni, więc do zbierania danych użyj <code>collect.cmd</code>.</li><li><code>collect.ps1</code> sprawdzono w PowerShell 7 na atrapie serwera, w Windows PowerShell 5.1 jeszcze nie.</li></ul>',
  jq1="# identyfikacja urządzenia", jq2="# pakiety, które się nie udały",
  assum='''<ol>
 <li><strong>Logowanie.</strong> Pliki menu podają tylko <code>query=120</code>. Nazwy pól <code>username</code> i <code>pwd</code> oraz nazwy ciasteczek pochodzą z konfiguracji LabVIEW (<code>data/modulesCfg.ts</code>). Jeśli logowanie się nie uda, przechwyć prawdziwe żądanie w DevTools i podaj je w <code>REM_LOGIN_BODY</code>.</li>
@@ -242,6 +243,7 @@ L = {
  script_vars=[("REM_HOST","device address (may include a port)","192.168.128.1"),("REM_USER","login","required"),("REM_PASS","password","required"),("REM_LOGIN_BODY","full login request body","query=120&amp;username=…&amp;pwd=…"),("REM_OUT_DIR","output directory (collected.json, samples/, collect.log)","rem102/results/"),("REM_TIMEOUT","per-request time limit, s","10"),("REM_DELAY","pause between requests, s","0")],
  script_dump="# write to files (default rem102/results/): collected.json, samples/&lt;tab&gt;/&lt;id&gt;.json, collect.log",
  script_req="Requires <code>bash</code>, <code>curl</code>, <code>jq</code>. <code>jq</code> examples:",
+ win_html='<h3 class="sub">Windows (PowerShell)</h3><p><code>.sh</code> files do not run on Windows (the system asks which app should open the file). Use the PowerShell version: <code>rem102\\scripts\\collect.ps1</code>. It needs neither bash, nor <code>curl</code>, nor <code>jq</code>, nor Python – Windows PowerShell 5.1 is enough.</p><pre><code>cd C:\\rem102\\scripts\n.\\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password</code></pre><ul><li>Without <code>-Password</code> the script asks for the password.</li><li><code>collect.cmd</code> runs <code>collect.ps1</code> with <code>-ExecutionPolicy Bypass</code>, so no PowerShell settings need to change. If you run the <code>.ps1</code> directly and get an error about blocked scripts, run <code>Unblock-File .\\collect.ps1</code>.</li><li>The result is in <code>rem102\\results\\</code> (<code>collected.json</code>, <code>samples\\</code>, <code>collect.log</code>), in the same format as from <code>collect.sh</code>.</li><li>The parameters match the <code>REM_*</code> variables: <code>-DeviceHost</code>, <code>-User</code>, <code>-Password</code>, <code>-LoginBody</code>, <code>-OutDir</code>, <code>-TimeoutSec</code>, <code>-DelayMs</code>, <code>-StdOut</code>.</li><li>In PowerShell <code>curl</code> is an alias of <code>Invoke-WebRequest</code>. Run the curl commands from this documentation as <code>curl.exe</code> (Windows 10 and later); shell syntax (<code>\\</code>, <code>$HOST</code>) differs too, so use <code>collect.cmd</code> to collect data.</li><li><code>collect.ps1</code> was tested in PowerShell 7 against a mock server, not yet in Windows PowerShell 5.1.</li></ul>',
  jq1="# device identification", jq2="# packages that failed",
  assum='''<ol>
 <li><strong>Login.</strong> The menu files give only <code>query=120</code>. The <code>username</code> and <code>pwd</code> field names and the cookie names come from the LabVIEW configuration (<code>data/modulesCfg.ts</code>). If login fails, capture the real request in DevTools and pass it in <code>REM_LOGIN_BODY</code>.</li>
@@ -391,7 +393,8 @@ jq -r 'del(.device) | to_entries[] | .key as $t | .value | to_entries[]
 REM_HOST=… REM_USER=… REM_PASS=… ./rem102/scripts/collect.sh</code></pre>
 {table(P["script_th"], [(f"<code>{a}</code>",b,(f"<code>{c}</code>" if c.startswith(("192","query")) else c)) for a,b,c in P["script_vars"]])}
 <p>{P["script_req"]}</p>
-<pre><code>{jq}</code></pre></section>
+<pre><code>{jq}</code></pre>
+{P["win_html"]}</section>
 
 <section id="labview"><h2>{U["lv"]}</h2>{P["lv"]}</section>
 
@@ -451,6 +454,8 @@ def build_index():
         ("data/rem102-package-names.txt", "nazwy pakietów (<code>tab.id</code>) – pozycje enuma w LabVIEW", isok),
         ("data/rem102-package-requests.txt", "zapytania w tej samej kolejności – tablica stringów indeksowana enumem", isok),
         ("scripts/collect.sh", "pobiera po kolei wszystkie pakiety i zapisuje wynik do <code>results/</code>", isok),
+        ("scripts/collect.ps1", "wersja dla Windows (PowerShell 5.1+, bez bash/curl/jq): ten sam odczyt i te same pliki wynikowe", isok),
+        ("scripts/collect.cmd", "launcher dla <code>collect.ps1</code> (bez zmiany polityki wykonywania skryptów)", isok),
         ("scripts/rem102-info.sh", "skrót do <code>collect.sh</code>: ten sam odczyt, wynik JSON na stdout", isok),
         ("scripts/build-docs.py", "generuje strony HTML, sekcje „Przykłady odpowiedzi” w md i tę stronę", isok),
     ]
@@ -505,7 +510,8 @@ def build_index():
 <h2>TODO</h2>
 <ul class="chk">
 {done("Lista zapytań, skrypty, dokumentacja PL/EN, tabele dla LabVIEW, generator")}
-{todo("Uruchomić <code>collect.sh</code> na prawdziwym urządzeniu (przykład: użytkownik <code>user</code>, hasło <code>password</code>)")}
+{todo("Uruchomić <code>collect.sh</code> (Windows: <code>collect.cmd</code>) na prawdziwym urządzeniu (przykład: użytkownik <code>user</code>, hasło <code>password</code>)")}
+{todo("Sprawdzić <code>collect.ps1</code> w Windows PowerShell 5.1 (testowano w PowerShell 7 na atrapie)")}
 {todo("Przekazać wynik: <code>results/collected.json</code> (commit na gałąź lub załącznik) – dokumentację uzupełnia się z niego")}
 {todo("Uruchomić <code>python3 rem102/scripts/build-docs.py</code> – znikną oznaczenia „do uzupełnienia”")}
 {todo("Potwierdzić format logowania (pola <code>username</code>/<code>pwd</code>) – pole <code>login</code> w <code>collected.json</code>")}
@@ -526,9 +532,13 @@ def build_index():
 {files(doc_rows)}
 
 <h2>Uruchomienie</h2>
+<p>Linux / macOS / Git Bash:</p>
 <pre><code>REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.sh
 python3 rem102/scripts/build-docs.py</code></pre>
-<p class="muted">Wymaga <code>bash</code>, <code>curl</code>, <code>jq</code> (zbieranie) oraz <code>python3</code> (generator). Skrypt nie zapisuje hasła w plikach wynikowych ani w logu.</p>
+<p>Windows (PowerShell) – <code>.sh</code> nie uruchomi się, użyj <code>collect.cmd</code> (nie wymaga bash, curl, jq ani Pythona):</p>
+<pre><code>cd C:\\rem102\\scripts
+.\\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password</code></pre>
+<p class="muted">Wersja bash wymaga <code>bash</code>, <code>curl</code>, <code>jq</code>; generator wymaga <code>python3</code> (uruchamiam go ja po otrzymaniu <code>collected.json</code>). Skrypt nie zapisuje hasła w plikach wynikowych ani w logu.</p>
 </main>
 </body>
 </html>

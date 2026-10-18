@@ -38,6 +38,7 @@ backup_*/
 
 # One-off fix / patch scripts
 *.ps1
+!rem102/scripts/*.ps1
 
 # Backup file variants
 *.bak

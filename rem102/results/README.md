@@ -10,6 +10,8 @@ REM_HOST=192.168.128.1 REM_USER=user REM_PASS=password ./rem102/scripts/collect.
 python3 rem102/scripts/build-docs.py
 ```
 
+Windows (PowerShell): `cd rem102\scripts` i `.\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password`.
+
 `collect.sh` zapisuje tutaj / writes here:
 
 - `collected.json` – wszystko w jednym pliku (`device`, `login`, pakiety) / everything in one file

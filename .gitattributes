@@ -27,3 +27,4 @@
 *.ttf      binary
 *.eot      binary
 *.zip      binary
+*.cmd      text eol=crlf

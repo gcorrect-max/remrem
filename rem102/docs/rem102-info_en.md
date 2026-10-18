@@ -36,6 +36,22 @@ REM_HOST=... REM_USER=... REM_PASS=... ./rem102/scripts/collect.sh
 
 Warnings (e.g. a failed login) go to stderr, so stdout always holds clean JSON.
 
+### Windows (PowerShell)
+
+`.sh` files do not run on Windows (the system asks which app should open the file). Use the PowerShell version: `rem102\scripts\collect.ps1`. It needs neither bash, nor `curl`, nor `jq`, nor Python – Windows PowerShell 5.1 is enough.
+
+```powershell
+cd C:\rem102\scripts
+.\collect.cmd -DeviceHost 192.168.128.1 -User user -Password password
+```
+
+- Without `-Password` the script asks for the password.
+- `collect.cmd` runs `collect.ps1` with `-ExecutionPolicy Bypass`, so no PowerShell settings need to change. If you run the `.ps1` directly and get an error about blocked scripts, run `Unblock-File .\collect.ps1`.
+- The result is in `rem102\results\` (`collected.json`, `samples\`, `collect.log`), in the same format as from `collect.sh`.
+- The parameters match the `REM_*` variables: `-DeviceHost`, `-User`, `-Password`, `-LoginBody`, `-OutDir`, `-TimeoutSec`, `-DelayMs`, `-StdOut`.
+- In PowerShell `curl` is an alias of `Invoke-WebRequest`. Run the curl commands from this documentation as `curl.exe` (Windows 10 and later); shell syntax (`\`, `$HOST`) differs too, so use `collect.cmd` to collect data.
+- `collect.ps1` was tested in PowerShell 7 against a mock server, not yet in Windows PowerShell 5.1.
+
 ## Basic information – full curl sequence
 
 User `user`, password `password`, default address `192.168.128.1`. Steps 2–6 return the model, serial number, article number and the other identification data.
