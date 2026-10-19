@@ -26,19 +26,28 @@ case "$(printf '%s' "$USER_ARG" | tr '[:upper:]' '[:lower:]' | tr -d ' ')" in
   *) echo "Unknown user '$USER_ARG': use User, Admin, Super Admin or 1, 2, 3" >&2; exit 1 ;;
 esac
 
-JAR="$(mktemp)"
-trap 'rm -f "$JAR"' EXIT
+HDR="$(mktemp)"; OUT="$(mktemp)"
+trap 'rm -f "$HDR" "$OUT"' EXIT
 
 echo "== 1. login (level $LEVEL)"
-printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "$BASE/cgi-bin/mpc105.cgi" \
+printf '%s' "$PASS" | curl -sS -D "$HDR" -o "$OUT" -X POST "$BASE/cgi-bin/mpc105.cgi" \
      --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
-if ! grep -q CGISESSID "$JAR"; then
-  echo "Login failed (no CGISESSID cookie). Check the password: every failed login is recorded in the device's event log." >&2
+REPLY="$(cat "$OUT")"; echo "$REPLY"
+VALUE="$(printf '%s' "$REPLY" | tr -d '\r\n' | sed -n 's/.*"value" *: *"\([^"]*\)".*/\1/p')"
+# the session id comes from the Set-Cookie header (no cookie jar involved)
+SID="$(tr -d '\r' < "$HDR" | sed -n 's/^[Ss]et-[Cc]ookie: *CGISESSID=\([^;]*\).*/\1/p' | head -1)"
+if [ -z "$SID" ]; then
+  if [ "$VALUE" = fail ]; then
+    echo "Login rejected by the device (value=fail): wrong password for level $LEVEL. Every failed login is recorded in the device's event log, so do not retry blindly." >&2
+  else
+    echo "No CGISESSID cookie in the reply (value='$VALUE'). Response headers:" >&2; cat "$HDR" >&2
+  fi
   exit 1
 fi
+COOKIE="Cookie: CGISESSID=$SID"
 
 echo "== 2. device data (model, serial no., article no., ...)"
-DEVICE="$(curl -sS -b "$JAR" "$BASE/cgi-bin/mpc105.cgi?query=302")"
+DEVICE="$(curl -sS -H "$COOKIE" "$BASE/cgi-bin/mpc105.cgi?query=302")"
 echo "$DEVICE"
 if command -v jq >/dev/null; then
   echo "-- summary"
@@ -46,7 +55,7 @@ if command -v jq >/dev/null; then
 fi
 
 echo "== 3. software versions"
-curl -sS -w '\n' -b "$JAR" "$BASE/cgi-bin/mpc105.cgi?query=301"
+curl -sS -w '\n' -H "$COOKIE" "$BASE/cgi-bin/mpc105.cgi?query=301"
 
 echo "== 4. logout"
-curl -sS -w '\n' -b "$JAR" "$BASE/cgi-bin/mpc105j.cgi?query=122"
+curl -sS -w '\n' -H "$COOKIE" "$BASE/cgi-bin/mpc105j.cgi?query=122"

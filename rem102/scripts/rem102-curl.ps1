@@ -32,20 +32,33 @@ if (-not $Password) {
   try { $Password = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
 }
 $base = "http://$DeviceHost"
-$jar = [IO.Path]::GetTempFileName()
+$hdr = [IO.Path]::GetTempFileName()
+$out = [IO.Path]::GetTempFileName()
 $pwdFile = [IO.Path]::GetTempFileName()
 try {
   # the password goes to curl through a temporary file (url-encoded by curl), not through the command line
   [IO.File]::WriteAllText($pwdFile, $Password, (New-Object System.Text.UTF8Encoding($false)))
 
   Write-Host "== 1. login (level $level)"
-  curl.exe -sS -w "`n" -c $jar -X POST "$base/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$level" --data-urlencode "pwd@$pwdFile"
-  if (-not (Select-String -Path $jar -Pattern 'CGISESSID' -Quiet)) {
-    throw 'Login failed (no CGISESSID cookie). Check the password: every failed login is recorded in the device event log.'
+  curl.exe -sS -D $hdr -o $out -X POST "$base/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$level" --data-urlencode "pwd@$pwdFile"
+  $reply = [IO.File]::ReadAllText($out)
+  Write-Host $reply
+  $value = $null
+  try { $value = [string](ConvertFrom-Json -InputObject $reply).value } catch { }
+  # the session id comes from the Set-Cookie header (no cookie jar involved)
+  $sid = $null
+  foreach ($line in [IO.File]::ReadAllLines($hdr)) { if ($line -match '^(?i)Set-Cookie:\s*CGISESSID=([^;\s]*)') { $sid = $Matches[1] } }
+  if (-not $sid) {
+    if ($value -eq 'fail') {
+      throw "Login rejected by the device (value=fail): wrong password for level $level. Every failed login is recorded in the device event log, so do not retry blindly."
+    }
+    Write-Host 'Response headers:'; Get-Content $hdr | Write-Host
+    throw "No CGISESSID cookie in the reply (value='$value')."
   }
+  $cookie = "Cookie: CGISESSID=$sid"
 
   Write-Host '== 2. device data (model, serial no., article no., ...)'
-  $device = (curl.exe -sS -b $jar "$base/cgi-bin/mpc105.cgi?query=302") -join "`n"
+  $device = (curl.exe -sS -H $cookie "$base/cgi-bin/mpc105.cgi?query=302") -join "`n"
   Write-Host $device
   try {
     Write-Host '-- summary'
@@ -54,11 +67,11 @@ try {
   } catch { }
 
   Write-Host '== 3. software versions'
-  curl.exe -sS -w "`n" -b $jar "$base/cgi-bin/mpc105.cgi?query=301"
+  curl.exe -sS -w "`n" -H $cookie "$base/cgi-bin/mpc105.cgi?query=301"
 
   Write-Host '== 4. logout'
-  curl.exe -sS -w "`n" -b $jar "$base/cgi-bin/mpc105j.cgi?query=122"
+  curl.exe -sS -w "`n" -H $cookie "$base/cgi-bin/mpc105j.cgi?query=122"
 }
 finally {
-  Remove-Item -Force -ErrorAction SilentlyContinue $jar, $pwdFile
+  Remove-Item -Force -ErrorAction SilentlyContinue $hdr, $out, $pwdFile
 }
