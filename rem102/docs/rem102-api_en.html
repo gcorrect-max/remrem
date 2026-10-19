@@ -4792,7 +4792,9 @@ done; rm -f "$JAR"</code></pre></div>
 <h3 class="sub">Login, read and logout – ready-made scripts with parameters</h3>
 <p>The user and the password are given on the command line (<code>User</code>, <code>Admin</code>, <code>Super Admin</code> or the level <code>1</code>, <code>2</code>, <code>3</code>). The scripts log in, read the device data (<code>query=302</code>) and the versions (<code>query=301</code>), and log out.</p>
 <div class="code"><button class="copy" type="button">Copy</button><pre><code>./rem102/scripts/rem102-curl.sh "Super Admin" 'password' [host]</code></pre></div>
-<div class="code"><button class="copy" type="button">Copy</button><pre><code>.\rem102-curl.cmd "Super Admin" 'password' [host]</code></pre></div>
+<div class="code"><button class="copy" type="button">Copy</button><pre><code>cd C:\rem102\scripts
+.\rem102-curl.cmd "Super Admin" 'password' [host]</code></pre></div>
+<p>The <code>.cmd</code> file lives in <code>rem102\scripts</code>, so run it from that folder or by its full path: <code>C:\rem102\scripts\rem102-curl.cmd "Super Admin" 'password'</code>. If the password contains <code>%</code>, <code>^</code>, <code>&amp;</code> or <code>"</code>, leave the password argument out: the script then asks for it and nothing gets mangled.</p>
 <p>The password reaches <code>curl</code> through stdin or a temporary file, so it does not show in the process list. The bare <code>curl</code> calls (level 3):</p>
 <div class="code"><button class="copy" type="button">Copy</button><pre><code>LEVEL=3; PASS='password'; HOST=192.168.128.1; JAR=$(mktemp)
 printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"

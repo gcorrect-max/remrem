@@ -389,8 +389,11 @@ Użytkownik i hasło podaje się w linii poleceń (`User`, `Admin`, `Super Admin
 ```
 
 ```powershell
+cd C:\\rem102\\scripts
 .\\rem102-curl.cmd "Super Admin" 'hasło' [host]
 ```
+
+Plik `.cmd` jest w `rem102\\scripts`, więc uruchom go z tego katalogu albo pełną ścieżką: `C:\\rem102\\scripts\\rem102-curl.cmd "Super Admin" 'hasło'`. Gdy hasło zawiera znaki `%`, `^`, `&` lub `"`, pomiń argument hasła: skrypt zapyta o nie sam i nic się nie zepsuje.
 
 Hasło trafia do `curl` przez stdin lub plik tymczasowy, więc nie widać go na liście procesów. Same wywołania `curl` (poziom 3):
 
@@ -668,8 +671,11 @@ The user and the password are given on the command line (`User`, `Admin`, `Super
 ```
 
 ```powershell
+cd C:\\rem102\\scripts
 .\\rem102-curl.cmd "Super Admin" 'password' [host]
 ```
+
+The `.cmd` file lives in `rem102\\scripts`, so run it from that folder or by its full path: `C:\\rem102\\scripts\\rem102-curl.cmd "Super Admin" 'password'`. If the password contains `%`, `^`, `&` or `"`, leave the password argument out: the script then asks for it and nothing gets mangled.
 
 The password reaches `curl` through stdin or a temporary file, so it does not show in the process list. The bare `curl` calls (level 3):
 

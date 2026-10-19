@@ -4935,8 +4935,11 @@ The user and the password are given on the command line (`User`, `Admin`, `Super
 ```
 
 ```powershell
+cd C:\rem102\scripts
 .\rem102-curl.cmd "Super Admin" 'password' [host]
 ```
+
+The `.cmd` file lives in `rem102\scripts`, so run it from that folder or by its full path: `C:\rem102\scripts\rem102-curl.cmd "Super Admin" 'password'`. If the password contains `%`, `^`, `&` or `"`, leave the password argument out: the script then asks for it and nothing gets mangled.
 
 The password reaches `curl` through stdin or a temporary file, so it does not show in the process list. The bare `curl` calls (level 3):
 
