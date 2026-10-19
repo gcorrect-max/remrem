@@ -470,7 +470,7 @@ Nazwy mają postać `tab.id`, bo samo `id` mogłoby się powtarzać między zak�
 "C:\\Windows\\System32\\curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
 ```
 
-   Z *standard output* (nagłówki + ciało) wyciągnij *Match Regular Expression*: identyfikator sesji `CGISESSID=([^;\s]+)` (pod-dopasowanie 1) i wynik `"value"\s*:\s*"([^"]*)"` (`ok` albo `fail`). Brak identyfikatora lub `fail` = błąd logowania (zły poziom lub hasło); każde nieudane logowanie jest zapisywane w dzienniku zdarzeń urządzenia.
+   Z *standard output* (nagłówki + ciało) wyciągnij *Match Regular Expression*: identyfikator sesji `CGISESSID=([^;\\s]+)` (pod-dopasowanie 1) i wynik `"value"\\s*:\\s*"([^"]*)"` (`ok` albo `fail`). Brak identyfikatora lub `fail` = błąd logowania (zły poziom lub hasło); każde nieudane logowanie jest zapisywane w dzienniku zdarzeń urządzenia.
 
 2. **Odczyt danych urządzenia** (`%s` = identyfikator sesji, `%s` = host):
 
@@ -785,7 +785,7 @@ Names are `tab.id` because a bare `id` could repeat between tabs.
 "C:\\Windows\\System32\\curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
 ```
 
-   From *standard output* (headers + body) extract with *Match Regular Expression*: the session id `CGISESSID=([^;\s]+)` (sub-match 1) and the result `"value"\s*:\s*"([^"]*)"` (`ok` or `fail`). No session id or `fail` = login error (wrong level or password); every failed login is recorded in the device's event log.
+   From *standard output* (headers + body) extract with *Match Regular Expression*: the session id `CGISESSID=([^;\\s]+)` (sub-match 1) and the result `"value"\\s*:\\s*"([^"]*)"` (`ok` or `fail`). No session id or `fail` = login error (wrong level or password); every failed login is recorded in the device's event log.
 
 2. **Read the device data** (`%s` = session id, `%s` = host):
 

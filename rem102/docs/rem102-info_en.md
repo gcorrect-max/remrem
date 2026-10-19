@@ -5007,6 +5007,39 @@ Names are `tab.id` because a bare `id` could repeat between tabs.
 4. **Request.** *Index Array* with the enum value → path with query; *HTTP Client* GET → response body as a string.
 5. **Parsing.** *Unflatten From JSON* into the typedef of that package.
 
+### `System Exec` calls (curl)
+
+`System Exec.vi` runs `curl.exe` (Windows 10 and later). Every call is a separate process, so the session is carried by the `CGISESSID` cookie value, which you read from the login reply. `System Exec` inputs: *command line*, *working directory* (e.g. the application folder), *wait until completion* = TRUE; outputs: *standard output*, *standard error*, *return code* (0 = curl performed the request; 7 = could not connect, 28 = timeout). Build the command lines with *Format Into String* (`%s` = string, `%d` = number).
+
+1. **Login** (`%s` = host, `%d` = level 1/2/3, `%s` = path of the password file):
+
+```text
+"C:\Windows\System32\curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
+```
+
+   From *standard output* (headers + body) extract with *Match Regular Expression*: the session id `CGISESSID=([^;\s]+)` (sub-match 1) and the result `"value"\s*:\s*"([^"]*)"` (`ok` or `fail`). No session id or `fail` = login error (wrong level or password); every failed login is recorded in the device's event log.
+
+2. **Read the device data** (`%s` = session id, `%s` = host):
+
+```text
+"C:\Windows\System32\curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
+```
+
+   *Standard output* is a JSON array; *Unflatten From JSON* into an array of a cluster with the string fields `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Find a field by `tag`: `devname` (model), `sn` (serial number), `pn` (article number). Software versions: the same call with `query=301`; any other package from `rem102-package-requests.txt` – put its path in place of `/cgi-bin/mpc105.cgi?query=302`.
+
+3. **Logout**:
+
+```text
+"C:\Windows\System32\curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+```
+
+Notes:
+
+- **Password:** write it with *Write to Text File* to a temporary file (no end-of-line), pass the path in `pwd@<file>` (curl URL-encodes the value) and delete the file after the login. That way special characters (`%`, `^`, `&`, `"`) cannot break the command line and the password does not stay in the process command line. A simpler but less robust form: `--data-urlencode "pwd=%s"`.
+- **32-bit LabVIEW** on 64-bit Windows does not see `C:\Windows\System32\curl.exe` (redirected to `SysWOW64`). Use `C:\Windows\Sysnative\curl.exe` or ship a `curl.exe` with your application and give its full path.
+- Do not use redirections (`>`) or pipes (`|`) in the command line; use curl's `-o` and `-D` options to write to a file.
+- The logout (`mpc105j.cgi?query=122`) comes from the page's scripts and has not been run against the device yet.
+
 ### Polymorphic VI
 
 A polymorphic VI picks its instance by the **type** of the wired data, not by an enum value. So the enum selects the request and the type selects the parser. For a single VI that handles every package, a **malleable VI** (`.vim`, LabVIEW 2017 or newer) fits best:
