@@ -45,3 +45,9 @@ backup_*/
 
 # Postman environments (may contain tokens)
 postman/environments/
+
+# REM-102 raw device captures may contain credentials: keep them out of git (the redacted copy is tracked)
+rem102/results/collected.json
+rem102/results/samples/
+rem102/results/discover.json
+rem102/results/probe.json

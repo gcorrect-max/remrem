@@ -1,8 +1,10 @@
 # Wyniki zbierania z urządzenia / Results captured from the device
 
-Tu trafiają wyniki `collect.cmd` / `collect.sh` / `collect.ps1`. W repozytorium nie ma jeszcze żadnej poprawnej odpowiedzi pakietu z prawdziwego urządzenia
-(w `archive/` są zapisy wcześniejszych prób: probe, discover i zbieranie z błędem 404).
-No usable package response from the real device is in the repository yet (`archive/` keeps earlier attempts).
+**Uwaga / Note:** surowe wyniki (`collected.json`, `samples/`, `discover.json`, `probe.json`) mogą zawierać hasła z konfiguracji urządzenia (hosty FTP, APN) i są wyłączone z gita (`.gitignore`) oraz z archiwum zip. Śledzona kopia `collected.redacted.json` ma dane uwierzytelniające zastąpione `<redacted>`; generator czyta surowy plik, a gdy go nie ma – tę kopię, i zawsze usuwa dane uwierzytelniające z dokumentacji.
+Raw results may contain passwords from the device configuration; they are git-ignored and left out of the zip. The tracked `collected.redacted.json` has credentials replaced with `<redacted>`.
+
+Tu trafiają wyniki `collect.cmd` / `collect.sh` / `collect.ps1`. `collected.redacted.json` to pierwsze pełne zbieranie z prawdziwego urządzenia (19.10.2026, Super Admin); w `archive/` są zapisy wcześniejszych prób (probe, discover, zbieranie z błędem 404).
+`collected.redacted.json` is the first full collection from the real device; `archive/` keeps earlier attempts.
 
 Windows (PowerShell):
 

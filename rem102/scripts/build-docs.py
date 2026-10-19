@@ -21,6 +21,7 @@ import csv, html, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAMPLES = os.path.join(ROOT, "results", "samples")
 COLLECTED = os.path.join(ROOT, "results", "collected.json")
+REDACTED = os.path.join(ROOT, "results", "collected.redacted.json")
 if "--samples" in sys.argv:
     SAMPLES = os.path.abspath(sys.argv[sys.argv.index("--samples") + 1])
 if "--collected" in sys.argv:
@@ -35,17 +36,37 @@ TABS = ["home", "monitoring", "setup", "advanced", "features"]
 def req_of(e):
     return [r.split(".", 1)[1] for r in e["requires"].split(";") if r]
 
+SECRET_TAG = re.compile(r"^(user|usr|username|password|passwd|pass|pwd|psw|psk|secret)\d*$", re.I)
+
+def redact(node):
+    """Replaces the value of credential fields (user names and passwords in the device's {tag,value} items) in place."""
+    if isinstance(node, list):
+        for x in node:
+            redact(x)
+    elif isinstance(node, dict):
+        if SECRET_TAG.match(str(node.get("tag", ""))) and node.get("value") not in (None, ""):
+            node["value"] = "<redacted>"
+        for v in node.values():
+            if isinstance(v, (list, dict)):
+                redact(v)
+    return node
+
 _collected = None
-if os.path.isfile(COLLECTED):
-    with open(COLLECTED, encoding="utf-8-sig") as f:
-        _collected = json.load(f)
+_src = COLLECTED if os.path.isfile(COLLECTED) else (REDACTED if os.path.isfile(REDACTED) else None)
+if _src:
+    with open(_src, encoding="utf-8-sig") as f:
+        _collected = redact(json.load(f))
+    if _src == COLLECTED and "--collected" not in sys.argv:
+        # the tracked, shareable copy: same data, credentials removed (the raw file stays out of git)
+        with open(REDACTED, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(_collected, f, ensure_ascii=False, separators=(",", ":"))
 
 def load_sample(e):
     """Captured package (envelope with http_status/body) or None. A per-package file wins over collected.json."""
     p = os.path.join(SAMPLES, e["tab"], e["id"] + ".json")
     if os.path.isfile(p):
         with open(p, encoding="utf-8-sig") as f:
-            return json.load(f)
+            return redact(json.load(f))
     d = (_collected or {}).get(e["tab"], {}).get(e["id"])
     return d if isinstance(d, dict) and "http_status" in d else None
 
@@ -59,8 +80,10 @@ def is_ok(d):
     return not is_login_fail(d.get("body"))
 
 def is_login_fail(body):
-    """The device answers a read without a valid session with {"reference":"login","tag":"reply","value":"fail",...}."""
-    return isinstance(body, dict) and str(body.get("value", "")).lower() == "fail"
+    """A read without a valid session is answered with {"reference":"login","tag":"reply","value":"fail",...}.
+    Other replies with value fail (e.g. reference enable_RTP_page) are ordinary answers of the device."""
+    return (isinstance(body, dict) and str(body.get("value", "")).lower() == "fail"
+            and str(body.get("reference", "login")).lower() == "login")
 
 def why_not(d):
     if d is None:
@@ -69,9 +92,20 @@ def why_not(d):
         return "login required"
     return f"HTTP {d.get('http_status')}"
 
+def shorten(node, keep=6, limit=8):
+    """Long lists are cut to the first items plus a marker string, so the examples stay readable."""
+    if isinstance(node, list):
+        items = [shorten(x, keep, limit) for x in node]
+        if len(items) > limit:
+            items = items[:keep] + [f"... ({len(node) - keep} more items omitted)"]
+        return items
+    if isinstance(node, dict):
+        return {k: shorten(v, keep, limit) for k, v in node.items()}
+    return node
+
 def sample_text(d):
     body = d.get("body")
-    return body if isinstance(body, str) else json.dumps(body, indent=2, ensure_ascii=False)
+    return body if isinstance(body, str) else json.dumps(shorten(body), indent=2, ensure_ascii=False)
 
 CSS = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs.css"), encoding="utf-8").read() \
     if os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs.css")) else ""
@@ -178,20 +212,27 @@ L = {
        "setup": ("Setup", "Konfiguracja miernika, interfejsów sieciowych, DHCP i usług."),
        "advanced": ("Advanced", "Czas RTC, konfiguracja i informacje o urządzeniu (model, numer seryjny, wersje, zdarzenia)."),
        "features": ("Features", "Flagi włączenia modułów (<code>en_query</code> z menu).")},
- notes={("advanced", "information_device_settings"): "Model, numer seryjny, numer artykułu i pozostałe dane urządzenia. W menu: show_level 1, write_level 3.",
-        ("advanced", "information_version"): "Wersje oprogramowania.",
+ notes={("advanced", "information_device_settings"): "Model (<code>devname</code>), numer seryjny (<code>sn</code>), numer artykułu (<code>pn</code>, „Product Number”), nazwa hosta, adresy MAC, typ maszyny i urządzeń. W menu: show_level 1, write_level 3.",
+        ("advanced", "information_version"): "Wersje oprogramowania: pola <code>cgi</code>, <code>kernel</code>, <code>ramdisk</code>, <code>storage</code>, <code>t5</code>, <code>p_rnt</code>, <code>u_rnt</code>, <code>dsp_rnt</code>, <code>f_cfg</code>, <code>cksum</code>.",
+        ("home", "archive_2_test_files"): "W próbie z 19.10.2026: HTTP 502 „The CGI was not CGI/1.1 compliant” (GET i POST); to samo zapytanie dla archiwum 1 odpowiada normalnie. Przyczyna nieustalona.",
+        ("monitoring", "rtp100_rtp100_variables"): "Moduł RTP100 jest na tym urządzeniu wyłączony: odpowiedź <code>value: error</code> (<code>reference: get_RTP100_var</code>).",
+        ("monitoring", "rtp100_rtp100_files"): "Moduł RTP100 jest na tym urządzeniu wyłączony: odpowiedź <code>value: error</code>.",
+        ("setup", "rtp100_rtp100_command"): "Moduł RTP100 jest na tym urządzeniu wyłączony: odpowiedź <code>value: error</code> (<code>reference: get_RTP100_cmd_var</code>).",
+        ("setup", "meter_ftp_hosts"): "W odpowiedzi są nazwy użytkowników i hasła hostów FTP; w dokumentacji i w śledzonej kopii wyników zastąpione <code>&lt;redacted&gt;</code>.",
+        ("setup", "mobile_interface_mobile_settings"): "W odpowiedzi są użytkownik i hasło APN; w dokumentacji zastąpione <code>&lt;redacted&gt;</code>.",
+        ("home", "archive_1_test_files"): "W odpowiedzi są użytkownik i hasło FTP; w dokumentacji zastąpione <code>&lt;redacted&gt;</code>.",
         ("advanced", "information_events"): "Odpowiada bez logowania (próba z 19.10.2026). Pole „set” w menu to formularz wyboru daty (<code>datetime</code>, rok/miesiąc/dzień) – filtr, nie zapis ustawień.",
         ("home", "ch_a_measures"): "Pole „set” w menu to formularz wyboru godziny/daty (skrypt <code>measure.js</code>) – filtr, nie zapis ustawień.",
         ("home", "ch_b_measures"): "Pole „set” w menu to formularz wyboru godziny/daty (skrypt <code>measure.js</code>) – filtr, nie zapis ustawień.",
         ("monitoring", "network_interfaces_mobile"): "Odpowiada bez logowania (próba z 19.10.2026).",
         ("setup", "meter_settings"): "Ustawienia miernika (rem.cgi, nie mpc105.cgi).",
         ("setup", "meter_calibration"): "Odczyt pamięci współdzielonej; w menu show_level 3 (Super Admin).",
-        ("features", "rtp100"): "Odpowiedź to tablica obiektów; <code>{\"type\":\"enable\",\"value\":\"true\"}</code> oznacza włączony moduł (reguła ze skryptu strony)."},
+        ("features", "rtp100"): "Na tym urządzeniu moduł RTP100 jest wyłączony: <code>{\"reference\":\"enable_RTP_page\",\"tag\":\"reply\",\"value\":\"fail\"}</code>. To nie jest odpowiedź „wymagane logowanie” (<code>reference</code> ≠ <code>login</code>). Gdy moduł jest włączony, odpowiedź zawiera element <code>{\"type\":\"enable\",\"value\":\"true\"}</code> (reguła ze skryptu strony)."},
  sections=[
  ("overview", "Wprowadzenie", """
 Opis zapytań CGI, którymi interfejs WWW urządzenia **REM-102** (serwer Boa, strona producenta HaslerRail) pobiera dane. Lista pochodzi z plików, które urządzenie samo udostępnia (`Config/*.json`), odczytanych skryptem `collect.ps1 -Discover`. Uwzględnione są wyłącznie zapytania odczytowe.
 
-> **Status (19.10.2026).** Logowanie, nazwy CGI, ciasteczko sesji, poziomy dostępu i format odpowiedzi pochodzą ze skryptów strony urządzenia (`Script/*.js`). Pierwsze prawdziwe odpowiedzi mamy tylko dla pakietów, które odpowiadają **bez logowania** (2 z 66). Logowanie nie powiodło się (odrzucone hasło), więc reszta pakietów zwróciła odpowiedź „wymagane logowanie” – patrz „Przykłady odpowiedzi”.
+> @STATUS@
 
 Adres bazowy: `http://<HOST>` (domyślnie `192.168.128.1`, port 80). Urządzenie udostępnia cztery pliki CGI:
 
@@ -215,7 +256,27 @@ Wszystko jednym poleceniem (bez wylogowania), z nagłówkiem przed każdą odpow
 @ONE@
 ```
 
-Uwagi: `--data-urlencode` koduje hasło tak, jak robi to formularz strony (znaki `@`, `!`, `&` są bezpieczne). W PowerShellu `curl` jest aliasem `Invoke-WebRequest`: używaj `curl.exe` albo skryptu `collect.cmd` (patrz „Skrypty”). Zła para poziom/hasło zwraca `{"value":"fail"}`.
+Uwagi: `--data-urlencode` koduje hasło tak, jak robi to formularz strony (znaki `@`, `!`, `&` są bezpieczne). W PowerShellu `curl` jest aliasem `Invoke-WebRequest`: używaj `curl.exe` albo skryptu `collect.cmd` (patrz „Skrypty”). Złe hasło zwraca `{ "reference":"login", ..., "value":"fail" }`.
+
+### Gdzie w odpowiedzi są model, numer seryjny i numer artykułu
+
+Odpowiedź kroku 2 (`advanced.information_device_settings`) to tablica elementów `{type, tag, label, value}`. Interesujące pola wybiera się po `tag`:
+
+| Dane | `tag` | `label` urządzenia |
+|---|---|---|
+| Model (nazwa urządzenia) | `devname` | Device Name |
+| Numer seryjny | `sn` | Serial Number |
+| Numer artykułu | `pn` | Product Number |
+| Nazwa hosta | `hostname` | Local Hostname |
+| Adresy MAC | `ethaddr`, `eth1addr`, `eth2addr` | MAC ethernet 0 / 1 / 2 |
+| Typ maszyny i urządzeń | `machine`, `widev`, `gpsdev`, `mdmdev` | Machine Type, Wifi / GPS / Modem device |
+
+Wersje oprogramowania (krok 3, `advanced.information_version`) są w polach `kernel`, `ramdisk`, `storage`, `t5`, `p_rnt`, `u_rnt`, `dsp_rnt`, `f_cfg`, `cksum`. Wypisanie podstawowych danych jednym poleceniem:
+
+```bash
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302" \\
+  | jq -r '.[] | select(.tag=="devname" or .tag=="sn" or .tag=="pn") | "\\(.label): \\(.value)"'
+```
 """),
  ("auth", "Logowanie i poziomy dostępu", """
 Logowanie wykonuje formularz strony (`Script/mainParent.js`): `POST /cgi-bin/mpc105.cgi` z polami formularza:
@@ -249,7 +310,11 @@ Odpowiedzi CGI to JSON, ale z nagłówkiem `Content-type: text/html`. Format wyn
 { "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }
 ```
 
-Taką odpowiedź (HTTP 200) dostaje zapytanie bez ważnej sesji, a także nieudane logowanie. Skrypty zbierające liczą ją jako „wymagane logowanie”, nie jako dane.
+Taką odpowiedź (HTTP 200) dostaje zapytanie bez ważnej sesji, a także nieudane logowanie. Skrypty zbierające liczą ją jako „wymagane logowanie”, nie jako dane. Poprawne logowanie zwraca ten sam kształt z `"value":"ok"` i ustawia ciasteczko `CGISESSID`.
+
+### Inne odpowiedzi „reply”
+
+Gdy moduł jest niedostępny, urządzenie zwraca obiekt tego samego kształtu z innym `reference`: np. `{"reference":"enable_RTP_page","tag":"reply","value":"fail",...}` (moduł RTP100 wyłączony) albo `{"reference":"get_RTP100_var","tag":"reply","value":"error",...}`. Tylko `reference: login` oznacza „wymagane logowanie”.
 
 ### Lista pól (strony default.html, eth.html)
 
@@ -259,13 +324,13 @@ Tablica obiektów z polami `type`, `reference`, `tag`, `label`, `color`, `option
 
 Tablica: elementy `{"type":"head","column_no":N,"column_name":"..."}` opisują kolumny, a element `{"type":"data","events":[...]}` zawiera wiersze z polami `ID`, `DATATIME`, `CODE`, `USER`, `DESCRIPTION`, `TIMET`. Prawdziwy przykład poniżej.
 
-### Tabele archiwów (`home.archive_*`)
+### Tabele (`home.ch_*_measures`, archiwa)
 
-Według `tableMultiColPag.js`: element `{"type":"header","table_head":[{column_no, column_label, column_name, cell_type, method}]}` i wiersze w `table_rows`. Bez prawdziwej odpowiedzi.
+Tablica z dwoma elementami: `{"type":"header","table_head":[{column_no, column_name, column_label}]}` opisuje kolumny, a `{"type":"data","table_rows":[{...}]}` zawiera wiersze (dla pomiarów: `ID`, `DATA`, `TIMET`, `EAP`, `ENP`, `ERP`, `ERNP`; wiersze co 15 s, od najnowszego). Prawdziwy przykład: `home.ch_a_measures` (skrócony w dokumentacji).
 
 ### Odczyty pamięci (`query=7&...`)
 
-Pakiety Meter Status, Energy i Digital IO to tablice obiektów z polami `tag`, `label`, `value`, `color`; strony rozpoznają `tag` (np. w `energy.js` pola mocy, napięcia, prądu i energii). Bez prawdziwej odpowiedzi.
+Prawdziwa odpowiedź (`home.summary_meter_status`, `home.ch_a_energy`, `home.digital_io`): tablica elementów `{"type":"text","reference":"energy","tag":"remshm_<block_offset>_<przesunięcie>","label":<tag>,"color","options","value"}`. Kolejne pola leżą co 32 bajty (`string_size=32`), wartości są tekstami; znaczenie pola wynika z jego położenia (strony mapują `tag` na opisy).
 """),
  ("response", "Format wyniku skryptów", """
 Skrypty zbierające zwracają jeden obiekt JSON: `device` (metadane), `login` (wynik logowania) i klucz na zakładkę z pakietami po `id`.
@@ -381,11 +446,11 @@ Get Package.vim
 Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` (poziom konta) i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
 """),
  ("assumptions", "Założenia i do sprawdzenia", """
-Ustalone z plików WWW urządzenia i z prawdziwych odpowiedzi (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd`, ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`, separator `~` zamieniany na `&`, format odpowiedzi „wymagane logowanie”, pola „set” przy zdarzeniach i pomiarach to filtry daty (nie zapis).
+Ustalone z plików WWW urządzenia i z prawdziwych odpowiedzi (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd` (potwierdzone zalogowaniem jako Super Admin), ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`, separator `~` zamieniany na `&`, format odpowiedzi „wymagane logowanie”, pola „set” przy zdarzeniach i pomiarach to filtry daty (nie zapis).
 
-1. **Hasło.** Ostatnie logowanie (poziom 3) zostało odrzucone; dopóki nie ma ważnej sesji, 64 z 66 pakietów zwraca „wymagane logowanie”.
-2. **Treść pozostałych odpowiedzi.** Znamy prawdziwe odpowiedzi tylko dla `monitoring.network_interfaces_mobile` i `advanced.information_events`.
-3. **Poziomy dostępu.** `show_level` rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu; do sprawdzenia na kontach Admin i User.
+1. **Konta Admin i User.** Zbieranie wykonano jako Super Admin (poziom 3). Czy `show_level` i `write_level` działają jak opisano i które pakiety są dostępne niższym poziomom – do sprawdzenia.
+2. **`home.archive_2_test_files`** zwraca 502 (GET i POST), a to samo zapytanie dla archiwum 1 działa; przyczyna nieustalona.
+3. **Moduł RTP100** jest na tym urządzeniu wyłączony; jego odpowiedzi (`value: error` / `fail`) opisują brak modułu, a nie format danych. Na urządzeniu z włączonym RTP100 trzeba je zebrać ponownie.
 4. **Odpowiedź 502 „The CGI was not CGI/1.1 compliant”** pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach nie występuje.
 """),
  ]),
@@ -401,20 +466,27 @@ Ustalone z plików WWW urządzenia i z prawdziwych odpowiedzi (nie są już zał
        "setup": ("Setup", "Meter, network interface, DHCP and service configuration."),
        "advanced": ("Advanced", "RTC time, configuration and device information (model, serial number, versions, events)."),
        "features": ("Features", "Module enable flags (<code>en_query</code> from the menu).")},
- notes={("advanced", "information_device_settings"): "Model, serial number, article number and other device data. In the menu: show_level 1, write_level 3.",
-        ("advanced", "information_version"): "Software versions.",
+ notes={("advanced", "information_device_settings"): "Model (<code>devname</code>), serial number (<code>sn</code>), article number (<code>pn</code>, “Product Number”), hostname, MAC addresses, machine and device types. In the menu: show_level 1, write_level 3.",
+        ("advanced", "information_version"): "Software versions: fields <code>cgi</code>, <code>kernel</code>, <code>ramdisk</code>, <code>storage</code>, <code>t5</code>, <code>p_rnt</code>, <code>u_rnt</code>, <code>dsp_rnt</code>, <code>f_cfg</code>, <code>cksum</code>.",
+        ("home", "archive_2_test_files"): "In the run of 19 Oct 2026: HTTP 502 “The CGI was not CGI/1.1 compliant” (GET and POST); the same query for archive 1 answers normally. Cause not established.",
+        ("monitoring", "rtp100_rtp100_variables"): "The RTP100 module is disabled on this device: reply <code>value: error</code> (<code>reference: get_RTP100_var</code>).",
+        ("monitoring", "rtp100_rtp100_files"): "The RTP100 module is disabled on this device: reply <code>value: error</code>.",
+        ("setup", "rtp100_rtp100_command"): "The RTP100 module is disabled on this device: reply <code>value: error</code> (<code>reference: get_RTP100_cmd_var</code>).",
+        ("setup", "meter_ftp_hosts"): "The reply holds FTP host user names and passwords; they are replaced with <code>&lt;redacted&gt;</code> in the documentation and in the tracked copy of the results.",
+        ("setup", "mobile_interface_mobile_settings"): "The reply holds the APN user and password; replaced with <code>&lt;redacted&gt;</code> in the documentation.",
+        ("home", "archive_1_test_files"): "The reply holds the FTP user and password; replaced with <code>&lt;redacted&gt;</code> in the documentation.",
         ("advanced", "information_events"): "Answers without a login (run of 19 Oct 2026). The menu's “set” field is a date picker form (<code>datetime</code>, year/month/day) – a filter, not a settings write.",
         ("home", "ch_a_measures"): "The menu's “set” field is an hour/date picker form (script <code>measure.js</code>) – a filter, not a settings write.",
         ("home", "ch_b_measures"): "The menu's “set” field is an hour/date picker form (script <code>measure.js</code>) – a filter, not a settings write.",
         ("monitoring", "network_interfaces_mobile"): "Answers without a login (run of 19 Oct 2026).",
         ("setup", "meter_settings"): "Meter settings (rem.cgi, not mpc105.cgi).",
         ("setup", "meter_calibration"): "Shared-memory read; show_level 3 in the menu (Super Admin).",
-        ("features", "rtp100"): "The reply is an array of objects; <code>{\"type\":\"enable\",\"value\":\"true\"}</code> means the module is enabled (rule from the page's script)."},
+        ("features", "rtp100"): "On this device the RTP100 module is disabled: <code>{\"reference\":\"enable_RTP_page\",\"tag\":\"reply\",\"value\":\"fail\"}</code>. This is not the “login required” reply (<code>reference</code> ≠ <code>login</code>). When the module is enabled, the reply contains an item <code>{\"type\":\"enable\",\"value\":\"true\"}</code> (rule from the page script)."},
  sections=[
  ("overview", "Overview", """
 Description of the CGI requests that the web interface of the **REM-102** device (Boa server, vendor page by HaslerRail) uses to fetch data. The list comes from files the device serves itself (`Config/*.json`), read with `collect.ps1 -Discover`. Only read requests are included.
 
-> **Status (19 Oct 2026).** The login, CGI names, session cookie, access levels and reply format come from the device page's own scripts (`Script/*.js`). Real responses so far exist only for the packages that answer **without a login** (2 of 66). The login failed (password rejected), so the other packages returned the “login required” reply – see “Response examples”.
+> @STATUS@
 
 Base URL: `http://<HOST>` (default `192.168.128.1`, port 80). The device exposes four CGI files:
 
@@ -438,7 +510,27 @@ Everything in one command (no logout), with a header before each response:
 @ONE@
 ```
 
-Notes: `--data-urlencode` encodes the password the way the page's form does (`@`, `!`, `&` are safe). In PowerShell `curl` is an alias of `Invoke-WebRequest`: use `curl.exe` or the `collect.cmd` script (see “Scripts”). A wrong level/password pair returns `{"value":"fail"}`.
+Notes: `--data-urlencode` encodes the password the way the page's form does (`@`, `!`, `&` are safe). In PowerShell `curl` is an alias of `Invoke-WebRequest`: use `curl.exe` or the `collect.cmd` script (see “Scripts”). A wrong password returns `{ "reference":"login", ..., "value":"fail" }`.
+
+### Where the model, serial number and article number are in the reply
+
+The reply of step 2 (`advanced.information_device_settings`) is an array of `{type, tag, label, value}` items. Pick the fields you want by `tag`:
+
+| Data | `tag` | Device `label` |
+|---|---|---|
+| Model (device name) | `devname` | Device Name |
+| Serial number | `sn` | Serial Number |
+| Article number | `pn` | Product Number |
+| Hostname | `hostname` | Local Hostname |
+| MAC addresses | `ethaddr`, `eth1addr`, `eth2addr` | MAC ethernet 0 / 1 / 2 |
+| Machine and device types | `machine`, `widev`, `gpsdev`, `mdmdev` | Machine Type, Wifi / GPS / Modem device |
+
+Software versions (step 3, `advanced.information_version`) are in the fields `kernel`, `ramdisk`, `storage`, `t5`, `p_rnt`, `u_rnt`, `dsp_rnt`, `f_cfg`, `cksum`. Printing the basic data with one command:
+
+```bash
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302" \\
+  | jq -r '.[] | select(.tag=="devname" or .tag=="sn" or .tag=="pn") | "\\(.label): \\(.value)"'
+```
 """),
  ("auth", "Login and access levels", """
 Login is done by the page's form (`Script/mainParent.js`): `POST /cgi-bin/mpc105.cgi` with the form fields:
@@ -472,7 +564,11 @@ CGI replies are JSON, but with the header `Content-type: text/html`. The format 
 { "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }
 ```
 
-A request without a valid session gets this reply (HTTP 200), and so does a failed login. The collector scripts count it as “login required”, not as data.
+A request without a valid session gets this reply (HTTP 200), and so does a failed login. The collector scripts count it as “login required”, not as data. A successful login returns the same shape with `"value":"ok"` and sets the `CGISESSID` cookie.
+
+### Other “reply” answers
+
+When a module is unavailable, the device returns an object of the same shape with a different `reference`: e.g. `{"reference":"enable_RTP_page","tag":"reply","value":"fail",...}` (RTP100 module disabled) or `{"reference":"get_RTP100_var","tag":"reply","value":"error",...}`. Only `reference: login` means “login required”.
 
 ### Field list (default.html, eth.html pages)
 
@@ -482,13 +578,13 @@ An array of objects with `type`, `reference`, `tag`, `label`, `color`, `options`
 
 An array: items `{"type":"head","column_no":N,"column_name":"..."}` describe the columns, and an item `{"type":"data","events":[...]}` holds rows with `ID`, `DATATIME`, `CODE`, `USER`, `DESCRIPTION`, `TIMET`. A real example is below.
 
-### Archive tables (`home.archive_*`)
+### Tables (`home.ch_*_measures`, archives)
 
-According to `tableMultiColPag.js`: an item `{"type":"header","table_head":[{column_no, column_label, column_name, cell_type, method}]}` and rows in `table_rows`. No real response yet.
+An array with two items: `{"type":"header","table_head":[{column_no, column_name, column_label}]}` describes the columns and `{"type":"data","table_rows":[{...}]}` holds the rows (for measures: `ID`, `DATA`, `TIMET`, `EAP`, `ENP`, `ERP`, `ERNP`; one row every 15 s, newest first). Real example: `home.ch_a_measures` (shortened in the documentation).
 
 ### Memory reads (`query=7&...`)
 
-Meter Status, Energy and Digital IO are arrays of objects with `tag`, `label`, `value`, `color`; the pages key on `tag` (e.g. power, voltage, current and energy fields in `energy.js`). No real response yet.
+Real reply (`home.summary_meter_status`, `home.ch_a_energy`, `home.digital_io`): an array of `{"type":"text","reference":"energy","tag":"remshm_<block_offset>_<offset>","label":<tag>,"color","options","value"}` items. Consecutive fields are 32 bytes apart (`string_size=32`), values are strings; the meaning of a field follows from its position (the pages map `tag` to descriptions).
 """),
  ("response", "Result format of the scripts", """
 The collector scripts return one JSON object: `device` (metadata), `login` (login result) and a key per tab with packages keyed by `id`.
@@ -604,11 +700,11 @@ Get Package.vim
 Each package only needs its own cluster typedef, with no separate instance. Until you know the real responses, use a `Get Package (Raw).vi` that returns just the string. Build the typedefs from samples collected with the script on a real device. Before reading, check the `min_level` (account level) and `requires` columns in the tsv (the `features.*` package tells whether the module is enabled).
 """),
  ("assumptions", "Assumptions and open points", """
-Established from the device's own web files and from real responses (no longer assumptions): login `query=120` with the `login` (level) and `pwd` fields, the `CGISESSID` cookie, reads over GET with JSON replies, the `.cgi` CGI names, the request list from `Config/*.json`, the `~` separator being replaced by `&`, the “login required” reply format, and the “set” fields of events and measures being date filters (not writes).
+Established from the device's own web files and from real responses (no longer assumptions): login `query=120` with the `login` (level) and `pwd` fields (confirmed by logging in as Super Admin), the `CGISESSID` cookie, reads over GET with JSON replies, the `.cgi` CGI names, the request list from `Config/*.json`, the `~` separator being replaced by `&`, the “login required” reply format, and the “set” fields of events and measures being date filters (not writes).
 
-1. **Password.** The last login (level 3) was rejected; until there is a valid session, 64 of 66 packages return “login required”.
-2. **Content of the other replies.** Real replies are known only for `monitoring.network_interfaces_mobile` and `advanced.information_events`.
-3. **Access levels.** `show_level` is understood as the minimum user level needed to show the menu entry; to be checked with the Admin and User accounts.
+1. **Admin and User accounts.** The collection was made as Super Admin (level 3). Whether `show_level` and `write_level` behave as described and which packages are available to lower levels is to be checked.
+2. **`home.archive_2_test_files`** returns 502 (GET and POST) while the same query for archive 1 works; the cause is not established.
+3. **The RTP100 module** is disabled on this device; its replies (`value: error` / `fail`) describe the missing module, not the data format. They must be collected again on a device with RTP100 enabled.
 4. **The 502 “The CGI was not CGI/1.1 compliant” reply** appeared for non-existent query numbers in the old list; with correct queries it does not occur.
 """),
  ]),
@@ -628,9 +724,24 @@ def seq_text(code):
                     logout="logout (optional)")}[code]
     return SEQ % t
 
+def status_text(code):
+    have = [load_sample(e) for e in eps]
+    n_ok = sum(1 for d in have if is_ok(d))
+    n_login = sum(1 for d in have if d is not None and is_login_fail(d.get("body")))
+    n_bad = sum(1 for d in have if d is not None and not is_ok(d) and not is_login_fail(d.get("body")))
+    when = ((_collected or {}).get("device") or {}).get("collected_at", "")[:10]
+    ok_login = bool(((_collected or {}).get("login") or {}).get("ok"))
+    if code == "pl":
+        return (f"**Status ({when or 'brak danych'}).** Logowanie, nazwy CGI, ciasteczko sesji, poziomy dostępu i format odpowiedzi pochodzą ze skryptów strony urządzenia (`Script/*.js`). "
+                f"Ostatnie zbieranie z urządzenia ({'zalogowano' if ok_login else 'bez ważnego logowania'}): **{n_ok} z {len(eps)}** pakietów zwróciło odpowiedź, {n_login} wymagało logowania, {n_bad} zakończyło się błędem HTTP. "
+                "Dane uwierzytelniające (użytkownicy i hasła w konfiguracji) są w dokumentacji zastąpione `<redacted>`.")
+    return (f"**Status ({when or 'no data'}).** The login, CGI names, session cookie, access levels and reply format come from the device page's own scripts (`Script/*.js`). "
+            f"The latest collection from the device ({'logged in' if ok_login else 'no valid login'}): **{n_ok} of {len(eps)}** packages returned a reply, {n_login} needed a login, {n_bad} ended with an HTTP error. "
+            "Credentials (user names and passwords in the configuration) are replaced with `<redacted>` in the documentation.")
+
 def section_md(code, sid):
     body = dict((s[0], s[2]) for s in L[code]["sections"])[sid].strip("\n")
-    return body.replace("@SEQ@", seq_text(code)).replace("@ONE@", ONELINER)
+    return body.replace("@SEQ@", seq_text(code)).replace("@ONE@", ONELINER).replace("@STATUS@", status_text(code))
 
 def build_html(code):
     T = L[code]; U = T["ui"]
@@ -792,8 +903,9 @@ def build_index():
             h += f'<tr><td>{name}</td><td>{desc}</td><td>{st}</td></tr>'
         return f'<div class="tablewrap"><table>{h}</table></div>'
     out_rows = [
-        ("results/collected.json", "wszystko z jednego uruchomienia w jednym pliku: <code>device</code>, <code>login</code>, pakiety. <strong>To wystarczy przekazać dalej.</strong>", status("results/collected.json")),
-        ("results/samples/<zakładka>/<id>.json", "ten sam wynik rozbity na pakiety; z nich generator wstawia przykłady do dokumentacji", status("results/samples")),
+        ("results/collected.redacted.json", "wynik zbierania bez danych uwierzytelniających (tu czyta generator, jeśli nie ma surowego pliku)", status("results/collected.redacted.json")),
+        ("results/collected.json", "surowy wynik zbierania (<strong>poza gitem</strong>, może zawierać hasła; to wystarczy przekazać dalej)", status("results/collected.json")),
+        ("results/samples/<zakładka>/<id>.json", "ten sam wynik rozbity na pakiety (surowy, poza gitem)", status("results/samples")),
         ("results/collect.log", "log przebiegu: numer, nazwa pakietu, kod HTTP, rozmiar (bez hasła)", status("results/collect.log")),
         ("results/discover.json", "wynik <code>-Discover</code>: własne pliki WWW urządzenia (strony, skrypty JS, <code>Config/*.json</code>)", status("results/discover.json")),
         ("results/archive/", "zachowane wyniki wcześniejszych uruchomień na urządzeniu (probe, discover, nieudane próby)", status("results/archive")),
@@ -830,7 +942,7 @@ def build_index():
 <main style="margin:0 auto">
 <h1>REM-102 – odczyt informacji o urządzeniu</h1>
 <p class="lead">Strona prowadząca do wątku, w którym powstał ten zestaw: <a href="{SESSION_URL}">{SESSION_URL}</a></p>
-<div class="callout"><strong>Stan (19.10.2026):</strong> znamy prawdziwe API urządzenia i format odpowiedzi (z jego własnych plików WWW), a logowanie poziomem i hasłem jest zaimplementowane. Prawdziwe odpowiedzi mamy dla {captured} z {len(eps)} pakietów (te, które odpowiadają bez logowania). <strong>Hasło dla poziomu Super Admin zostało odrzucone</strong>, więc reszta wymaga poprawnego hasła.</div>
+<div class="callout"><strong>Stan (19.10.2026):</strong> zalogowano jako Super Admin i pobrano pakiety z prawdziwego urządzenia: poprawne odpowiedzi ma <strong>{captured} z {len(eps)}</strong> pakietów. Dane identyfikacyjne (model, numer seryjny, numer artykułu) są w <code>advanced.information_device_settings</code>. Moduł RTP100 jest na tym urządzeniu wyłączony, a <code>home.archive_2_test_files</code> zwraca 502. Hasła z konfiguracji urządzenia są w dokumentacji zastąpione <code>&lt;redacted&gt;</code>.</div>
 
 <h2>Cel</h2>
 <p>Pełny opis podłączonego urządzenia REM-102 (model, numer seryjny, numer artykułu i reszta informacji z zakładek Home, Monitoring, Setup, Advanced) pobierany przez CGI, razem z dokumentacją tych zapytań i danymi do użycia w LabVIEW.</p>
@@ -841,8 +953,10 @@ def build_index():
 <li><strong>Pliki menu z pierwotnego zestawu były z innej wersji firmware.</strong> To urządzenie używa CGI <code>.cgi</code> (nie <code>.fcgi</code>), a lista zapytań jest inna: kanały A/B, archiwa, Ethernet 2, WLAN, HDLC i inne. Dlatego <code>-Discover</code> pobrał jego własne <code>Config/*.json</code>, a z nich odtworzono listę ({len(eps)} pakietów).</li>
 <li><strong>Logowanie nie używa nazwy użytkownika.</strong> Formularz wysyła <code>query=120&amp;login=&lt;1|2|3&gt;&amp;pwd=&lt;hasło&gt;</code> (User, Admin, Super Admin) do <code>/cgi-bin/mpc105.cgi</code>. Sesję niesie ciasteczko <code>CGISESSID</code>, błąd to <code>{{"value":"fail"}}</code>.</li>
 <li><strong>Wcześniejsze 404 i 502:</strong> pierwotne zapytania szły na nieistniejące <code>.fcgi</code> (404); <code>rem.cgi</code> z nieznanym numerem zapytania daje 502 „The CGI was not CGI/1.1 compliant”. Biblioteka HTTP z PowerShella nie radziła sobie z odpowiedzią <code>mpc105.cgi</code> (kod 0), dlatego <code>collect.ps1</code> mówi teraz surowym HTTP przez TCP.</li>
-<li><strong>Logowanie (19.10.2026):</strong> urządzenie przyjęło żądanie (<code>login=3</code>; w dzienniku zdarzeń: użytkownik <code>superadmin</code>, „Login unauthorized”), ale odrzuciło hasło. Odpowiedź to <code>{{"reference":"login","tag":"reply","label":"reply","value":"fail","execute":"","cancel":""}}</code>. Każda taka próba jest zapisywana w dzienniku zdarzeń.</li>
-<li><strong>Bez logowania odpowiadają tylko dwa pakiety:</strong> <code>monitoring.network_interfaces_mobile</code> (<code>mpc105.cgi?query=13</code>) i <code>advanced.information_events</code> (<code>?query=314</code>); to pierwsze prawdziwe odpowiedzi w dokumentacji. Pozostałe 64 zwróciły odpowiedź „wymagane logowanie”.</li>
+<li><strong>Logowanie (19.10.2026):</strong> poziom 3 (Super Admin) z hasłem zadziałał: odpowiedź <code>{{"reference":"login","tag":"reply","value":"ok",...}}</code> i ciasteczko <code>CGISESSID</code> (poziom z ciasteczka = 3). Wcześniejsza próba z innym hasłem została odrzucona (<code>value: fail</code>) i zapisała się w dzienniku zdarzeń jako „Login unauthorized”.</li>
+<li><strong>Pobrano 65 z 66 pakietów</strong>, w tym wszystkie dane identyfikacyjne: model <code>devname</code>, numer seryjny <code>sn</code>, numer artykułu <code>pn</code> („Product Number”), wersje oprogramowania (<code>advanced.information_version</code>). Bez logowania odpowiadały tylko <code>monitoring.network_interfaces_mobile</code> i <code>advanced.information_events</code>.</li>
+<li><strong>Dane uwierzytelniające w odpowiedziach:</strong> konfiguracja zawiera użytkowników i hasła (hosty FTP, APN). Surowy plik <code>results/collected.json</code> jest wyłączony z gita; śledzona kopia <code>results/collected.redacted.json</code> i dokumentacja mają je zastąpione <code>&lt;redacted&gt;</code>.</li>
+<li><strong>Do wyjaśnienia:</strong> <code>home.archive_2_test_files</code> (502 „CGI not CGI/1.1 compliant”, archiwum 1 działa) oraz moduł RTP100 (wyłączony: <code>value: error</code> / <code>fail</code>).</li>
 <li><strong>Z pobranych stron i skryptów:</strong> separator <code>~</code> jest zamieniany na <code>&amp;</code>; pola „set” przy zdarzeniach i pomiarach to filtry daty, nie zapis; format odpowiedzi to tablice obiektów <code>type/tag/label/value</code> (szczegóły w dokumentacji).</li>
 <li>Zapisy z tych prób są w <code>results/archive/</code>: <a href="results/archive/probe-2026-10-18.json">probe</a>, <a href="results/archive/discover-2026-10-18.json">discover</a>, <a href="results/archive/collected-2026-10-18_all-404.json">pierwsze zbieranie (wszystko 404)</a>.</li>
 </ul>
@@ -874,8 +988,10 @@ def build_index():
 {done("Odtworzyć listę zapytań z <code>Config/*.json</code> urządzenia, przepisać skrypty i dokumentację")}
 {done("Pobrać strony <code>*.html</code> i skrypty urządzenia (<code>-Discover</code>): separator <code>~</code>, format odpowiedzi, filtry daty")}
 {done("Pierwsze prawdziwe odpowiedzi (bez logowania): mobile i zdarzenia")}
-{todo("Ustalić poprawne hasło dla poziomu Super Admin (najlepiej przez stronę w przeglądarce) i sprawdzić je jedną próbą: <code>collect.cmd -Level 3 -LoginTest</code>")}
-{todo("Uruchomić <code>collect.cmd</code> z poprawnym hasłem – pozostałe 64 pakiety (<code>results\\collected.json</code>) i przekazać plik")}
+{done("Zalogować się jako Super Admin i pobrać pakiety (65 z 66); wyciągnąć model, numer seryjny i numer artykułu")}
+{done("Zabezpieczyć dane uwierzytelniające: surowe wyniki poza gitem, śledzona kopia i dokumentacja z <code>&lt;redacted&gt;</code>")}
+{todo("Wyjaśnić 502 dla <code>home.archive_2_test_files</code> (GET i POST) – archiwum 1 odpowiada normalnie")}
+{todo("Powtórzyć zbieranie na koncie Admin i User – które pakiety są dostępne niższym poziomom (<code>min_level</code>)")}
 {todo("Sprawdzić <code>collect.ps1</code> w Windows PowerShell 5.1 (testowano w PowerShell 7 na atrapie)")}
 {todo("Potwierdzić format odpowiedzi poszczególnych pakietów i poziomy dostępu (<code>min_level</code>)")}
 {todo("Potwierdzić, że odczyt <code>advanced.information_events</code> i <code>home.ch_*_measures</code> jest bezpieczny – w menu to samo zapytanie służy też do zapisu")}

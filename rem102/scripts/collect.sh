@@ -147,7 +147,7 @@ while IFS=$'\t' read -r name tab id request label; do
                   --argjson e "$entry" '{tab:$tab, id:$id, label:$label, cgi:$cgi, query:$query} + $e')"
   printf '%s\n' "$entry" >> "$ENTRIES"
   code="$(jq -r .http_status <<<"$entry")"
-  if jq -e '(.body | type == "object") and ((.body.value // "") | ascii_downcase) == "fail"' <<<"$entry" >/dev/null 2>&1; then AUTHFAIL=$((AUTHFAIL+1)); note="${note}  WYMAGANE LOGOWANIE (value=fail)"
+  if jq -e '(.body | type == "object") and ((.body.value // "") | ascii_downcase) == "fail" and ((.body.reference // "login") | ascii_downcase) == "login"' <<<"$entry" >/dev/null 2>&1; then AUTHFAIL=$((AUTHFAIL+1)); note="${note}  WYMAGANE LOGOWANIE (value=fail)"
   elif [[ "$code" =~ ^2 ]]; then OK=$((OK+1)); else BAD=$((BAD+1)); fi
   log "[$N/$TOTAL] $name  HTTP ${code}  ${bytes} B${note}"
   [ "$DELAY" != 0 ] && sleep "$DELAY"

@@ -260,7 +260,9 @@ function RespJson($r) {
 function IsAuthFail([string]$body) {
   try {
     $o = ConvertFrom-Json -InputObject $body
-    return (($o -is [pscustomobject]) -and ($o.PSObject.Properties.Name -contains 'value') -and (([string]$o.value) -ieq 'fail'))
+    $isFail = ($o -is [pscustomobject]) -and ($o.PSObject.Properties.Name -contains 'value') -and (([string]$o.value) -ieq 'fail')
+    $ref = 'login'; if ($isFail -and ($o.PSObject.Properties.Name -contains 'reference')) { $ref = [string]$o.reference }
+    return ($isFail -and ($ref -ieq 'login'))
   } catch { return $false }
 }
 
