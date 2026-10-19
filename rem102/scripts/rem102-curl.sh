@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# REM-102: login -> read the device data -> logout, with plain curl calls.
+# REM-102: login -> read the device data -> end of session, with plain curl calls.
 #
 # Usage:   ./rem102/scripts/rem102-curl.sh <user> <password> [host]
 #   user   = User | Admin | Super Admin  (or the level 1 | 2 | 3)
@@ -13,7 +13,8 @@
 #   login   POST /cgi-bin/mpc105.cgi   query=120 & login=<level> & pwd=<password>   -> cookie CGISESSID
 #   data    GET  /cgi-bin/mpc105.cgi?query=302   device settings: devname (model), sn, pn (article no.), hostname, MAC...
 #           GET  /cgi-bin/mpc105.cgi?query=301   software versions
-#   logout  GET  /cgi-bin/mpc105j.cgi?query=122  (taken from the page's scripts; not yet run against the device)
+#   end     there is no logout call: the page's logout CGI (mpc105j.cgi?query=122) returns 404 on this device,
+#           and the page itself only drops the cookie; this script does the same (nothing is kept)
 set -u
 
 USER_ARG="${1:?usage: $0 <user: User|Admin|Super Admin|1|2|3> <password> [host]}"
@@ -57,5 +58,4 @@ fi
 echo "== 3. software versions"
 curl -sS -w '\n' -H "$COOKIE" "$BASE/cgi-bin/mpc105.cgi?query=301"
 
-echo "== 4. logout"
-curl -sS -w '\n' -H "$COOKIE" "$BASE/cgi-bin/mpc105j.cgi?query=122"
+echo "== 4. end of session (the device has no working logout CGI; the session cookie is simply dropped)"

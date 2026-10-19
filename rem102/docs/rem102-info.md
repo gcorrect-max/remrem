@@ -13,7 +13,7 @@ Adres bazowy: `http://<HOST>` (domyślnie `192.168.128.1`, port 80). Urządzenie
 | Plik CGI | Zakres |
 |---|---|
 | `/cgi-bin/mpc105.cgi` | platforma: logowanie, sieć, GPS, modem, RTC, pamięci, informacje o urządzeniu |
-| `/cgi-bin/mpc105j.cgi` | wylogowanie |
+| `/cgi-bin/mpc105j.cgi` | wylogowanie (wg menu; na tym urządzeniu HTTP 404 – nie istnieje) |
 | `/cgi-bin/rem.cgi` | miernik: kanały A/B, energia, archiwa, konfiguracja |
 | `/cgi-bin/rtp.cgi` | RTP100 |
 
@@ -45,8 +45,7 @@ curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/rem.cgi?query=100"
 # 6. stan Ethernet 0 (Monitoring > Network Interfaces)
 curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=3"
 
-# 7. wylogowanie (opcjonalnie)
-curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+# 7. koniec sesji: logout CGI (mpc105j.cgi) zwraca na tym urządzeniu 404, więc wystarczy usunąć ciasteczko
 rm -f "$JAR"
 ```
 
@@ -97,7 +96,7 @@ Logowanie wykonuje formularz strony (`Script/mainParent.js`): `POST /cgi-bin/mpc
 - Odpowiedź to JSON z polem `value`: `"fail"` = złe hasło, `"change"` = trzeba zmienić hasło, inna wartość = zalogowano. Prawdziwa odpowiedź na nieudane logowanie: `{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }`.
 - Każde nieudane logowanie trafia do dziennika zdarzeń urządzenia (`advanced.information_events`: `CODE` 2, `DESCRIPTION` „Login unauthorized”, `USER` np. `superadmin`), więc nie zgaduj haseł wielokrotnie. Skrypty mają tryb samego testu logowania (`-LoginTest` / `REM_LOGIN_TEST=1`).
 - Sesję niesie ciasteczko `CGISESSID`; poziom odczytuje strona z 5. znaku wartości (`A`..`D` = 0..3).
-- Wylogowanie: `GET /cgi-bin/mpc105j.cgi?query=122`, strona kasuje ciasteczko.
+- Wylogowanie: strona wywołuje `GET /cgi-bin/mpc105j.cgi?query=122` i kasuje ciasteczko, ale na tym urządzeniu ten plik nie istnieje (HTTP 404, sprawdzone 19.10.2026). Faktycznym końcem sesji jest więc usunięcie ciasteczka; skrypty tak robią.
 - Strona pokazuje pozycję menu, gdy `show_level` ≤ poziom użytkownika; zapis wymaga `write_level`.
 - Odczyt bez ważnej sesji zwraca tę samą odpowiedź `value: fail` (strona pokazuje wtedy „Needed Authentication”). Bez logowania odpowiadają tylko niektóre zapytania: w próbie z 19.10.2026 `mpc105.cgi?query=13` i `mpc105.cgi?query=314`.
 
@@ -4915,7 +4914,7 @@ python3 rem102/scripts/build-docs.py
 |---|---|
 | `rem.cgi?query=440` | Restore Factory Default – przywraca ustawienia fabryczne |
 | `mpc105.cgi?query=1982` | restart urządzenia |
-| `mpc105j.cgi?query=122` | wylogowanie (kończy sesję) |
+| `mpc105j.cgi?query=122` | wylogowanie – brak na tym urządzeniu (404) |
 | `mpc105.cgi?query=121` | zmiana hasła |
 | `rem.cgi?query=402` | Export (akcja pobrania konfiguracji) |
 | `rem.cgi?query=401`, `mpc105.cgi?query=310` | Import konfiguracji i Firmware Upgrade (upload plików) |
@@ -4928,7 +4927,7 @@ Zbieranie wszystkich pakietów po kolei: `rem102/scripts/collect.sh` (bash, curl
 
 ### Login, odczyt i wylogowanie – gotowe skrypty z parametrami
 
-Użytkownik i hasło podaje się w linii poleceń (`User`, `Admin`, `Super Admin` albo poziom `1`, `2`, `3`). Skrypty wykonują: logowanie, odczyt danych urządzenia (`query=302`) i wersji (`query=301`) oraz wylogowanie.
+Użytkownik i hasło podaje się w linii poleceń (`User`, `Admin`, `Super Admin` albo poziom `1`, `2`, `3`). Skrypty wykonują: logowanie, odczyt danych urządzenia (`query=302`) i wersji (`query=301`) i kończą sesję (usunięcie ciasteczka; logout CGI zwraca na tym urządzeniu 404).
 
 ```bash
 ./rem102/scripts/rem102-curl.sh "Super Admin" 'hasło' [host]
@@ -4948,11 +4947,10 @@ LEVEL=3; PASS='hasło'; HOST=192.168.128.1; JAR=$(mktemp)
 printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
 curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
 curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
-curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
 rm -f "$JAR"
 ```
 
-Wylogowanie (`mpc105j.cgi?query=122`) pochodzi ze skryptów strony i nie było jeszcze uruchomione na urządzeniu.
+Wylogowania nie ma: strona wywołuje `mpc105j.cgi?query=122`, ale na tym urządzeniu zwraca ono 404 – sesję kończy usunięcie ciasteczka (`rm -f "$JAR"`).
 
 ### Linux / macOS / Git Bash
 
@@ -5009,13 +5007,13 @@ Nazwy mają postać `tab.id`, bo samo `id` mogłoby się powtarzać między zak�
 
 ### Najprościej: jedno wywołanie `System Exec`
 
-Jedna linia poleceń wykonuje logowanie, odczyt danych i wylogowanie: `curl` obsługuje kilka zapytań w jednym uruchomieniu i trzyma sesję w pliku ciasteczek, więc nie trzeba wyciągać identyfikatora sesji. Parametry *Format Into String* po kolei: plik ciasteczek (dowolna ścieżka do zapisu, np. w folderze tymczasowym), host, poziom (1/2/3), hasło, plik ciasteczek, host, plik ciasteczek, host.
+Jedna linia poleceń wykonuje logowanie i odczyt danych: `curl` obsługuje kilka zapytań w jednym uruchomieniu i trzyma sesję w pliku ciasteczek, więc nie trzeba wyciągać identyfikatora sesji. Parametry *Format Into String* po kolei: plik ciasteczek (dowolna ścieżka do zapisu, np. w folderze tymczasowym), host, poziom (1/2/3), hasło, plik ciasteczek, host.
 
 ```text
-"C:/Windows/System32/curl.exe" -sS --max-time 20 -w "#END#" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+"C:/Windows/System32/curl.exe" -sS --max-time 20 -w "#END#" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
 ```
 
-*Standard output* podziel na znaczniku `#END#` (*Search and Split String*) na trzy części: (1) odpowiedź logowania (`"value":"ok"` albo `fail`), (2) dane urządzenia (tablica JSON, patrz niżej), (3) odpowiedź wylogowania. Przy złym haśle część (2) zawiera odpowiedź „wymagane logowanie”. Bez wylogowania usuń trzecią grupę (od drugiego `--next`). Hasło ze znakami `%`, `^`, `&` lub `"` może zepsuć linię – wtedy użyj wersji z plikiem hasła poniżej. Sprawdzono z `curl` na atrapie urządzenia.
+*Standard output* podziel na znaczniku `#END#` (*Search and Split String*) na dwie części: (1) odpowiedź logowania (`"value":"ok"` albo `fail`), (2) dane urządzenia (tablica JSON, patrz niżej). Przy złym haśle część (2) zawiera odpowiedź „wymagane logowanie”. Wylogowania nie ma (logout CGI zwraca 404): po odczycie wystarczy usunąć plik ciasteczek. Hasło ze znakami `%`, `^`, `&` lub `"` może zepsuć linię – wtedy użyj wersji z plikiem hasła poniżej. Sprawdzono z `curl` na atrapie urządzenia.
 
 Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Client POST* (treść `query=120&login=3&pwd=<hasło zakodowane URL>`, nagłówek `Content-Type: application/x-www-form-urlencoded`) → *HTTP Client GET* → *HTTP Client Close Handle*. Niesprawdzone z tym urządzeniem.
 
@@ -5039,11 +5037,7 @@ Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Cl
 
    *Standard output* to tablica JSON; *Unflatten From JSON* do tablicy klastra z polami tekstowymi `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Wartość pola znajdziesz po `tag`: `devname` (model), `sn` (numer seryjny), `pn` (numer artykułu). Wersje oprogramowania: to samo wywołanie z `query=301`; dowolny inny pakiet z `rem102-package-requests.txt` – podstaw jego ścieżkę zamiast `/cgi-bin/mpc105.cgi?query=302`.
 
-3. **Logout**:
-
-```text
-"C:/Windows/System32/curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
-```
+3. **Koniec sesji:** logout CGI (`mpc105j.cgi`) zwraca na tym urządzeniu 404, więc nie ma osobnego wywołania; usuń plik ciasteczek lub zapomnij identyfikator sesji.
 
 Uwagi:
 
@@ -5051,7 +5045,7 @@ Uwagi:
 - **Hasło:** zapisz je *Write to Text File* do pliku tymczasowego (bez znaku końca linii), przekaż ścieżkę w `pwd@<plik>` (curl sam koduje wartość) i po logowaniu usuń plik. Dzięki temu znaki specjalne (`%`, `^`, `&`, `"`) nie psują linii poleceń i hasło nie zostaje w wierszu poleceń procesu. Prostsza, ale mniej odporna wersja: `--data-urlencode "pwd=%s"`.
 - **32-bitowy LabVIEW** na 64-bitowym Windows nie widzi `C:/Windows/System32/curl.exe` (przekierowanie do `SysWOW64`). Użyj `C:/Windows/Sysnative/curl.exe` albo dołącz `curl.exe` do aplikacji i podaj jego pełną ścieżkę.
 - Nie używaj przekierowań (`>`) ani potoków (`|`) w linii poleceń; do zapisu do pliku służą opcje curl `-o` i `-D`.
-- Wylogowanie (`mpc105j.cgi?query=122`) pochodzi ze skryptów strony i nie było jeszcze uruchomione na urządzeniu.
+- Wylogowania nie ma: strona wywołuje `mpc105j.cgi?query=122`, ale na tym urządzeniu zwraca ono 404 – sesję kończy usunięcie ciasteczka (`rm -f "$JAR"`).
 
 ### VI polimorficzny
 

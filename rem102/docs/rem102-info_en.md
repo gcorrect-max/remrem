@@ -13,7 +13,7 @@ Base URL: `http://<HOST>` (default `192.168.128.1`, port 80). The device exposes
 | CGI file | Scope |
 |---|---|
 | `/cgi-bin/mpc105.cgi` | platform: login, networking, GPS, modem, RTC, memories, device information |
-| `/cgi-bin/mpc105j.cgi` | logout |
+| `/cgi-bin/mpc105j.cgi` | logout (per the menu; HTTP 404 on this device – it does not exist) |
 | `/cgi-bin/rem.cgi` | meter: channels A/B, energy, archives, configuration |
 | `/cgi-bin/rtp.cgi` | RTP100 |
 
@@ -45,8 +45,7 @@ curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/rem.cgi?query=100"
 # 6. Ethernet 0 state (Monitoring > Network Interfaces)
 curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=3"
 
-# 7. logout (optional)
-curl -sS -w '\n' -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+# 7. end of session: the logout CGI (mpc105j.cgi) returns 404 on this device, so just drop the cookie
 rm -f "$JAR"
 ```
 
@@ -97,7 +96,7 @@ Login is done by the page's form (`Script/mainParent.js`): `POST /cgi-bin/mpc105
 - The reply is JSON with a `value` field: `"fail"` = wrong password, `"change"` = the password must be changed, any other value = logged in. The real reply to a failed login: `{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }`.
 - Every failed login is recorded in the device's event log (`advanced.information_events`: `CODE` 2, `DESCRIPTION` “Login unauthorized”, `USER` e.g. `superadmin`), so do not guess passwords repeatedly. The scripts have a login-only test mode (`-LoginTest` / `REM_LOGIN_TEST=1`).
 - The session is carried by the `CGISESSID` cookie; the page reads the level from the 5th character of its value (`A`..`D` = 0..3).
-- Logout: `GET /cgi-bin/mpc105j.cgi?query=122`, the page then deletes the cookie.
+- Logout: the page calls `GET /cgi-bin/mpc105j.cgi?query=122` and deletes the cookie, but this file does not exist on this device (HTTP 404, checked on 19 Oct 2026). So the session effectively ends by dropping the cookie; the scripts do that.
 - The page shows a menu entry when `show_level` ≤ the user level; writing needs `write_level`.
 - A read without a valid session returns the same `value: fail` reply (the page then shows “Needed Authentication”). Only some queries answer without a login: in the run of 19 Oct 2026 `mpc105.cgi?query=13` and `mpc105.cgi?query=314`.
 
@@ -4915,7 +4914,7 @@ python3 rem102/scripts/build-docs.py
 |---|---|
 | `rem.cgi?query=440` | Restore Factory Default – resets the device to factory settings |
 | `mpc105.cgi?query=1982` | device reboot |
-| `mpc105j.cgi?query=122` | logout (ends the session) |
+| `mpc105j.cgi?query=122` | logout – does not exist on this device (404) |
 | `mpc105.cgi?query=121` | change password |
 | `rem.cgi?query=402` | Export (configuration download action) |
 | `rem.cgi?query=401`, `mpc105.cgi?query=310` | configuration Import and Firmware Upgrade (file uploads) |
@@ -4928,7 +4927,7 @@ Collecting all packages one by one: `rem102/scripts/collect.sh` (bash, curl, jq)
 
 ### Login, read and logout – ready-made scripts with parameters
 
-The user and the password are given on the command line (`User`, `Admin`, `Super Admin` or the level `1`, `2`, `3`). The scripts log in, read the device data (`query=302`) and the versions (`query=301`), and log out.
+The user and the password are given on the command line (`User`, `Admin`, `Super Admin` or the level `1`, `2`, `3`). The scripts log in, read the device data (`query=302`) and the versions (`query=301`) and end the session (the cookie is dropped; the logout CGI returns 404 on this device).
 
 ```bash
 ./rem102/scripts/rem102-curl.sh "Super Admin" 'password' [host]
@@ -4948,11 +4947,10 @@ LEVEL=3; PASS='password'; HOST=192.168.128.1; JAR=$(mktemp)
 printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
 curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
 curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
-curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
 rm -f "$JAR"
 ```
 
-The logout (`mpc105j.cgi?query=122`) comes from the page's scripts and has not been run against the device yet.
+There is no logout call: the page uses `mpc105j.cgi?query=122`, but it returns 404 on this device – the session ends by dropping the cookie (`rm -f "$JAR"`).
 
 ### Linux / macOS / Git Bash
 
@@ -5009,13 +5007,13 @@ Names are `tab.id` because a bare `id` could repeat between tabs.
 
 ### Simplest: one `System Exec` call
 
-One command line does the login, the data read and the logout: `curl` handles several requests in one run and keeps the session in a cookie file, so there is no session id to extract. *Format Into String* parameters in order: cookie file (any writable path, e.g. in the temp folder), host, level (1/2/3), password, cookie file, host, cookie file, host.
+One command line does the login and the data read: `curl` handles several requests in one run and keeps the session in a cookie file, so there is no session id to extract. *Format Into String* parameters in order: cookie file (any writable path, e.g. in the temp folder), host, level (1/2/3), password, cookie file, host.
 
 ```text
-"C:/Windows/System32/curl.exe" -sS --max-time 20 -w "#END#" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+"C:/Windows/System32/curl.exe" -sS --max-time 20 -w "#END#" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
 ```
 
-Split *standard output* on the `#END#` marker (*Search and Split String*) into three parts: (1) the login reply (`"value":"ok"` or `fail`), (2) the device data (a JSON array, see below), (3) the logout reply. With a wrong password part (2) holds the “login required” reply. Without the logout, drop the third group (from the second `--next`). A password with `%`, `^`, `&` or `"` may break the line – then use the password-file version below. Tested with `curl` against a mock device.
+Split *standard output* on the `#END#` marker (*Search and Split String*) into two parts: (1) the login reply (`"value":"ok"` or `fail`), (2) the device data (a JSON array, see below). With a wrong password part (2) holds the “login required” reply. There is no logout (the logout CGI returns 404): after the read just delete the cookie file. A password with `%`, `^`, `&` or `"` may break the line – then use the password-file version below. Tested with `curl` against a mock device.
 
 Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP Client POST* (body `query=120&login=3&pwd=<URL-encoded password>`, header `Content-Type: application/x-www-form-urlencoded`) → *HTTP Client GET* → *HTTP Client Close Handle*. Not tested against this device.
 
@@ -5039,11 +5037,7 @@ Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP 
 
    *Standard output* is a JSON array; *Unflatten From JSON* into an array of a cluster with the string fields `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Find a field by `tag`: `devname` (model), `sn` (serial number), `pn` (article number). Software versions: the same call with `query=301`; any other package from `rem102-package-requests.txt` – put its path in place of `/cgi-bin/mpc105.cgi?query=302`.
 
-3. **Logout**:
-
-```text
-"C:/Windows/System32/curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
-```
+3. **End of session:** the logout CGI (`mpc105j.cgi`) returns 404 on this device, so there is no separate call; delete the cookie file or forget the session id.
 
 Notes:
 
@@ -5051,7 +5045,7 @@ Notes:
 - **Password:** write it with *Write to Text File* to a temporary file (no end-of-line), pass the path in `pwd@<file>` (curl URL-encodes the value) and delete the file after the login. That way special characters (`%`, `^`, `&`, `"`) cannot break the command line and the password does not stay in the process command line. A simpler but less robust form: `--data-urlencode "pwd=%s"`.
 - **32-bit LabVIEW** on 64-bit Windows does not see `C:/Windows/System32/curl.exe` (redirected to `SysWOW64`). Use `C:/Windows/Sysnative/curl.exe` or ship a `curl.exe` with your application and give its full path.
 - Do not use redirections (`>`) or pipes (`|`) in the command line; use curl's `-o` and `-D` options to write to a file.
-- The logout (`mpc105j.cgi?query=122`) comes from the page's scripts and has not been run against the device yet.
+- There is no logout call: the page uses `mpc105j.cgi?query=122`, but it returns 404 on this device – the session ends by dropping the cookie (`rm -f "$JAR"`).
 
 ### Polymorphic VI
 

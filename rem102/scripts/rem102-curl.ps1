@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  REM-102: login -> read the device data -> logout, with plain curl.exe calls (Windows 10 and later).
+  REM-102: login -> read the device data -> end of session, with plain curl.exe calls (Windows 10 and later).
 
 .EXAMPLE
   .\rem102-curl.cmd "Super Admin" 'my-password'
@@ -10,7 +10,7 @@
   User = User | Admin | Super Admin (or the level 1 | 2 | 3). Without -Password the script asks for it.
   Calls: POST /cgi-bin/mpc105.cgi (query=120, login=<level>, pwd) -> cookie CGISESSID;
          GET /cgi-bin/mpc105.cgi?query=302 (device data) and ?query=301 (versions);
-         GET /cgi-bin/mpc105j.cgi?query=122 (logout; taken from the page's scripts, not yet run against the device).
+         no logout call: the page's logout CGI (mpc105j.cgi?query=122) returns 404 on this device, the session cookie is just dropped.
   ASCII only on purpose (Windows PowerShell 5.1 reads BOM-less files as ANSI).
 #>
 param(
@@ -69,8 +69,7 @@ try {
   Write-Host '== 3. software versions'
   curl.exe -sS -w "`n" -H $cookie "$base/cgi-bin/mpc105.cgi?query=301"
 
-  Write-Host '== 4. logout'
-  curl.exe -sS -w "`n" -H $cookie "$base/cgi-bin/mpc105j.cgi?query=122"
+  Write-Host '== 4. end of session (the device has no working logout CGI; the session cookie is simply dropped)'
 }
 finally {
   Remove-Item -Force -ErrorAction SilentlyContinue $hdr, $out, $pwdFile
