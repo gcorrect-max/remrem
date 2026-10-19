@@ -5012,7 +5012,7 @@ Nazwy mają postać `tab.id`, bo samo `id` mogłoby się powtarzać między zak�
 Jedna linia poleceń wykonuje logowanie, odczyt danych i wylogowanie: `curl` obsługuje kilka zapytań w jednym uruchomieniu i trzyma sesję w pliku ciasteczek, więc nie trzeba wyciągać identyfikatora sesji. Parametry *Format Into String* po kolei: plik ciasteczek (dowolna ścieżka do zapisu, np. w folderze tymczasowym), host, poziom (1/2/3), hasło, plik ciasteczek, host, plik ciasteczek, host.
 
 ```text
-"C:\Windows\System32\curl.exe" -sS --max-time 20 -w "\n#END#\n" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "\n#END#\n" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "\n#END#\n" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+"C:/Windows/System32/curl.exe" -sS --max-time 20 -w "#END#" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
 ```
 
 *Standard output* podziel na znaczniku `#END#` (*Search and Split String*) na trzy części: (1) odpowiedź logowania (`"value":"ok"` albo `fail`), (2) dane urządzenia (tablica JSON, patrz niżej), (3) odpowiedź wylogowania. Przy złym haśle część (2) zawiera odpowiedź „wymagane logowanie”. Bez wylogowania usuń trzecią grupę (od drugiego `--next`). Hasło ze znakami `%`, `^`, `&` lub `"` może zepsuć linię – wtedy użyj wersji z plikiem hasła poniżej. Sprawdzono z `curl` na atrapie urządzenia.
@@ -5026,7 +5026,7 @@ Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Cl
 1. **Logowanie** (`%s` = host, `%d` = poziom 1/2/3, `%s` = ścieżka pliku z hasłem):
 
 ```text
-"C:\Windows\System32\curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
+"C:/Windows/System32/curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
 ```
 
    Z *standard output* (nagłówki + ciało) wyciągnij *Match Regular Expression*: identyfikator sesji `CGISESSID=([^;\s]+)` (pod-dopasowanie 1) i wynik `"value"\s*:\s*"([^"]*)"` (`ok` albo `fail`). Brak identyfikatora lub `fail` = błąd logowania (zły poziom lub hasło); każde nieudane logowanie jest zapisywane w dzienniku zdarzeń urządzenia.
@@ -5034,7 +5034,7 @@ Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Cl
 2. **Odczyt danych urządzenia** (`%s` = identyfikator sesji, `%s` = host):
 
 ```text
-"C:\Windows\System32\curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
+"C:/Windows/System32/curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
 ```
 
    *Standard output* to tablica JSON; *Unflatten From JSON* do tablicy klastra z polami tekstowymi `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Wartość pola znajdziesz po `tag`: `devname` (model), `sn` (numer seryjny), `pn` (numer artykułu). Wersje oprogramowania: to samo wywołanie z `query=301`; dowolny inny pakiet z `rem102-package-requests.txt` – podstaw jego ścieżkę zamiast `/cgi-bin/mpc105.cgi?query=302`.
@@ -5042,13 +5042,14 @@ Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Cl
 3. **Logout**:
 
 ```text
-"C:\Windows\System32\curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+"C:/Windows/System32/curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
 ```
 
 Uwagi:
 
+- **Ukośniki i apostrofy:** w stałych tekstowych LabVIEW (*Format Into String*) pisz ścieżki z ukośnikami `/` (`C:/rem102/cookies.txt`): backslash jest tam kodem specjalnym i znika (`C:\Windows` staje się `C:Windows`, błąd 2 w `System Exec`). Hasło wpisz bez apostrofów i cudzysłowów, dokładnie tak, jak w przeglądarce, i pamiętaj o `http://` (dwa ukośniki).
 - **Hasło:** zapisz je *Write to Text File* do pliku tymczasowego (bez znaku końca linii), przekaż ścieżkę w `pwd@<plik>` (curl sam koduje wartość) i po logowaniu usuń plik. Dzięki temu znaki specjalne (`%`, `^`, `&`, `"`) nie psują linii poleceń i hasło nie zostaje w wierszu poleceń procesu. Prostsza, ale mniej odporna wersja: `--data-urlencode "pwd=%s"`.
-- **32-bitowy LabVIEW** na 64-bitowym Windows nie widzi `C:\Windows\System32\curl.exe` (przekierowanie do `SysWOW64`). Użyj `C:\Windows\Sysnative\curl.exe` albo dołącz `curl.exe` do aplikacji i podaj jego pełną ścieżkę.
+- **32-bitowy LabVIEW** na 64-bitowym Windows nie widzi `C:/Windows/System32/curl.exe` (przekierowanie do `SysWOW64`). Użyj `C:/Windows/Sysnative/curl.exe` albo dołącz `curl.exe` do aplikacji i podaj jego pełną ścieżkę.
 - Nie używaj przekierowań (`>`) ani potoków (`|`) w linii poleceń; do zapisu do pliku służą opcje curl `-o` i `-D`.
 - Wylogowanie (`mpc105j.cgi?query=122`) pochodzi ze skryptów strony i nie było jeszcze uruchomione na urządzeniu.
 

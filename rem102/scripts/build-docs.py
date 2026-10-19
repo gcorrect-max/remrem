@@ -500,7 +500,7 @@ Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Cl
 
 Uwagi:
 
-- **Ukośniki i apostrofy:** w stałych tekstowych LabVIEW (*Format Into String*) pisz ścieżki z ukośnikami `/` (`C:/rem102/cookies.txt`): backslash jest tam kodem specjalnym i znika (`C:\Windows` staje się `C:Windows`, błąd 2 w `System Exec`). Hasło wpisz bez apostrofów i cudzysłowów, dokładnie tak, jak w przeglądarce, i pamiętaj o `http://` (dwa ukośniki).
+- **Ukośniki i apostrofy:** w stałych tekstowych LabVIEW (*Format Into String*) pisz ścieżki z ukośnikami `/` (`C:/rem102/cookies.txt`): backslash jest tam kodem specjalnym i znika (`C:\\Windows` staje się `C:Windows`, błąd 2 w `System Exec`). Hasło wpisz bez apostrofów i cudzysłowów, dokładnie tak, jak w przeglądarce, i pamiętaj o `http://` (dwa ukośniki).
 - **Hasło:** zapisz je *Write to Text File* do pliku tymczasowego (bez znaku końca linii), przekaż ścieżkę w `pwd@<plik>` (curl sam koduje wartość) i po logowaniu usuń plik. Dzięki temu znaki specjalne (`%`, `^`, `&`, `"`) nie psują linii poleceń i hasło nie zostaje w wierszu poleceń procesu. Prostsza, ale mniej odporna wersja: `--data-urlencode "pwd=%s"`.
 - **32-bitowy LabVIEW** na 64-bitowym Windows nie widzi `C:/Windows/System32/curl.exe` (przekierowanie do `SysWOW64`). Użyj `C:/Windows/Sysnative/curl.exe` albo dołącz `curl.exe` do aplikacji i podaj jego pełną ścieżkę.
 - Nie używaj przekierowań (`>`) ani potoków (`|`) w linii poleceń; do zapisu do pliku służą opcje curl `-o` i `-D`.
@@ -828,7 +828,7 @@ Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP 
 
 Notes:
 
-- **Slashes and apostrophes:** in LabVIEW string constants (*Format Into String*) write paths with forward slashes `/` (`C:/rem102/cookies.txt`): a backslash is an escape code there and disappears (`C:\Windows` becomes `C:Windows`, error 2 in `System Exec`). Type the password without apostrophes or quotes, exactly as in the browser, and keep `http://` (two slashes).
+- **Slashes and apostrophes:** in LabVIEW string constants (*Format Into String*) write paths with forward slashes `/` (`C:/rem102/cookies.txt`): a backslash is an escape code there and disappears (`C:\\Windows` becomes `C:Windows`, error 2 in `System Exec`). Type the password without apostrophes or quotes, exactly as in the browser, and keep `http://` (two slashes).
 - **Password:** write it with *Write to Text File* to a temporary file (no end-of-line), pass the path in `pwd@<file>` (curl URL-encodes the value) and delete the file after the login. That way special characters (`%`, `^`, `&`, `"`) cannot break the command line and the password does not stay in the process command line. A simpler but less robust form: `--data-urlencode "pwd=%s"`.
 - **32-bit LabVIEW** on 64-bit Windows does not see `C:/Windows/System32/curl.exe` (redirected to `SysWOW64`). Use `C:/Windows/Sysnative/curl.exe` or ship a `curl.exe` with your application and give its full path.
 - Do not use redirections (`>`) or pipes (`|`) in the command line; use curl's `-o` and `-D` options to write to a file.

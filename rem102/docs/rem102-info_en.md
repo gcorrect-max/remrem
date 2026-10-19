@@ -5012,7 +5012,7 @@ Names are `tab.id` because a bare `id` could repeat between tabs.
 One command line does the login, the data read and the logout: `curl` handles several requests in one run and keeps the session in a cookie file, so there is no session id to extract. *Format Into String* parameters in order: cookie file (any writable path, e.g. in the temp folder), host, level (1/2/3), password, cookie file, host, cookie file, host.
 
 ```text
-"C:\Windows\System32\curl.exe" -sS --max-time 20 -w "\n#END#\n" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "\n#END#\n" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "\n#END#\n" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+"C:/Windows/System32/curl.exe" -sS --max-time 20 -w "#END#" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "#END#" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
 ```
 
 Split *standard output* on the `#END#` marker (*Search and Split String*) into three parts: (1) the login reply (`"value":"ok"` or `fail`), (2) the device data (a JSON array, see below), (3) the logout reply. With a wrong password part (2) holds the “login required” reply. Without the logout, drop the third group (from the second `--next`). A password with `%`, `^`, `&` or `"` may break the line – then use the password-file version below. Tested with `curl` against a mock device.
@@ -5026,7 +5026,7 @@ Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP 
 1. **Login** (`%s` = host, `%d` = level 1/2/3, `%s` = path of the password file):
 
 ```text
-"C:\Windows\System32\curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
+"C:/Windows/System32/curl.exe" -sS -i --max-time 10 -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd@%s"
 ```
 
    From *standard output* (headers + body) extract with *Match Regular Expression*: the session id `CGISESSID=([^;\s]+)` (sub-match 1) and the result `"value"\s*:\s*"([^"]*)"` (`ok` or `fail`). No session id or `fail` = login error (wrong level or password); every failed login is recorded in the device's event log.
@@ -5034,7 +5034,7 @@ Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP 
 2. **Read the device data** (`%s` = session id, `%s` = host):
 
 ```text
-"C:\Windows\System32\curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
+"C:/Windows/System32/curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105.cgi?query=302"
 ```
 
    *Standard output* is a JSON array; *Unflatten From JSON* into an array of a cluster with the string fields `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Find a field by `tag`: `devname` (model), `sn` (serial number), `pn` (article number). Software versions: the same call with `query=301`; any other package from `rem102-package-requests.txt` – put its path in place of `/cgi-bin/mpc105.cgi?query=302`.
@@ -5042,13 +5042,14 @@ Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP 
 3. **Logout**:
 
 ```text
-"C:\Windows\System32\curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+"C:/Windows/System32/curl.exe" -sS --max-time 10 -H "Cookie: CGISESSID=%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
 ```
 
 Notes:
 
+- **Slashes and apostrophes:** in LabVIEW string constants (*Format Into String*) write paths with forward slashes `/` (`C:/rem102/cookies.txt`): a backslash is an escape code there and disappears (`C:\Windows` becomes `C:Windows`, error 2 in `System Exec`). Type the password without apostrophes or quotes, exactly as in the browser, and keep `http://` (two slashes).
 - **Password:** write it with *Write to Text File* to a temporary file (no end-of-line), pass the path in `pwd@<file>` (curl URL-encodes the value) and delete the file after the login. That way special characters (`%`, `^`, `&`, `"`) cannot break the command line and the password does not stay in the process command line. A simpler but less robust form: `--data-urlencode "pwd=%s"`.
-- **32-bit LabVIEW** on 64-bit Windows does not see `C:\Windows\System32\curl.exe` (redirected to `SysWOW64`). Use `C:\Windows\Sysnative\curl.exe` or ship a `curl.exe` with your application and give its full path.
+- **32-bit LabVIEW** on 64-bit Windows does not see `C:/Windows/System32/curl.exe` (redirected to `SysWOW64`). Use `C:/Windows/Sysnative/curl.exe` or ship a `curl.exe` with your application and give its full path.
 - Do not use redirections (`>`) or pipes (`|`) in the command line; use curl's `-o` and `-D` options to write to a file.
 - The logout (`mpc105j.cgi?query=122`) comes from the page's scripts and has not been run against the device yet.
 
