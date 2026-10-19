@@ -460,7 +460,19 @@ Nazwy mają postać `tab.id`, bo samo `id` mogłoby się powtarzać między zak�
 4. **Zapytanie.** *Index Array* wartością enuma → ścieżka z zapytaniem; *HTTP Client* GET → ciało odpowiedzi jako string.
 5. **Parsowanie.** *Unflatten From JSON* do typedefu danego pakietu.
 
-### Wywołania `System Exec` (curl)
+### Najprościej: jedno wywołanie `System Exec`
+
+Jedna linia poleceń wykonuje logowanie, odczyt danych i wylogowanie: `curl` obsługuje kilka zapytań w jednym uruchomieniu i trzyma sesję w pliku ciasteczek, więc nie trzeba wyciągać identyfikatora sesji. Parametry *Format Into String* po kolei: plik ciasteczek (dowolna ścieżka do zapisu, np. w folderze tymczasowym), host, poziom (1/2/3), hasło, plik ciasteczek, host, plik ciasteczek, host.
+
+```text
+"C:\\Windows\\System32\\curl.exe" -sS --max-time 20 -w "\\n#END#\\n" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "\\n#END#\\n" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "\\n#END#\\n" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+```
+
+*Standard output* podziel na znaczniku `#END#` (*Search and Split String*) na trzy części: (1) odpowiedź logowania (`"value":"ok"` albo `fail`), (2) dane urządzenia (tablica JSON, patrz niżej), (3) odpowiedź wylogowania. Przy złym haśle część (2) zawiera odpowiedź „wymagane logowanie”. Bez wylogowania usuń trzecią grupę (od drugiego `--next`). Hasło ze znakami `%`, `^`, `&` lub `"` może zepsuć linię – wtedy użyj wersji z plikiem hasła poniżej. Sprawdzono z `curl` na atrapie urządzenia.
+
+Bez `System Exec`: *HTTP Client Open Handle* (z plikiem ciasteczek) → *HTTP Client POST* (treść `query=120&login=3&pwd=<hasło zakodowane URL>`, nagłówek `Content-Type: application/x-www-form-urlencoded`) → *HTTP Client GET* → *HTTP Client Close Handle*. Niesprawdzone z tym urządzeniem.
+
+### Osobne wywołania `System Exec` (curl, z wersją z plikiem hasła)
 
 `System Exec.vi` uruchamia `curl.exe` (Windows 10 i nowszy). Każde wywołanie to osobny proces, więc sesję przenosi identyfikator z ciasteczka `CGISESSID`, który odczytujesz z odpowiedzi logowania. Wejścia `System Exec`: *command line*, *working directory* (np. folder aplikacji), *wait until completion* = TRUE; wyjścia: *standard output*, *standard error*, *return code* (0 = curl wykonał zapytanie; 7 = brak połączenia, 28 = przekroczony czas). Linie poleceń składaj przez *Format Into String* (`%s` = tekst, `%d` = liczba).
 
@@ -775,7 +787,19 @@ Names are `tab.id` because a bare `id` could repeat between tabs.
 4. **Request.** *Index Array* with the enum value → path with query; *HTTP Client* GET → response body as a string.
 5. **Parsing.** *Unflatten From JSON* into the typedef of that package.
 
-### `System Exec` calls (curl)
+### Simplest: one `System Exec` call
+
+One command line does the login, the data read and the logout: `curl` handles several requests in one run and keeps the session in a cookie file, so there is no session id to extract. *Format Into String* parameters in order: cookie file (any writable path, e.g. in the temp folder), host, level (1/2/3), password, cookie file, host, cookie file, host.
+
+```text
+"C:\\Windows\\System32\\curl.exe" -sS --max-time 20 -w "\\n#END#\\n" -c "%s" -X POST "http://%s/cgi-bin/mpc105.cgi" --data "query=120" --data "login=%d" --data-urlencode "pwd=%s" --next -sS -w "\\n#END#\\n" -b "%s" "http://%s/cgi-bin/mpc105.cgi?query=302" --next -sS -w "\\n#END#\\n" -b "%s" "http://%s/cgi-bin/mpc105j.cgi?query=122"
+```
+
+Split *standard output* on the `#END#` marker (*Search and Split String*) into three parts: (1) the login reply (`"value":"ok"` or `fail`), (2) the device data (a JSON array, see below), (3) the logout reply. With a wrong password part (2) holds the “login required” reply. Without the logout, drop the third group (from the second `--next`). A password with `%`, `^`, `&` or `"` may break the line – then use the password-file version below. Tested with `curl` against a mock device.
+
+Without `System Exec`: *HTTP Client Open Handle* (with a cookie file) → *HTTP Client POST* (body `query=120&login=3&pwd=<URL-encoded password>`, header `Content-Type: application/x-www-form-urlencoded`) → *HTTP Client GET* → *HTTP Client Close Handle*. Not tested against this device.
+
+### Separate `System Exec` calls (curl, with the password-file version)
 
 `System Exec.vi` runs `curl.exe` (Windows 10 and later). Every call is a separate process, so the session is carried by the `CGISESSID` cookie value, which you read from the login reply. `System Exec` inputs: *command line*, *working directory* (e.g. the application folder), *wait until completion* = TRUE; outputs: *standard output*, *standard error*, *return code* (0 = curl performed the request; 7 = could not connect, 28 = timeout). Build the command lines with *Format Into String* (`%s` = string, `%d` = number).
 
