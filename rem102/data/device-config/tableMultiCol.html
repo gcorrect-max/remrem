@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- META tag -->
+	<meta charset="UTF-8"/>
+	<meta name="author" content="HaslerRail">
+	<title> Application </title>
+
+	<!-- Style sheet -->
+	<link rel="stylesheet" type="text/css" href="../Style/table.css"/>
+
+	<!-- Script -->
+	<script type="text/javascript" src="../Script/jquery.js"></script>
+	<script type="text/javascript" src="../Script/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../Script/jquery.scrolltable.js"></script>
+	<script type="text/javascript" src="../Script/globalFunc.js"></script>
+	<script type="text/javascript" src="../Script/tableMultiColPag.js"></script>
+
+</head>
+
+<body>
+<div id="App_container">
+	<div><h1 class="pagetitle">Waiting files</h1><span class="pagecount"></span></div>
+	<div class="paginationcontainer">
+		<ul class="pagination"></ul>
+	</div>
+	<!-- <div id="loader"></div> -->
+	<img src="Images/loading.gif" id="loading-img" style="display:none;" alt="Please Wait"/>
+	<div id="paginated_table" class="table-responsive" style="display:none;">
+		<table class="table table-bordered table-hover">
+			<!-- table head -->
+			<thead>
+			<tr>
+			</tr>
+			</thead>
+			<!-- table body -->
+			<tbody></tbody>
+		</table>
+	</div>
+	<div id="foot"></div>
+	<div id="result"><h1></h1></div>
+</div>
+</body>
+</html>

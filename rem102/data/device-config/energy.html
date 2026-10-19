@@ -1,0 +1,95 @@
+<!DOCTYPE html>		
+<html>
+	<head>
+		<!-- META tag -->
+		<meta charset="UTF-8" />
+		<meta name="author" content="HaslerRail">
+		<title> Pie </title>
+		
+		<!-- Style sheet -->
+			<link class="include" rel="stylesheet" type="text/css" href="Style/energy.css" />
+		    <link class="include" rel="stylesheet" type="text/css" href="Style/jquery.jqplot.min.css" />
+	
+		<!-- Script -->
+		<!--[if IE]><script language="javascript" type="text/javascript" src="Script/excanvas.min.js"></script><![endif]--> 
+		<script type="text/javascript" src="Script/jquery.js"></script>
+	    <script class="include" type="text/javascript" src="Script/jquery.jqplot.min.js"></script>
+		<script type="text/javascript" src="Script/jqplot.canvasTextRenderer.min.js"></script>
+		<script type="text/javascript" src="Script/jqplot.canvasAxisLabelRenderer.min.js"></script>
+		<script type="text/javascript" src="Script/jqplot.enhancedLegendRenderer.min.js"></script>		
+		<script type="text/javascript" src="Script/globalFunc.js"></script>
+		<script type="text/javascript" src="Script/energy.js"></script>
+	</head>
+	</head>
+	<body id="pie">	
+		<div id="chart_container">						
+			<div id="chart-con">
+				<h1></h1>
+				<div class="chart_div" >
+					<div id="chart" style="width:300px; height:300px"></div>
+				</div>
+				<div class="chart_div" >
+				
+					<div id="chart2" style="width:380px; height:300px"></div>
+				</div>				
+				<div style="clear:both;"></div>
+				<table id="pietable">
+					 <!-- table head -->
+					<thead>
+						<tr>							
+							<th width="8%">Period [s]</th>
+							<th width="7%">Cos &Phi; </th>
+							<th width="17%">Power Active [kW]</th>
+							<th width="17%">Power Reactive [kvar]</th>
+							<th width="17%">Power Apparent [kVA]</th>
+							<th width="17%">Voltage [V]</th>
+							<th width="17%">Current [A]</th>							
+						</tr>
+					</thead>					
+					<!-- table body -->
+					<tbody>
+						<tr>
+							<td id="p"></th>
+							<td id="cos"></td>
+							<td id="pa"></td>
+							<td id="pr"></td>
+							<td id="pap"></td>
+							<td id="v"></td>
+							<td id="i"></td>
+						</tr>						
+					</tbody>
+				</table>
+				<br>
+				<table id="pietable">
+					 <!-- table head -->
+					<thead>
+						<tr>
+							<th width="8%"></th>
+							<th width="23%">Energy Active [kWh]</th>
+							<th width="23%">Energy Reactive [kvarh]</th>
+							<th width="23%">Regenerated Energy Active [kWh]</th>
+							<th width="23%">Regenerated Energy Reactive [kvarh]</th>
+						</tr>
+					</thead>					
+					<!-- table body -->
+					<tbody>
+						<tr>
+							<th>Ref.</th>
+							<td id="eap"></td>
+							<td id="erp"></td>
+							<td id="enp"></td>
+							<td id="enrp"></td>
+						</tr>
+						<tr>
+							<th>Tot.</th>
+							<td id="eat"></td>
+							<td id="ert"></td>
+							<td id="ent"></td>
+							<td id="enrt"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>

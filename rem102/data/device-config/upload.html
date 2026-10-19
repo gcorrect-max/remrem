@@ -1,0 +1,49 @@
+<!DOCTYPE html>		
+<html>
+	<head>
+		<!-- META tag -->
+		<meta charset="UTF-8" />
+		<meta name="author" content="HaslerRail">
+		<title> Upload </title>
+		
+		<!-- Style sheet -->
+		<link href="Style/upload.css" rel="stylesheet" type="text/css" />
+		
+		<!-- Script -->
+		<script type="text/javascript" src="Script/canvasloader-min.js"></script>
+		<script type="text/javascript" src="Script/jquery.js"></script>		
+		<script type="text/javascript" src="Script/jquery.form.min.js"></script>
+        <script type="text/javascript" src="Script/globalFunc.js"></script>
+        <script type="text/javascript" src="Script/jquery.cookie.js"></script>
+		<script type="text/javascript" src="Script/upload.js"></script>
+	</head>
+	<body id="upload">	
+		<h1></h1>
+		<div id="upload-wrapper" class="wrapok">		
+			<div align="center">
+				<h3></h3>
+				<span></span>
+				<form name="load" onSubmit="return false" method="post" enctype="multipart/form-data" id="MyUploadForm">					
+					<input name="firmwarefile" id="imageInput" type="file" />
+					<input type="submit"  id="submit-btn" value="Upload" />
+					<img src="Images/ajax-loader.gif" id="loading-img" style="display:none;" alt="Please Wait"/>
+				</form>
+				<br>
+				<div id="progressbox" style="display:none;">
+					<div id="progressbar"></div >
+					<div id="statustxt">0%</div>
+				</div>
+				<br>
+			</div>
+		</div>
+		<br>
+		<div id="output"></div>
+		<br>
+		<div id="cl_execution"></div>
+		<br>
+		<div id="execution">
+			<input type="button" class="exec" value="Save">
+			<input type="button" class="cancel" value="Cancel">
+		</div>
+	</body>
+</html>

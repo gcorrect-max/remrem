@@ -50,18 +50,22 @@ def load_sample(e):
     return d if isinstance(d, dict) and "http_status" in d else None
 
 def is_ok(d):
-    """A captured package with an HTTP 2xx answer that is not the login-required reply {"value":"fail"}."""
+    """A captured package with an HTTP 2xx answer that is not the login-required reply (value = fail)."""
     try:
         if not (isinstance(d, dict) and 200 <= int(d.get("http_status") or 0) < 300):
             return False
     except (TypeError, ValueError):
         return False
-    return d.get("body") != {"value": "fail"}
+    return not is_login_fail(d.get("body"))
+
+def is_login_fail(body):
+    """The device answers a read without a valid session with {"reference":"login","tag":"reply","value":"fail",...}."""
+    return isinstance(body, dict) and str(body.get("value", "")).lower() == "fail"
 
 def why_not(d):
     if d is None:
         return None
-    if d.get("body") == {"value": "fail"}:
+    if is_login_fail(d.get("body")):
         return "login required"
     return f"HTTP {d.get('http_status')}"
 
@@ -176,9 +180,10 @@ L = {
        "features": ("Features", "Flagi włączenia modułów (<code>en_query</code> z menu).")},
  notes={("advanced", "information_device_settings"): "Model, numer seryjny, numer artykułu i pozostałe dane urządzenia. W menu: show_level 1, write_level 3.",
         ("advanced", "information_version"): "Wersje oprogramowania.",
-        ("advanced", "information_events"): "W menu to samo zapytanie służy też do zapisu (set = query=314); skrypt wysyła tylko odczyt.",
-        ("home", "ch_a_measures"): "W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt.",
-        ("home", "ch_b_measures"): "W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt.",
+        ("advanced", "information_events"): "Odpowiada bez logowania (próba z 19.10.2026). Pole „set” w menu to formularz wyboru daty (<code>datetime</code>, rok/miesiąc/dzień) – filtr, nie zapis ustawień.",
+        ("home", "ch_a_measures"): "Pole „set” w menu to formularz wyboru godziny/daty (skrypt <code>measure.js</code>) – filtr, nie zapis ustawień.",
+        ("home", "ch_b_measures"): "Pole „set” w menu to formularz wyboru godziny/daty (skrypt <code>measure.js</code>) – filtr, nie zapis ustawień.",
+        ("monitoring", "network_interfaces_mobile"): "Odpowiada bez logowania (próba z 19.10.2026).",
         ("setup", "meter_settings"): "Ustawienia miernika (rem.cgi, nie mpc105.cgi).",
         ("setup", "meter_calibration"): "Odczyt pamięci współdzielonej; w menu show_level 3 (Super Admin).",
         ("features", "rtp100"): "Odpowiedź to tablica obiektów; <code>{\"type\":\"enable\",\"value\":\"true\"}</code> oznacza włączony moduł (reguła ze skryptu strony)."},
@@ -186,7 +191,7 @@ L = {
  ("overview", "Wprowadzenie", """
 Opis zapytań CGI, którymi interfejs WWW urządzenia **REM-102** (serwer Boa, strona producenta HaslerRail) pobiera dane. Lista pochodzi z plików, które urządzenie samo udostępnia (`Config/*.json`), odczytanych skryptem `collect.ps1 -Discover`. Uwzględnione są wyłącznie zapytania odczytowe.
 
-> **Status.** Logowanie, nazwy CGI, ciasteczko sesji i poziomy dostępu pochodzą ze skryptów strony urządzenia (`Script/mainParent.js`, `Script/globalFunc.js`). Skrypty zbierające sprawdzono na atrapie serwera, nie na prawdziwych odpowiedziach. **Treści odpowiedzi poszczególnych pakietów nie znamy jeszcze** – patrz sekcja „Przykłady odpowiedzi”.
+> **Status (19.10.2026).** Logowanie, nazwy CGI, ciasteczko sesji, poziomy dostępu i format odpowiedzi pochodzą ze skryptów strony urządzenia (`Script/*.js`). Pierwsze prawdziwe odpowiedzi mamy tylko dla pakietów, które odpowiadają **bez logowania** (2 z 66). Logowanie nie powiodło się (odrzucone hasło), więc reszta pakietów zwróciła odpowiedź „wymagane logowanie” – patrz „Przykłady odpowiedzi”.
 
 Adres bazowy: `http://<HOST>` (domyślnie `192.168.128.1`, port 80). Urządzenie udostępnia cztery pliki CGI:
 
@@ -222,17 +227,45 @@ Logowanie wykonuje formularz strony (`Script/mainParent.js`): `POST /cgi-bin/mpc
 | `pwd` | hasło, kodowane URL |
 | `change` | zaznaczone tylko przy zmianie hasła |
 
-- Odpowiedź to JSON z polem `value`: `"fail"` = złe hasło, `"change"` = trzeba zmienić hasło, inna wartość = zalogowano.
+- Odpowiedź to JSON z polem `value`: `"fail"` = złe hasło, `"change"` = trzeba zmienić hasło, inna wartość = zalogowano. Prawdziwa odpowiedź na nieudane logowanie: `{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }`.
+- Każde nieudane logowanie trafia do dziennika zdarzeń urządzenia (`advanced.information_events`: `CODE` 2, `DESCRIPTION` „Login unauthorized”, `USER` np. `superadmin`), więc nie zgaduj haseł wielokrotnie. Skrypty mają tryb samego testu logowania (`-LoginTest` / `REM_LOGIN_TEST=1`).
 - Sesję niesie ciasteczko `CGISESSID`; poziom odczytuje strona z 5. znaku wartości (`A`..`D` = 0..3).
 - Wylogowanie: `GET /cgi-bin/mpc105j.cgi?query=122`, strona kasuje ciasteczko.
 - Strona pokazuje pozycję menu, gdy `show_level` ≤ poziom użytkownika; zapis wymaga `write_level`.
-- Według skryptów strony odpowiedź `{"value":"fail"}` na zapytanie odczytowe oznacza „Needed Authentication”.
+- Odczyt bez ważnej sesji zwraca tę samą odpowiedź `value: fail` (strona pokazuje wtedy „Needed Authentication”). Bez logowania odpowiadają tylko niektóre zapytania: w próbie z 19.10.2026 `mpc105.cgi?query=13` i `mpc105.cgi?query=314`.
 """),
  ("conv", "Konwencje", """
 - Zapytania odczytowe to `GET <cgi>?<query>`, odpowiedzi są w JSON (strona używa `$.getJSON`).
-- W plikach menu parametry zapytań bywają rozdzielone znakiem `~` (np. `query=7~block_offset=10240~…`). W tabeli pakietów zapisano je jako `&`; to założenie, patrz „Założenia”.
+- W plikach menu parametry zapytań są rozdzielone znakiem `~` (np. `query=7~block_offset=10240~…`). Skrypty stron (`iframe.js`, `energy.js`, …) zamieniają go na `&` przed wysłaniem, tak samo zapisano to w tabeli pakietów.
 - Pola `en_cgi`/`en_query` w menu sprawdzają, czy moduł jest włączony – to pakiety z zakładki Features.
 - Pola `set`, `set1`, `set2` zapisują konfigurację – **nie są** używane.
+"""),
+ ("replies", "Format odpowiedzi urządzenia", """
+Odpowiedzi CGI to JSON, ale z nagłówkiem `Content-type: text/html`. Format wynika ze skryptów strony (`Script/globalFunc.js`, `iframe.js`, `iframeDB.js`, `tableMultiColPag.js`) oraz z pierwszych prawdziwych odpowiedzi.
+
+### Wymagane logowanie
+
+```json
+{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }
+```
+
+Taką odpowiedź (HTTP 200) dostaje zapytanie bez ważnej sesji, a także nieudane logowanie. Skrypty zbierające liczą ją jako „wymagane logowanie”, nie jako dane.
+
+### Lista pól (strony default.html, eth.html)
+
+Tablica obiektów z polami `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Typy (z `globalFunc.js`): `text` (tylko do odczytu), `input`, `password`, `check`, `select` (po nim elementy `option`), `bar` (siła sygnału 1–5), `note`, `menu` oraz `enable` (flaga modułu: `value` = `true`/`false`). Pole `tag` jest nazwą pola formularza zapisu. Prawdziwy przykład: `monitoring.network_interfaces_mobile`.
+
+### Zdarzenia (`advanced.information_events`)
+
+Tablica: elementy `{"type":"head","column_no":N,"column_name":"..."}` opisują kolumny, a element `{"type":"data","events":[...]}` zawiera wiersze z polami `ID`, `DATATIME`, `CODE`, `USER`, `DESCRIPTION`, `TIMET`. Prawdziwy przykład poniżej.
+
+### Tabele archiwów (`home.archive_*`)
+
+Według `tableMultiColPag.js`: element `{"type":"header","table_head":[{column_no, column_label, column_name, cell_type, method}]}` i wiersze w `table_rows`. Bez prawdziwej odpowiedzi.
+
+### Odczyty pamięci (`query=7&...`)
+
+Pakiety Meter Status, Energy i Digital IO to tablice obiektów z polami `tag`, `label`, `value`, `color`; strony rozpoznają `tag` (np. w `energy.js` pola mocy, napięcia, prądu i energii). Bez prawdziwej odpowiedzi.
 """),
  ("response", "Format wyniku skryptów", """
 Skrypty zbierające zwracają jeden obiekt JSON: `device` (metadane), `login` (wynik logowania) i klucz na zakładkę z pakietami po `id`.
@@ -309,7 +342,8 @@ cd C:\\rem102\\scripts
 .\\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'password'
 ```
 
-- Bez `-Password` skrypt zapyta o hasło. Nazwę ze spacją podaj w cudzysłowie; zamiast nazwy można podać `-Level 3`.
+- Bez `-Password` skrypt zapyta o hasło (to najprostszy sposób, bez problemów z cudzysłowami). Nazwę ze spacją podaj w cudzysłowie; zamiast nazwy można podać `-Level 3`.
+- `-LoginTest` wykonuje jedną próbę logowania i kończy – dobry sposób na sprawdzenie hasła bez wielu nieudanych prób.
 - `-Discover` czyta własne pliki WWW urządzenia (bez logowania) i zapisuje `results\\discover.json`; `-Probe` sprawdza porty i ścieżki (`results\\probe.json`).
 - `-BaseUrl https://192.168.128.1:8443 -Insecure` – inny adres bazowy lub certyfikat self-signed.
 - Zwykły HTTP idzie surowym połączeniem TCP, więc nietypowe odpowiedzi CGI też zostają zapisane (z powodem w polu `error`).
@@ -347,13 +381,12 @@ Get Package.vim
 Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Dopóki nie znasz prawdziwych odpowiedzi, użyj `Get Package (Raw).vi` zwracającego sam string. Typedefy zbuduj z próbek zebranych skryptem na prawdziwym urządzeniu. Przed odczytem sprawdź w tsv kolumny `min_level` (poziom konta) i `requires` (pakiet `features.*` mówi, czy moduł jest włączony).
 """),
  ("assumptions", "Założenia i do sprawdzenia", """
-Ustalone z plików WWW urządzenia (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd`, ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`.
+Ustalone z plików WWW urządzenia i z prawdziwych odpowiedzi (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd`, ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`, separator `~` zamieniany na `&`, format odpowiedzi „wymagane logowanie”, pola „set” przy zdarzeniach i pomiarach to filtry daty (nie zapis).
 
-1. **Treść odpowiedzi.** Format poszczególnych pakietów jest nieznany do czasu zebrania ich z urządzenia.
-2. **Separator `~`.** W plikach menu oznacza prawdopodobnie `&`; kod stron-iframe, który to przekształca, nie był jeszcze pobrany (nowy `-Discover` je pobiera).
-3. **Zapytania używane też do zapisu** (`advanced.information_events`, `home.ch_a_measures`, `home.ch_b_measures`): odczyt przez GET powinien być bezpieczny, bo strona robi to samo cyklicznie, ale do potwierdzenia.
-4. **Poziomy dostępu.** `show_level` rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu.
-5. **Odpowiedź 502 „The CGI was not CGI/1.1 compliant”** pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach i po zalogowaniu nie powinna występować.
+1. **Hasło.** Ostatnie logowanie (poziom 3) zostało odrzucone; dopóki nie ma ważnej sesji, 64 z 66 pakietów zwraca „wymagane logowanie”.
+2. **Treść pozostałych odpowiedzi.** Znamy prawdziwe odpowiedzi tylko dla `monitoring.network_interfaces_mobile` i `advanced.information_events`.
+3. **Poziomy dostępu.** `show_level` rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu; do sprawdzenia na kontach Admin i User.
+4. **Odpowiedź 502 „The CGI was not CGI/1.1 compliant”** pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach nie występuje.
 """),
  ]),
 "en": dict(
@@ -370,9 +403,10 @@ Ustalone z plików WWW urządzenia (nie są już założeniami): logowanie `quer
        "features": ("Features", "Module enable flags (<code>en_query</code> from the menu).")},
  notes={("advanced", "information_device_settings"): "Model, serial number, article number and other device data. In the menu: show_level 1, write_level 3.",
         ("advanced", "information_version"): "Software versions.",
-        ("advanced", "information_events"): "In the menu the same query is also used for writing (set = query=314); the scripts send reads only.",
-        ("home", "ch_a_measures"): "In the menu the same query is also used for writing (set); the scripts send reads only.",
-        ("home", "ch_b_measures"): "In the menu the same query is also used for writing (set); the scripts send reads only.",
+        ("advanced", "information_events"): "Answers without a login (run of 19 Oct 2026). The menu's “set” field is a date picker form (<code>datetime</code>, year/month/day) – a filter, not a settings write.",
+        ("home", "ch_a_measures"): "The menu's “set” field is an hour/date picker form (script <code>measure.js</code>) – a filter, not a settings write.",
+        ("home", "ch_b_measures"): "The menu's “set” field is an hour/date picker form (script <code>measure.js</code>) – a filter, not a settings write.",
+        ("monitoring", "network_interfaces_mobile"): "Answers without a login (run of 19 Oct 2026).",
         ("setup", "meter_settings"): "Meter settings (rem.cgi, not mpc105.cgi).",
         ("setup", "meter_calibration"): "Shared-memory read; show_level 3 in the menu (Super Admin).",
         ("features", "rtp100"): "The reply is an array of objects; <code>{\"type\":\"enable\",\"value\":\"true\"}</code> means the module is enabled (rule from the page's script)."},
@@ -380,7 +414,7 @@ Ustalone z plików WWW urządzenia (nie są już założeniami): logowanie `quer
  ("overview", "Overview", """
 Description of the CGI requests that the web interface of the **REM-102** device (Boa server, vendor page by HaslerRail) uses to fetch data. The list comes from files the device serves itself (`Config/*.json`), read with `collect.ps1 -Discover`. Only read requests are included.
 
-> **Status.** The login, CGI names, session cookie and access levels come from the device page's own scripts (`Script/mainParent.js`, `Script/globalFunc.js`). The collector scripts were tested against a mock server, not against real responses. **The response content of the individual packages is not known yet** – see “Response examples”.
+> **Status (19 Oct 2026).** The login, CGI names, session cookie, access levels and reply format come from the device page's own scripts (`Script/*.js`). Real responses so far exist only for the packages that answer **without a login** (2 of 66). The login failed (password rejected), so the other packages returned the “login required” reply – see “Response examples”.
 
 Base URL: `http://<HOST>` (default `192.168.128.1`, port 80). The device exposes four CGI files:
 
@@ -416,17 +450,45 @@ Login is done by the page's form (`Script/mainParent.js`): `POST /cgi-bin/mpc105
 | `pwd` | password, URL-encoded |
 | `change` | checked only when changing the password |
 
-- The reply is JSON with a `value` field: `"fail"` = wrong password, `"change"` = the password must be changed, any other value = logged in.
+- The reply is JSON with a `value` field: `"fail"` = wrong password, `"change"` = the password must be changed, any other value = logged in. The real reply to a failed login: `{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }`.
+- Every failed login is recorded in the device's event log (`advanced.information_events`: `CODE` 2, `DESCRIPTION` “Login unauthorized”, `USER` e.g. `superadmin`), so do not guess passwords repeatedly. The scripts have a login-only test mode (`-LoginTest` / `REM_LOGIN_TEST=1`).
 - The session is carried by the `CGISESSID` cookie; the page reads the level from the 5th character of its value (`A`..`D` = 0..3).
 - Logout: `GET /cgi-bin/mpc105j.cgi?query=122`, the page then deletes the cookie.
 - The page shows a menu entry when `show_level` ≤ the user level; writing needs `write_level`.
-- According to the page's scripts, the reply `{"value":"fail"}` to a read request means “Needed Authentication”.
+- A read without a valid session returns the same `value: fail` reply (the page then shows “Needed Authentication”). Only some queries answer without a login: in the run of 19 Oct 2026 `mpc105.cgi?query=13` and `mpc105.cgi?query=314`.
 """),
  ("conv", "Conventions", """
 - Read requests are `GET <cgi>?<query>`; replies are JSON (the page uses `$.getJSON`).
-- In the menu files multi-parameter queries are sometimes separated with `~` (e.g. `query=7~block_offset=10240~…`). The package table writes them as `&`; this is an assumption, see “Assumptions”.
+- In the menu files the parameters of a query are separated with `~` (e.g. `query=7~block_offset=10240~…`). The page scripts (`iframe.js`, `energy.js`, …) replace it with `&` before sending; the package table writes it the same way.
 - The `en_cgi`/`en_query` menu fields check whether a module is enabled – these are the packages in the Features tab.
 - The `set`, `set1`, `set2` fields write configuration – they are **not** used.
+"""),
+ ("replies", "Device reply formats", """
+CGI replies are JSON, but with the header `Content-type: text/html`. The format comes from the page scripts (`Script/globalFunc.js`, `iframe.js`, `iframeDB.js`, `tableMultiColPag.js`) and from the first real responses.
+
+### Login required
+
+```json
+{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }
+```
+
+A request without a valid session gets this reply (HTTP 200), and so does a failed login. The collector scripts count it as “login required”, not as data.
+
+### Field list (default.html, eth.html pages)
+
+An array of objects with `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Types (from `globalFunc.js`): `text` (read-only), `input`, `password`, `check`, `select` (followed by `option` items), `bar` (signal quality 1–5), `note`, `menu` and `enable` (module flag: `value` = `true`/`false`). `tag` is the name of the write form field. Real example: `monitoring.network_interfaces_mobile`.
+
+### Events (`advanced.information_events`)
+
+An array: items `{"type":"head","column_no":N,"column_name":"..."}` describe the columns, and an item `{"type":"data","events":[...]}` holds rows with `ID`, `DATATIME`, `CODE`, `USER`, `DESCRIPTION`, `TIMET`. A real example is below.
+
+### Archive tables (`home.archive_*`)
+
+According to `tableMultiColPag.js`: an item `{"type":"header","table_head":[{column_no, column_label, column_name, cell_type, method}]}` and rows in `table_rows`. No real response yet.
+
+### Memory reads (`query=7&...`)
+
+Meter Status, Energy and Digital IO are arrays of objects with `tag`, `label`, `value`, `color`; the pages key on `tag` (e.g. power, voltage, current and energy fields in `energy.js`). No real response yet.
 """),
  ("response", "Result format of the scripts", """
 The collector scripts return one JSON object: `device` (metadata), `login` (login result) and a key per tab with packages keyed by `id`.
@@ -503,7 +565,8 @@ cd C:\\rem102\\scripts
 .\\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'password'
 ```
 
-- Without `-Password` the script asks for it. Quote a name with a space; instead of the name you can pass `-Level 3`.
+- Without `-Password` the script asks for it (the simplest way, no quoting problems). Quote a name with a space; instead of the name you can pass `-Level 3`.
+- `-LoginTest` makes a single login attempt and stops – a good way to check the password without many failed attempts.
 - `-Discover` reads the device's own web files (no login) and writes `results\\discover.json`; `-Probe` checks ports and paths (`results\\probe.json`).
 - `-BaseUrl https://192.168.128.1:8443 -Insecure` – another base URL or a self-signed certificate.
 - Plain HTTP goes over a raw TCP connection, so unusual CGI replies are captured too (the reason is in the `error` field).
@@ -541,13 +604,12 @@ Get Package.vim
 Each package only needs its own cluster typedef, with no separate instance. Until you know the real responses, use a `Get Package (Raw).vi` that returns just the string. Build the typedefs from samples collected with the script on a real device. Before reading, check the `min_level` (account level) and `requires` columns in the tsv (the `features.*` package tells whether the module is enabled).
 """),
  ("assumptions", "Assumptions and open points", """
-Established from the device's own web files (no longer assumptions): login `query=120` with the `login` (level) and `pwd` fields, the `CGISESSID` cookie, reads over GET with JSON replies, the `.cgi` CGI names, the request list from `Config/*.json`.
+Established from the device's own web files and from real responses (no longer assumptions): login `query=120` with the `login` (level) and `pwd` fields, the `CGISESSID` cookie, reads over GET with JSON replies, the `.cgi` CGI names, the request list from `Config/*.json`, the `~` separator being replaced by `&`, the “login required” reply format, and the “set” fields of events and measures being date filters (not writes).
 
-1. **Response content.** The format of the individual packages is unknown until they are captured from the device.
-2. **The `~` separator.** In the menu files it probably means `&`; the iframe page code that converts it has not been downloaded yet (the new `-Discover` fetches it).
-3. **Queries also used for writing** (`advanced.information_events`, `home.ch_a_measures`, `home.ch_b_measures`): a GET read should be safe because the page does the same cyclically, but this is to be confirmed.
-4. **Access levels.** `show_level` is understood as the minimum user level needed to show the menu entry.
-5. **The 502 “The CGI was not CGI/1.1 compliant” reply** appeared for non-existent query numbers in the old list; with correct queries and after login it should not occur.
+1. **Password.** The last login (level 3) was rejected; until there is a valid session, 64 of 66 packages return “login required”.
+2. **Content of the other replies.** Real replies are known only for `monitoring.network_interfaces_mobile` and `advanced.information_events`.
+3. **Access levels.** `show_level` is understood as the minimum user level needed to show the menu entry; to be checked with the Admin and User accounts.
+4. **The 502 “The CGI was not CGI/1.1 compliant” reply** appeared for non-existent query numbers in the old list; with correct queries it does not occur.
 """),
  ]),
 }
@@ -579,10 +641,10 @@ def build_html(code):
         return f'<section id="{sid}"><h2>{esc(title)}</h2>{md2html(section_md(code, sid), U["copy"])}</section>'
     first = T["sections"][0]
     nav.append(f'<div class="nav-group"><a class="nav-h" href="#overview">{esc(first[1])}</a>'
-               + "".join(f'<a class="nav-i" href="#{s[0]}">{esc(s[1])}</a>' for s in T["sections"][1:5]) + '</div>')
+               + "".join(f'<a class="nav-i" href="#{s[0]}">{esc(s[1])}</a>' for s in T["sections"][1:6]) + '</div>')
     parts.append(f'<section id="overview-top"><h1>{esc(T["title"])}</h1></section>')
     parts.append(f'<section id="overview"><h2>{esc(first[1])}</h2>{md2html(section_md(code, "overview"), U["copy"])}</section>')
-    for sid in ("quick", "auth", "conv", "response"):
+    for sid in ("quick", "auth", "conv", "replies", "response"):
         parts.append(sec(sid))
     # package cards
     def sample_html(e):
@@ -677,7 +739,7 @@ def build_md(code):
     def sec(sid):
         title = next(s[1] for s in T["sections"] if s[0] == sid)
         return [f"## {title}", "", section_md(code, sid), ""]
-    for sid in ("overview", "quick", "auth", "conv", "response"):
+    for sid in ("overview", "quick", "auth", "conv", "replies", "response"):
         o += sec(sid)
     # packages
     o += [f"## {U['pk_title']}", ""]
@@ -695,8 +757,8 @@ def build_md(code):
     have = [(e, load_sample(e)) for e in eps]
     done = [(e, d) for e, d in have if is_ok(d)]
     todo = [(e, d) for e, d in have if not is_ok(d)]
-    intro = {"pl": "Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia. Odpowiedź `{\"value\":\"fail\"}` (wymagane logowanie) i błędy HTTP nie są przykładami.",
-             "en": "The examples come **only** from responses captured on a real device – nothing is made up. Packages without an example are waiting to be filled in after connecting to the device. The reply `{\"value\":\"fail\"}` (login required) and HTTP errors are not examples."}[code]
+    intro = {"pl": "Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia. Odpowiedź „wymagane logowanie” (`value: fail`) i błędy HTTP nie są przykładami.",
+             "en": "The examples come **only** from responses captured on a real device – nothing is made up. Packages without an example are waiting to be filled in after connecting to the device. The “login required” reply (`value: fail`) and HTTP errors are not examples."}[code]
     howto = {"pl": "Jak uzupełnić:", "en": "How to fill them in:"}[code]
     o += [f"## {U['samples_title']}", "", intro, "", U["count"].format(n=len(done), t=len(eps)), "", howto, "", "```bash",
           "REM_HOST=192.168.128.1 REM_USER=\"Super Admin\" REM_PASS='password' ./rem102/scripts/collect.sh", "python3 rem102/scripts/build-docs.py", "```", ""]
@@ -768,7 +830,7 @@ def build_index():
 <main style="margin:0 auto">
 <h1>REM-102 – odczyt informacji o urządzeniu</h1>
 <p class="lead">Strona prowadząca do wątku, w którym powstał ten zestaw: <a href="{SESSION_URL}">{SESSION_URL}</a></p>
-<div class="callout"><strong>Stan:</strong> znamy już prawdziwe API urządzenia (z jego własnych plików WWW), ale nie mamy jeszcze żadnej prawdziwej odpowiedzi pakietu. Skrypty sprawdzono na atrapie serwera. Poprawne odpowiedzi w dokumentacji: {captured} z {len(eps)}.</div>
+<div class="callout"><strong>Stan (19.10.2026):</strong> znamy prawdziwe API urządzenia i format odpowiedzi (z jego własnych plików WWW), a logowanie poziomem i hasłem jest zaimplementowane. Prawdziwe odpowiedzi mamy dla {captured} z {len(eps)} pakietów (te, które odpowiadają bez logowania). <strong>Hasło dla poziomu Super Admin zostało odrzucone</strong>, więc reszta wymaga poprawnego hasła.</div>
 
 <h2>Cel</h2>
 <p>Pełny opis podłączonego urządzenia REM-102 (model, numer seryjny, numer artykułu i reszta informacji z zakładek Home, Monitoring, Setup, Advanced) pobierany przez CGI, razem z dokumentacją tych zapytań i danymi do użycia w LabVIEW.</p>
@@ -779,6 +841,9 @@ def build_index():
 <li><strong>Pliki menu z pierwotnego zestawu były z innej wersji firmware.</strong> To urządzenie używa CGI <code>.cgi</code> (nie <code>.fcgi</code>), a lista zapytań jest inna: kanały A/B, archiwa, Ethernet 2, WLAN, HDLC i inne. Dlatego <code>-Discover</code> pobrał jego własne <code>Config/*.json</code>, a z nich odtworzono listę ({len(eps)} pakietów).</li>
 <li><strong>Logowanie nie używa nazwy użytkownika.</strong> Formularz wysyła <code>query=120&amp;login=&lt;1|2|3&gt;&amp;pwd=&lt;hasło&gt;</code> (User, Admin, Super Admin) do <code>/cgi-bin/mpc105.cgi</code>. Sesję niesie ciasteczko <code>CGISESSID</code>, błąd to <code>{{"value":"fail"}}</code>.</li>
 <li><strong>Wcześniejsze 404 i 502:</strong> pierwotne zapytania szły na nieistniejące <code>.fcgi</code> (404); <code>rem.cgi</code> z nieznanym numerem zapytania daje 502 „The CGI was not CGI/1.1 compliant”. Biblioteka HTTP z PowerShella nie radziła sobie z odpowiedzią <code>mpc105.cgi</code> (kod 0), dlatego <code>collect.ps1</code> mówi teraz surowym HTTP przez TCP.</li>
+<li><strong>Logowanie (19.10.2026):</strong> urządzenie przyjęło żądanie (<code>login=3</code>; w dzienniku zdarzeń: użytkownik <code>superadmin</code>, „Login unauthorized”), ale odrzuciło hasło. Odpowiedź to <code>{{"reference":"login","tag":"reply","label":"reply","value":"fail","execute":"","cancel":""}}</code>. Każda taka próba jest zapisywana w dzienniku zdarzeń.</li>
+<li><strong>Bez logowania odpowiadają tylko dwa pakiety:</strong> <code>monitoring.network_interfaces_mobile</code> (<code>mpc105.cgi?query=13</code>) i <code>advanced.information_events</code> (<code>?query=314</code>); to pierwsze prawdziwe odpowiedzi w dokumentacji. Pozostałe 64 zwróciły odpowiedź „wymagane logowanie”.</li>
+<li><strong>Z pobranych stron i skryptów:</strong> separator <code>~</code> jest zamieniany na <code>&amp;</code>; pola „set” przy zdarzeniach i pomiarach to filtry daty, nie zapis; format odpowiedzi to tablice obiektów <code>type/tag/label/value</code> (szczegóły w dokumentacji).</li>
 <li>Zapisy z tych prób są w <code>results/archive/</code>: <a href="results/archive/probe-2026-10-18.json">probe</a>, <a href="results/archive/discover-2026-10-18.json">discover</a>, <a href="results/archive/collected-2026-10-18_all-404.json">pierwsze zbieranie (wszystko 404)</a>.</li>
 </ul>
 
@@ -807,9 +872,10 @@ def build_index():
 <ul class="chk">
 {done("Odczytać własne pliki WWW urządzenia i ustalić API (Boa, <code>.cgi</code>, logowanie poziomem)")}
 {done("Odtworzyć listę zapytań z <code>Config/*.json</code> urządzenia, przepisać skrypty i dokumentację")}
-{todo("Uruchomić <code>collect.cmd</code> z poziomem Super Admin i hasłem – pierwsza prawdziwa odpowiedź (<code>results\\\\collected.json</code>)")}
-{todo("Uruchomić ponownie <code>collect.cmd -Discover</code> – nowa wersja pobiera też strony <code>*.html</code> i ich skrypty (separator <code>~</code>, format odpowiedzi)")}
-{todo("Przekazać <code>collected.json</code> i <code>discover.json</code> – dokumentację uzupełnia się z nich (<code>python3 rem102/scripts/build-docs.py</code>)")}
+{done("Pobrać strony <code>*.html</code> i skrypty urządzenia (<code>-Discover</code>): separator <code>~</code>, format odpowiedzi, filtry daty")}
+{done("Pierwsze prawdziwe odpowiedzi (bez logowania): mobile i zdarzenia")}
+{todo("Ustalić poprawne hasło dla poziomu Super Admin (najlepiej przez stronę w przeglądarce) i sprawdzić je jedną próbą: <code>collect.cmd -Level 3 -LoginTest</code>")}
+{todo("Uruchomić <code>collect.cmd</code> z poprawnym hasłem – pozostałe 64 pakiety (<code>results\\collected.json</code>) i przekazać plik")}
 {todo("Sprawdzić <code>collect.ps1</code> w Windows PowerShell 5.1 (testowano w PowerShell 7 na atrapie)")}
 {todo("Potwierdzić format odpowiedzi poszczególnych pakietów i poziomy dostępu (<code>min_level</code>)")}
 {todo("Potwierdzić, że odczyt <code>advanced.information_events</code> i <code>home.ch_*_measures</code> jest bezpieczny – w menu to samo zapytanie służy też do zapisu")}
@@ -828,8 +894,8 @@ def build_index():
 <h2>Uruchomienie</h2>
 <p>Windows (PowerShell) – plik <code>.sh</code> nie uruchomi się, użyj <code>collect.cmd</code> (nie wymaga bash, curl, jq ani Pythona):</p>
 <div class="code"><pre><code>cd C:\\rem102\\scripts
-.\\collect.cmd -DeviceHost 192.168.128.1 -Discover
-.\\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'hasło'</code></pre></div>
+.\\collect.cmd -DeviceHost 192.168.128.1 -Level 3 -LoginTest      (jedna próba logowania, pyta o hasło)
+.\\collect.cmd -DeviceHost 192.168.128.1 -Level 3                 (pełne zbieranie, pyta o hasło)</code></pre></div>
 <p>Linux / macOS / Git Bash:</p>
 <div class="code"><pre><code>REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='hasło' ./rem102/scripts/collect.sh
 python3 rem102/scripts/build-docs.py</code></pre></div>

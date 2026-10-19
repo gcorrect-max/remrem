@@ -25,6 +25,7 @@
   .\collect.cmd -DeviceHost 192.168.128.1 -Level 3        (asks for the password)
   .\collect.cmd -DeviceHost 192.168.128.1 -Discover       (no login: reads the device's own web files)
   .\collect.cmd -DeviceHost 192.168.128.1 -Probe          (no login: finds ports/paths that answer)
+  .\collect.cmd -DeviceHost 192.168.128.1 -Level 3 -LoginTest   (one login attempt only, then stop)
 
 .NOTES
   This file is ASCII only on purpose (Windows PowerShell 5.1 reads BOM-less files as ANSI).
@@ -44,6 +45,7 @@ param(
   [switch]$Insecure,
   [switch]$Probe,
   [switch]$Discover,
+  [switch]$LoginTest,
   [switch]$StdOut
 )
 
@@ -254,7 +256,13 @@ function RespJson($r) {
   }
   return ('{{"http_status":{0},"content_type":{1},"server":{2},"body":{3}}}' -f $r.Code, (J $r.ContentType), (J $r.Server), (BodyJson $r.Body))
 }
-function IsAuthFail([string]$body) { return ($body -match '^\s*\{\s*"value"\s*:\s*"fail"\s*\}\s*$') }
+# the device answers a read without a valid session with {"reference":"login","tag":"reply","value":"fail",...}
+function IsAuthFail([string]$body) {
+  try {
+    $o = ConvertFrom-Json -InputObject $body
+    return (($o -is [pscustomobject]) -and ($o.PSObject.Properties.Name -contains 'value') -and (([string]$o.value) -ieq 'fail'))
+  } catch { return $false }
+}
 
 # ---------- -Probe: find where the web interface is (no login, harmless GETs only) ----------
 if ($Probe) {
@@ -355,7 +363,9 @@ if ($null -ne $levelFromCookie -and $levelFromCookie -ge 0) { $lcJson = [string]
 $loginJson = ('{{"http_status":{0},"content_type":{1},"server":{2},"error":{3},"headers":{4},"body":{5},"ok":{6},"value":{7},"cookie_names":{8},"level_requested":{9},"level_from_cookie":{10}}}' -f `
   $lr.Code, (J $lr.ContentType), (J $lr.Server), (J $lr.Error), $hdrJson, (BodyJson $lr.Body), $loginOk.ToString().ToLower(), (J $lv), $namesJson, $Level, $lcJson)
 if ($loginOk) { Log ("   OK (HTTP {0}, value={1}); cookies: {2}; level from cookie: {3}" -f $lr.Code, $lv, ($script:Cookies.Keys -join ', '), $levelFromCookie) }
-else { Log ("   WARNING: login did not succeed (HTTP {0}, value={1}, cookies: {2}) {3} - the data below will probably be a login-required answer. Continuing." -f $lr.Code, $lv, ($script:Cookies.Keys -join ', '), $lr.Error) }
+else { Log ("   WARNING: login did not succeed (HTTP {0}, value={1}, cookies: {2}) {3}" -f $lr.Code, $lv, ($script:Cookies.Keys -join ', '), $lr.Error)
+       Log "   Check the password: every failed login is recorded in the device event log. Packages that need a login will come back as value=fail." }
+if ($LoginTest) { Log "== login test only (-LoginTest): nothing else was requested"; $Client.Dispose(); return }
 
 # ---------- packages, one by one ----------
 $rows = @(Import-Csv -LiteralPath $Tsv -Delimiter "`t" -Encoding UTF8)

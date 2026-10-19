@@ -16,7 +16,8 @@
 #          REM_LOGIN_BODY (pełne ciało logowania, nadpisuje domyślne), REM_OUT_DIR,
 #          REM_TIMEOUT (10 s na zapytanie), REM_DELAY (przerwa między zapytaniami, s; domyślnie 0),
 #          REM_TSV (inna lista pakietów), REM_BASE_URL (pełny adres bazowy, np. https://192.168.128.1:8443 lub http://host/prefix;
-#          domyślnie http://$REM_HOST), REM_INSECURE=1 (akceptuj certyfikat self-signed)
+#          domyślnie http://$REM_HOST), REM_INSECURE=1 (akceptuj certyfikat self-signed),
+#          REM_LOGIN_TEST=1 (tylko jedna próba logowania, bez pobierania pakietów)
 # Wymaga: bash, curl, jq.
 #
 # Logowanie tak, jak robi to strona urządzenia (Script/mainParent.js):
@@ -119,8 +120,9 @@ LOGIN_JSON="$(resp_json | jq -c --argjson ok "$LOGIN_OK" --arg cookies "$COOKIES
 if [ "$LOGIN_OK" = true ]; then
   log "   OK (HTTP ${F_CODE}, value=${LOGIN_VALUE}); ciasteczka: $(jq -r '.cookie_names | join(", ")' <<<"$LOGIN_JSON"); poziom z ciasteczka: ${LEVEL_COOKIE}"
 else
-  log "   UWAGA: logowanie nie powiodło się (HTTP ${F_CODE}, value=${LOGIN_VALUE}) – dane poniżej będą prawdopodobnie odpowiedzią 'wymagane logowanie'. Kontynuuję."
+  log "   UWAGA: logowanie nie powiodło się (HTTP ${F_CODE}, value=${LOGIN_VALUE}). Sprawdź hasło: każde nieudane logowanie jest zapisywane w dzienniku zdarzeń urządzenia."
 fi
+if [ -n "${REM_LOGIN_TEST:-}" ]; then log "== tylko test logowania (REM_LOGIN_TEST): nic więcej nie pobrano"; exit 0; fi
 
 # ---------- pakiety, po kolei ----------
 TOTAL="$(tail -n +2 "$TSV" | tr -d '\r' | grep -c .)"
@@ -145,7 +147,7 @@ while IFS=$'\t' read -r name tab id request label; do
                   --argjson e "$entry" '{tab:$tab, id:$id, label:$label, cgi:$cgi, query:$query} + $e')"
   printf '%s\n' "$entry" >> "$ENTRIES"
   code="$(jq -r .http_status <<<"$entry")"
-  if jq -e '.body == {"value":"fail"}' <<<"$entry" >/dev/null 2>&1; then AUTHFAIL=$((AUTHFAIL+1)); note="${note}  WYMAGANE LOGOWANIE (value=fail)"
+  if jq -e '(.body | type == "object") and ((.body.value // "") | ascii_downcase) == "fail"' <<<"$entry" >/dev/null 2>&1; then AUTHFAIL=$((AUTHFAIL+1)); note="${note}  WYMAGANE LOGOWANIE (value=fail)"
   elif [[ "$code" =~ ^2 ]]; then OK=$((OK+1)); else BAD=$((BAD+1)); fi
   log "[$N/$TOTAL] $name  HTTP ${code}  ${bytes} B${note}"
   [ "$DELAY" != 0 ] && sleep "$DELAY"

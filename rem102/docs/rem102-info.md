@@ -6,7 +6,7 @@
 
 Opis zapytań CGI, którymi interfejs WWW urządzenia **REM-102** (serwer Boa, strona producenta HaslerRail) pobiera dane. Lista pochodzi z plików, które urządzenie samo udostępnia (`Config/*.json`), odczytanych skryptem `collect.ps1 -Discover`. Uwzględnione są wyłącznie zapytania odczytowe.
 
-> **Status.** Logowanie, nazwy CGI, ciasteczko sesji i poziomy dostępu pochodzą ze skryptów strony urządzenia (`Script/mainParent.js`, `Script/globalFunc.js`). Skrypty zbierające sprawdzono na atrapie serwera, nie na prawdziwych odpowiedziach. **Treści odpowiedzi poszczególnych pakietów nie znamy jeszcze** – patrz sekcja „Przykłady odpowiedzi”.
+> **Status (19.10.2026).** Logowanie, nazwy CGI, ciasteczko sesji, poziomy dostępu i format odpowiedzi pochodzą ze skryptów strony urządzenia (`Script/*.js`). Pierwsze prawdziwe odpowiedzi mamy tylko dla pakietów, które odpowiadają **bez logowania** (2 z 66). Logowanie nie powiodło się (odrzucone hasło), więc reszta pakietów zwróciła odpowiedź „wymagane logowanie” – patrz „Przykłady odpowiedzi”.
 
 Adres bazowy: `http://<HOST>` (domyślnie `192.168.128.1`, port 80). Urządzenie udostępnia cztery pliki CGI:
 
@@ -74,18 +74,47 @@ Logowanie wykonuje formularz strony (`Script/mainParent.js`): `POST /cgi-bin/mpc
 | `pwd` | hasło, kodowane URL |
 | `change` | zaznaczone tylko przy zmianie hasła |
 
-- Odpowiedź to JSON z polem `value`: `"fail"` = złe hasło, `"change"` = trzeba zmienić hasło, inna wartość = zalogowano.
+- Odpowiedź to JSON z polem `value`: `"fail"` = złe hasło, `"change"` = trzeba zmienić hasło, inna wartość = zalogowano. Prawdziwa odpowiedź na nieudane logowanie: `{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }`.
+- Każde nieudane logowanie trafia do dziennika zdarzeń urządzenia (`advanced.information_events`: `CODE` 2, `DESCRIPTION` „Login unauthorized”, `USER` np. `superadmin`), więc nie zgaduj haseł wielokrotnie. Skrypty mają tryb samego testu logowania (`-LoginTest` / `REM_LOGIN_TEST=1`).
 - Sesję niesie ciasteczko `CGISESSID`; poziom odczytuje strona z 5. znaku wartości (`A`..`D` = 0..3).
 - Wylogowanie: `GET /cgi-bin/mpc105j.cgi?query=122`, strona kasuje ciasteczko.
 - Strona pokazuje pozycję menu, gdy `show_level` ≤ poziom użytkownika; zapis wymaga `write_level`.
-- Według skryptów strony odpowiedź `{"value":"fail"}` na zapytanie odczytowe oznacza „Needed Authentication”.
+- Odczyt bez ważnej sesji zwraca tę samą odpowiedź `value: fail` (strona pokazuje wtedy „Needed Authentication”). Bez logowania odpowiadają tylko niektóre zapytania: w próbie z 19.10.2026 `mpc105.cgi?query=13` i `mpc105.cgi?query=314`.
 
 ## Konwencje
 
 - Zapytania odczytowe to `GET <cgi>?<query>`, odpowiedzi są w JSON (strona używa `$.getJSON`).
-- W plikach menu parametry zapytań bywają rozdzielone znakiem `~` (np. `query=7~block_offset=10240~…`). W tabeli pakietów zapisano je jako `&`; to założenie, patrz „Założenia”.
+- W plikach menu parametry zapytań są rozdzielone znakiem `~` (np. `query=7~block_offset=10240~…`). Skrypty stron (`iframe.js`, `energy.js`, …) zamieniają go na `&` przed wysłaniem, tak samo zapisano to w tabeli pakietów.
 - Pola `en_cgi`/`en_query` w menu sprawdzają, czy moduł jest włączony – to pakiety z zakładki Features.
 - Pola `set`, `set1`, `set2` zapisują konfigurację – **nie są** używane.
+
+## Format odpowiedzi urządzenia
+
+Odpowiedzi CGI to JSON, ale z nagłówkiem `Content-type: text/html`. Format wynika ze skryptów strony (`Script/globalFunc.js`, `iframe.js`, `iframeDB.js`, `tableMultiColPag.js`) oraz z pierwszych prawdziwych odpowiedzi.
+
+### Wymagane logowanie
+
+```json
+{ "reference":"login", "tag":"reply", "label":"reply", "value":"fail", "execute":"", "cancel":"" }
+```
+
+Taką odpowiedź (HTTP 200) dostaje zapytanie bez ważnej sesji, a także nieudane logowanie. Skrypty zbierające liczą ją jako „wymagane logowanie”, nie jako dane.
+
+### Lista pól (strony default.html, eth.html)
+
+Tablica obiektów z polami `type`, `reference`, `tag`, `label`, `color`, `options`, `value`. Typy (z `globalFunc.js`): `text` (tylko do odczytu), `input`, `password`, `check`, `select` (po nim elementy `option`), `bar` (siła sygnału 1–5), `note`, `menu` oraz `enable` (flaga modułu: `value` = `true`/`false`). Pole `tag` jest nazwą pola formularza zapisu. Prawdziwy przykład: `monitoring.network_interfaces_mobile`.
+
+### Zdarzenia (`advanced.information_events`)
+
+Tablica: elementy `{"type":"head","column_no":N,"column_name":"..."}` opisują kolumny, a element `{"type":"data","events":[...]}` zawiera wiersze z polami `ID`, `DATATIME`, `CODE`, `USER`, `DESCRIPTION`, `TIMET`. Prawdziwy przykład poniżej.
+
+### Tabele archiwów (`home.archive_*`)
+
+Według `tableMultiColPag.js`: element `{"type":"header","table_head":[{column_no, column_label, column_name, cell_type, method}]}` i wiersze w `table_rows`. Bez prawdziwej odpowiedzi.
+
+### Odczyty pamięci (`query=7&...`)
+
+Pakiety Meter Status, Energy i Digital IO to tablice obiektów z polami `tag`, `label`, `value`, `color`; strony rozpoznają `tag` (np. w `energy.js` pola mocy, napięcia, prądu i energii). Bez prawdziwej odpowiedzi.
 
 ## Format wyniku skryptów
 
@@ -129,9 +158,9 @@ Odczyty miernika: kanały A i B, energia, wejścia/wyjścia cyfrowe, archiwa, si
 |---|---|---|---|
 | `home.summary_meter_status` | `/cgi-bin/rem.cgi?query=7&block_offset=10240&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=17&string_size=32` | 0 |  |
 | `home.ch_a_energy` | `/cgi-bin/rem.cgi?query=7&block_offset=11264&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32` | 0 |  |
-| `home.ch_a_measures` | `/cgi-bin/rem.cgi?query=106&channel=0` | 0 | W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt. |
+| `home.ch_a_measures` | `/cgi-bin/rem.cgi?query=106&channel=0` | 0 | Pole „set” w menu to formularz wyboru godziny/daty (skrypt `measure.js`) – filtr, nie zapis ustawień. |
 | `home.ch_b_energy` | `/cgi-bin/rem.cgi?query=7&block_offset=12288&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=19&string_size=32` | 0 |  |
-| `home.ch_b_measures` | `/cgi-bin/rem.cgi?query=106&channel=1` | 0 | W menu to samo zapytanie służy też do zapisu (set); skrypt wysyła tylko odczyt. |
+| `home.ch_b_measures` | `/cgi-bin/rem.cgi?query=106&channel=1` | 0 | Pole „set” w menu to formularz wyboru godziny/daty (skrypt `measure.js`) – filtr, nie zapis ustawień. |
 | `home.digital_io` | `/cgi-bin/rem.cgi?query=7&block_offset=13312&byte_offset=0&data_size=1024&type=STRING&name=energy&memory=remshm&number=12&string_size=32` | 0 |  |
 | `home.archive_1_waiting_files` | `/cgi-bin/rem.cgi?query=107&id=1` | 0 |  |
 | `home.archive_1_sent_files` | `/cgi-bin/rem.cgi?query=108&id=1` | 0 |  |
@@ -153,7 +182,7 @@ Stan interfejsów sieciowych, pamięci i podzespołów oraz RTP100.
 | `monitoring.network_interfaces_ethernet_1` | `/cgi-bin/mpc105.cgi?query=4` | 0 |  |
 | `monitoring.network_interfaces_ethernet_2` | `/cgi-bin/mpc105.cgi?query=5` | 0 |  |
 | `monitoring.network_interfaces_wlan` | `/cgi-bin/mpc105.cgi?query=6` | 0 |  |
-| `monitoring.network_interfaces_mobile` | `/cgi-bin/mpc105.cgi?query=13` | 0 |  |
+| `monitoring.network_interfaces_mobile` | `/cgi-bin/mpc105.cgi?query=13` | 0 | Odpowiada bez logowania (próba z 19.10.2026). |
 | `monitoring.network_interfaces_ethernet_switch` | `/cgi-bin/mpc105.cgi?query=14` | 0 |  |
 | `monitoring.network_interfaces_gps` | `/cgi-bin/mpc105.cgi?query=16` | 0 |  |
 | `monitoring.rtp100_rtp100_variables` | `/cgi-bin/rtp.cgi?query=441` | 0 | Wymaga włączonego modułu: `features.rtp100`. |
@@ -211,7 +240,7 @@ Czas RTC, konfiguracja i informacje o urządzeniu (model, numer seryjny, wersje,
 | `advanced.rtc_time_zones` | `/cgi-bin/mpc105.cgi?query=305` | 0 |  |
 | `advanced.configuration_settings` | `/cgi-bin/rem.cgi?query=113` | 0 |  |
 | `advanced.information_device_settings` | `/cgi-bin/mpc105.cgi?query=302` | 1 | Model, numer seryjny, numer artykułu i pozostałe dane urządzenia. W menu: show_level 1, write_level 3. |
-| `advanced.information_events` | `/cgi-bin/mpc105.cgi?query=314` | 0 | W menu to samo zapytanie służy też do zapisu (set = query=314); skrypt wysyła tylko odczyt. |
+| `advanced.information_events` | `/cgi-bin/mpc105.cgi?query=314` | 0 | Odpowiada bez logowania (próba z 19.10.2026). Pole „set” w menu to formularz wyboru daty (`datetime`, rok/miesiąc/dzień) – filtr, nie zapis ustawień. |
 | `advanced.information_version` | `/cgi-bin/mpc105.cgi?query=301` | 0 | Wersje oprogramowania. |
 
 ### Features (`features`)
@@ -224,9 +253,9 @@ Flagi włączenia modułów (`en_query` z menu).
 
 ## Przykłady odpowiedzi
 
-Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia. Odpowiedź `{"value":"fail"}` (wymagane logowanie) i błędy HTTP nie są przykładami.
+Przykłady pochodzą **wyłącznie** z odpowiedzi zebranych z prawdziwego urządzenia – nic nie jest zmyślone. Pakiety bez przykładu czekają na uzupełnienie po podłączeniu do urządzenia. Odpowiedź „wymagane logowanie” (`value: fail`) i błędy HTTP nie są przykładami.
 
-Zebrano przykładów: 0 z 66.
+Zebrano przykładów: 2 z 66.
 
 Jak uzupełnić:
 
@@ -235,74 +264,146 @@ REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='password' ./rem102/scrip
 python3 rem102/scripts/build-docs.py
 ```
 
-<details><summary>Do uzupełnienia (66)</summary>
+### `monitoring.network_interfaces_mobile`
 
-- `home.summary_meter_status`
-- `home.ch_a_energy`
-- `home.ch_a_measures`
-- `home.ch_b_energy`
-- `home.ch_b_measures`
-- `home.digital_io`
-- `home.archive_1_waiting_files`
-- `home.archive_1_sent_files`
-- `home.archive_1_test_files`
-- `home.archive_2_waiting_files`
-- `home.archive_2_sent_files`
-- `home.archive_2_test_files`
-- `home.networking_interfaces`
-- `home.networking_services`
-- `home.networking_redirection`
-- `monitoring.network_interfaces_ethernet_0`
-- `monitoring.network_interfaces_ethernet_1`
-- `monitoring.network_interfaces_ethernet_2`
-- `monitoring.network_interfaces_wlan`
-- `monitoring.network_interfaces_mobile`
-- `monitoring.network_interfaces_ethernet_switch`
-- `monitoring.network_interfaces_gps`
-- `monitoring.rtp100_rtp100_variables`
-- `monitoring.rtp100_rtp100_files`
-- `monitoring.memory_nand`
-- `monitoring.memory_nor`
-- `monitoring.memory_ram`
-- `monitoring.other_devices_rtc`
-- `monitoring.other_devices_fpga`
-- `monitoring.other_devices_fram`
-- `monitoring.other_devices_adc`
-- `monitoring.other_devices_hdlc`
-- `monitoring.other_devices_mvbcs`
-- `monitoring.other_devices_modem`
-- `monitoring.other_devices_wifi`
-- `setup.meter_settings`
-- `setup.meter_channels_configuration`
-- `setup.meter_ftp_hosts`
-- `setup.meter_udp_clients`
-- `setup.meter_messages`
-- `setup.meter_calibration`
-- `setup.meter_thresholds_protection`
-- `setup.rtp100_rtp100_command`
-- `setup.ethernet_interfaces_ethernet_0`
-- `setup.ethernet_interfaces_ethernet_1`
-- `setup.ethernet_interfaces_ethernet_2`
-- `setup.ethernet_interfaces_switch_ethernet`
-- `setup.mobile_interface_mobile_settings`
-- `setup.wireless_interface_wlan`
-- `setup.wireless_interface_client_access`
-- `setup.dhcp_client_settings`
-- `setup.dhcp_server_settings`
-- `setup.dhcp_address_reservation`
-- `setup.services_gateway_dns`
-- `setup.services_servers`
-- `setup.services_ntp_servers`
-- `setup.services_gps`
-- `setup.services_port_forwarding`
-- `setup.services_proxy_settings`
-- `advanced.rtc_time_settings`
-- `advanced.rtc_time_zones`
-- `advanced.configuration_settings`
-- `advanced.information_device_settings`
-- `advanced.information_events`
-- `advanced.information_version`
-- `features.rtp100`
+`GET /cgi-bin/mpc105.cgi?query=13` · HTTP 200
+
+```json
+[
+  {
+    "type": "text",
+    "reference": "ppp0",
+    "tag": "protocoltype",
+    "label": "Protocol Type",
+    "color": "black",
+    "options": "",
+    "value": "PPP"
+  },
+  {
+    "type": "text",
+    "reference": "ppp0",
+    "tag": "status",
+    "label": "Status",
+    "color": "black",
+    "options": "",
+    "value": ""
+  }
+]
+```
+
+### `advanced.information_events`
+
+`GET /cgi-bin/mpc105.cgi?query=314` · HTTP 200
+
+```json
+[
+  {
+    "type": "head",
+    "column_no": 1,
+    "column_name": "ID"
+  },
+  {
+    "type": "head",
+    "column_no": 2,
+    "column_name": "DATATIME"
+  },
+  {
+    "type": "head",
+    "column_no": 3,
+    "column_name": "CODE"
+  },
+  {
+    "type": "head",
+    "column_no": 4,
+    "column_name": "USER"
+  },
+  {
+    "type": "head",
+    "column_no": 5,
+    "column_name": "DESCRIPTION"
+  },
+  {
+    "type": "data",
+    "events": [
+      {
+        "ID": "3737",
+        "DATATIME": "2026-10-19 02:27:53",
+        "CODE": "2",
+        "USER": "superadmin",
+        "DESCRIPTION": "Login unauthorized",
+        "TIMET": "1792376873"
+      }
+    ]
+  }
+]
+```
+
+<details><summary>Do uzupełnienia (64)</summary>
+
+- `home.summary_meter_status` (ostatnia próba: login required)
+- `home.ch_a_energy` (ostatnia próba: login required)
+- `home.ch_a_measures` (ostatnia próba: login required)
+- `home.ch_b_energy` (ostatnia próba: login required)
+- `home.ch_b_measures` (ostatnia próba: login required)
+- `home.digital_io` (ostatnia próba: login required)
+- `home.archive_1_waiting_files` (ostatnia próba: login required)
+- `home.archive_1_sent_files` (ostatnia próba: login required)
+- `home.archive_1_test_files` (ostatnia próba: login required)
+- `home.archive_2_waiting_files` (ostatnia próba: login required)
+- `home.archive_2_sent_files` (ostatnia próba: login required)
+- `home.archive_2_test_files` (ostatnia próba: login required)
+- `home.networking_interfaces` (ostatnia próba: login required)
+- `home.networking_services` (ostatnia próba: login required)
+- `home.networking_redirection` (ostatnia próba: login required)
+- `monitoring.network_interfaces_ethernet_0` (ostatnia próba: login required)
+- `monitoring.network_interfaces_ethernet_1` (ostatnia próba: login required)
+- `monitoring.network_interfaces_ethernet_2` (ostatnia próba: login required)
+- `monitoring.network_interfaces_wlan` (ostatnia próba: login required)
+- `monitoring.network_interfaces_ethernet_switch` (ostatnia próba: login required)
+- `monitoring.network_interfaces_gps` (ostatnia próba: login required)
+- `monitoring.rtp100_rtp100_variables` (ostatnia próba: login required)
+- `monitoring.rtp100_rtp100_files` (ostatnia próba: login required)
+- `monitoring.memory_nand` (ostatnia próba: login required)
+- `monitoring.memory_nor` (ostatnia próba: login required)
+- `monitoring.memory_ram` (ostatnia próba: login required)
+- `monitoring.other_devices_rtc` (ostatnia próba: login required)
+- `monitoring.other_devices_fpga` (ostatnia próba: login required)
+- `monitoring.other_devices_fram` (ostatnia próba: login required)
+- `monitoring.other_devices_adc` (ostatnia próba: login required)
+- `monitoring.other_devices_hdlc` (ostatnia próba: login required)
+- `monitoring.other_devices_mvbcs` (ostatnia próba: login required)
+- `monitoring.other_devices_modem` (ostatnia próba: login required)
+- `monitoring.other_devices_wifi` (ostatnia próba: login required)
+- `setup.meter_settings` (ostatnia próba: login required)
+- `setup.meter_channels_configuration` (ostatnia próba: login required)
+- `setup.meter_ftp_hosts` (ostatnia próba: login required)
+- `setup.meter_udp_clients` (ostatnia próba: login required)
+- `setup.meter_messages` (ostatnia próba: login required)
+- `setup.meter_calibration` (ostatnia próba: login required)
+- `setup.meter_thresholds_protection` (ostatnia próba: login required)
+- `setup.rtp100_rtp100_command` (ostatnia próba: login required)
+- `setup.ethernet_interfaces_ethernet_0` (ostatnia próba: login required)
+- `setup.ethernet_interfaces_ethernet_1` (ostatnia próba: login required)
+- `setup.ethernet_interfaces_ethernet_2` (ostatnia próba: login required)
+- `setup.ethernet_interfaces_switch_ethernet` (ostatnia próba: login required)
+- `setup.mobile_interface_mobile_settings` (ostatnia próba: login required)
+- `setup.wireless_interface_wlan` (ostatnia próba: login required)
+- `setup.wireless_interface_client_access` (ostatnia próba: login required)
+- `setup.dhcp_client_settings` (ostatnia próba: login required)
+- `setup.dhcp_server_settings` (ostatnia próba: login required)
+- `setup.dhcp_address_reservation` (ostatnia próba: login required)
+- `setup.services_gateway_dns` (ostatnia próba: login required)
+- `setup.services_servers` (ostatnia próba: login required)
+- `setup.services_ntp_servers` (ostatnia próba: login required)
+- `setup.services_gps` (ostatnia próba: login required)
+- `setup.services_port_forwarding` (ostatnia próba: login required)
+- `setup.services_proxy_settings` (ostatnia próba: login required)
+- `advanced.rtc_time_settings` (ostatnia próba: login required)
+- `advanced.rtc_time_zones` (ostatnia próba: login required)
+- `advanced.configuration_settings` (ostatnia próba: login required)
+- `advanced.information_device_settings` (ostatnia próba: login required)
+- `advanced.information_version` (ostatnia próba: login required)
+- `features.rtp100` (ostatnia próba: login required)
 
 </details>
 
@@ -352,7 +453,8 @@ cd C:\rem102\scripts
 .\collect.cmd -DeviceHost 192.168.128.1 -User "Super Admin" -Password 'password'
 ```
 
-- Bez `-Password` skrypt zapyta o hasło. Nazwę ze spacją podaj w cudzysłowie; zamiast nazwy można podać `-Level 3`.
+- Bez `-Password` skrypt zapyta o hasło (to najprostszy sposób, bez problemów z cudzysłowami). Nazwę ze spacją podaj w cudzysłowie; zamiast nazwy można podać `-Level 3`.
+- `-LoginTest` wykonuje jedną próbę logowania i kończy – dobry sposób na sprawdzenie hasła bez wielu nieudanych prób.
 - `-Discover` czyta własne pliki WWW urządzenia (bez logowania) i zapisuje `results\discover.json`; `-Probe` sprawdza porty i ścieżki (`results\probe.json`).
 - `-BaseUrl https://192.168.128.1:8443 -Insecure` – inny adres bazowy lub certyfikat self-signed.
 - Zwykły HTTP idzie surowym połączeniem TCP, więc nietypowe odpowiedzi CGI też zostają zapisane (z powodem w polu `error`).
@@ -392,10 +494,9 @@ Dla każdego pakietu wystarczy osobny typedef klastra, bez osobnej instancji. Do
 
 ## Założenia i do sprawdzenia
 
-Ustalone z plików WWW urządzenia (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd`, ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`.
+Ustalone z plików WWW urządzenia i z prawdziwych odpowiedzi (nie są już założeniami): logowanie `query=120` z polami `login` (poziom) i `pwd`, ciasteczko `CGISESSID`, odczyty przez GET z odpowiedziami JSON, nazwy CGI `.cgi`, lista zapytań z `Config/*.json`, separator `~` zamieniany na `&`, format odpowiedzi „wymagane logowanie”, pola „set” przy zdarzeniach i pomiarach to filtry daty (nie zapis).
 
-1. **Treść odpowiedzi.** Format poszczególnych pakietów jest nieznany do czasu zebrania ich z urządzenia.
-2. **Separator `~`.** W plikach menu oznacza prawdopodobnie `&`; kod stron-iframe, który to przekształca, nie był jeszcze pobrany (nowy `-Discover` je pobiera).
-3. **Zapytania używane też do zapisu** (`advanced.information_events`, `home.ch_a_measures`, `home.ch_b_measures`): odczyt przez GET powinien być bezpieczny, bo strona robi to samo cyklicznie, ale do potwierdzenia.
-4. **Poziomy dostępu.** `show_level` rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu.
-5. **Odpowiedź 502 „The CGI was not CGI/1.1 compliant”** pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach i po zalogowaniu nie powinna występować.
+1. **Hasło.** Ostatnie logowanie (poziom 3) zostało odrzucone; dopóki nie ma ważnej sesji, 64 z 66 pakietów zwraca „wymagane logowanie”.
+2. **Treść pozostałych odpowiedzi.** Znamy prawdziwe odpowiedzi tylko dla `monitoring.network_interfaces_mobile` i `advanced.information_events`.
+3. **Poziomy dostępu.** `show_level` rozumiemy jako minimalny poziom użytkownika do wyświetlenia pozycji menu; do sprawdzenia na kontach Admin i User.
+4. **Odpowiedź 502 „The CGI was not CGI/1.1 compliant”** pojawiła się dla nieistniejących numerów zapytań w starej liście; przy poprawnych zapytaniach nie występuje.

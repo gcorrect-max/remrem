@@ -1,0 +1,118 @@
+<!DOCTYPE html>		
+<html>
+	<head>
+		<!-- META tag -->
+		<meta charset="UTF-8" />
+		<meta name="author" content="HaslerRail">
+		<title> Eth </title>
+		
+		<!-- Style sheet -->
+		<link rel="stylesheet" type="text/css" href="Style/table.css" />
+		
+		<!-- Script -->
+		<script type="text/javascript" src="Script/jquery.js"></script>
+		<script type="text/javascript" src="Script/globalFunc.js"></script>
+		<script type="text/javascript" src="Script/iframe.js"></script>
+	</head>
+	<body id="iframe">	
+		<div id="Iframe_container" >
+			<table>
+				<caption></caption>
+				<thead> <!-- table head -->
+					<tr>						
+						<th width="50%">Name</th>
+						<th width="50%">Value</th>
+					</tr>
+				</thead>
+				<tbody> <!-- table body -->
+					<tr> 
+						<th id="lab_mac"></th>
+						<td id="td_mac"><span id="span_mac">-</span></td>
+					</tr>
+					<tr>
+						<th id="lab_ip"></th>
+						<td id="td_ip"><span id="span_ip">-</span></td>
+					</tr>					<tr>
+						<th id="lab_ipbrod"></th>
+						<td id="td_ipbrod"><span id="span_ipbrod">-</span></td>
+					</tr>
+					<tr>
+						<th id="lab_mask"></th>
+						<td id="td_mask"><span id="span_mask">-</span></td>
+					</tr>
+					<tr> 
+						<th id="lab_protocoltype"></th>
+						<td id="td_protocoltype"><span id="span_protocoltype">-</span></td>													
+					</tr>
+					<tr> 
+						<th id="lab_status"></th>
+						<td id="td_status"><span id="span_status">-</span></td>												
+					</tr>
+				</tbody>
+			</table>
+			<table>					
+				<thead>
+					<tr> 
+						<th colspan="10" >Rx Statistics</th>																						
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th width="8%" id="lab_PacketsRX">Pac:</th>
+						<td width="12%" id="td_PacketsRX"><span id="span_PacketsRX">-</span></td>
+						<th width="8%" id="lab_ErrorsRX">Err:</th>
+						<td width="12%" id="td_ErrorsRX"><span id="span_ErrorsRX">-</span></td>
+						<th width="8%" id="lab_DroppedRX">Dro:</th>
+						<td width="12%" id="td_DroppedRX"><span id="span_DroppedRX">-</span></td>
+						<th width="8%" id="lab_OverrunsRX">Ove:</th>
+						<td width="12%" id="td_OverrunsRX"><span id="span_OverrunsRX">-</span></td>
+						<th width="8%" id="lab_FrameRX">Car:</th>
+						<td width="12%" id="td_FrameRX"><span id="span_FrameRX">-</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					<tr> 
+						<th colspan="10" >Tx Statistics</th>																						
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th width="8%" id="lab_PacketsTX">Pac:</th>
+						<td width="12%" id="td_PacketsTX"><span id="span_Packets">-</span></td>
+						<th width="8%" id="lab_ErrorsTX">Err:</th>
+						<td width="12%" id="td_ErrorsTX"><span id="span_Errors">-</span></td>
+						<th width="8%" id="lab_DroppedTX">Dro:</th>
+						<td width="12%" id="td_DroppedTX"><span id="span_DroppedTX">-</span></td>
+						<th width="8%" id="lab_OverrunsTX">Ove:</th>
+						<td width="12%" id="td_OverrunsTX"><span id="span_OverrunsTX">-</span></td>
+						<th width="8%" id="lab_CarrierTX">Car:</th>
+						<td width="12%" id="td_CarrierTX"><span id="span_CarrierTX">-</span></td>
+					</tr>         
+					<!--<tr> 														
+						<th width="8%" id="lab_CollisionsTX">Col:</td>
+						<td colspan="4" width="42%" id="CollisionsTX">-</td>
+						<th width="8%" id="lab_TxqueuelenTX">Txq:</td>
+						<td colspan="4" width="42%" id="TxqueuelenTX">-</td>
+					</tr>-->
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					<tr>
+						<th colspan="4">Total</th>																						
+					</tr>
+				</thead>
+				<tbody>
+					<tr> 														
+						<th width="20%" id="lab_RXbytes">RX bytes:</th>
+						<td width="30%" id="td_RXbytes"><span id="span_RXbytes">-</span></td>
+						<th width="20%" id="lab_TXbytes">TX bytes:</th>
+						<td width="30%" id="td_TXbytes"><span id="span_TXbytes">-</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

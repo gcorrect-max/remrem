@@ -1,0 +1,515 @@
+{"device":{"base_url":"http://192.168.128.1","collected_at":"2026-10-19T02:27:50Z","script":"collect.ps1","packages_total":66,"packages_ok":66,"packages_login_required":0,"packages_failed":0,"packages_skipped":0},"login":{"http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","error":null,"headers":["HTTP/1.0 200 OK","Date: Mon, 19 Oct 2026 02:27:53 GMT","Server: Boa/0.94.14rc21","Accept-Ranges: bytes","Connection: close","Content-type: text/html"],"body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+},"ok":false,"value":"fail","cookie_names":[],"level_requested":3,"level_from_cookie":null},"home":{"summary_meter_status":{"label":"Home \u003e Summary \u003e Meter Status","cgi":"/cgi-bin/rem.cgi","query":"query=7\u0026block_offset=10240\u0026byte_offset=0\u0026data_size=1024\u0026type=STRING\u0026name=energy\u0026memory=remshm\u0026number=17\u0026string_size=32","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ch_a_energy":{"label":"Home \u003e CH A \u003e Energy","cgi":"/cgi-bin/rem.cgi","query":"query=7\u0026block_offset=11264\u0026byte_offset=0\u0026data_size=1024\u0026type=STRING\u0026name=energy\u0026memory=remshm\u0026number=19\u0026string_size=32","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ch_a_measures":{"label":"Home \u003e CH A \u003e Measures","cgi":"/cgi-bin/rem.cgi","query":"query=106\u0026channel=0","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ch_b_energy":{"label":"Home \u003e CH B \u003e Energy","cgi":"/cgi-bin/rem.cgi","query":"query=7\u0026block_offset=12288\u0026byte_offset=0\u0026data_size=1024\u0026type=STRING\u0026name=energy\u0026memory=remshm\u0026number=19\u0026string_size=32","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ch_b_measures":{"label":"Home \u003e CH B \u003e Measures","cgi":"/cgi-bin/rem.cgi","query":"query=106\u0026channel=1","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"digital_io":{"label":"Home \u003e Digital IO","cgi":"/cgi-bin/rem.cgi","query":"query=7\u0026block_offset=13312\u0026byte_offset=0\u0026data_size=1024\u0026type=STRING\u0026name=energy\u0026memory=remshm\u0026number=12\u0026string_size=32","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"archive_1_waiting_files":{"label":"Home \u003e Archive 1 \u003e Waiting files","cgi":"/cgi-bin/rem.cgi","query":"query=107\u0026id=1","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"archive_1_sent_files":{"label":"Home \u003e Archive 1 \u003e Sent files","cgi":"/cgi-bin/rem.cgi","query":"query=108\u0026id=1","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"archive_1_test_files":{"label":"Home \u003e Archive 1 \u003e Test files","cgi":"/cgi-bin/rem.cgi","query":"query=112\u0026id=1","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"archive_2_waiting_files":{"label":"Home \u003e Archive 2 \u003e Waiting files","cgi":"/cgi-bin/rem.cgi","query":"query=107\u0026id=2","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"archive_2_sent_files":{"label":"Home \u003e Archive 2 \u003e Sent files","cgi":"/cgi-bin/rem.cgi","query":"query=108\u0026id=2","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"archive_2_test_files":{"label":"Home \u003e Archive 2 \u003e Test files","cgi":"/cgi-bin/rem.cgi","query":"query=112\u0026id=2","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"networking_interfaces":{"label":"Home \u003e Networking \u003e Interfaces","cgi":"/cgi-bin/mpc105.cgi","query":"query=500","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"networking_services":{"label":"Home \u003e Networking \u003e Services","cgi":"/cgi-bin/mpc105.cgi","query":"query=501","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"networking_redirection":{"label":"Home \u003e Networking \u003e Redirection","cgi":"/cgi-bin/mpc105.cgi","query":"query=502","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}}},"monitoring":{"network_interfaces_ethernet_0":{"label":"Monitoring \u003e Network Interfaces \u003e Ethernet 0","cgi":"/cgi-bin/mpc105.cgi","query":"query=3","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"network_interfaces_ethernet_1":{"label":"Monitoring \u003e Network Interfaces \u003e Ethernet 1","cgi":"/cgi-bin/mpc105.cgi","query":"query=4","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"network_interfaces_ethernet_2":{"label":"Monitoring \u003e Network Interfaces \u003e Ethernet 2","cgi":"/cgi-bin/mpc105.cgi","query":"query=5","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"network_interfaces_wlan":{"label":"Monitoring \u003e Network Interfaces \u003e WLAN","cgi":"/cgi-bin/mpc105.cgi","query":"query=6","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"network_interfaces_mobile":{"label":"Monitoring \u003e Network Interfaces \u003e Mobile","cgi":"/cgi-bin/mpc105.cgi","query":"query=13","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":[
+{
+"type":"text",
+"reference":"ppp0",
+"tag":"protocoltype",
+"label":"Protocol Type",
+"color":"black",
+"options":"",
+"value":"PPP"
+},
+{
+"type":"text",
+"reference":"ppp0",
+"tag":"status",
+"label":"Status",
+"color":"black",
+"options":"",
+"value":""
+}
+]},"network_interfaces_ethernet_switch":{"label":"Monitoring \u003e Network Interfaces \u003e Ethernet Switch","cgi":"/cgi-bin/mpc105.cgi","query":"query=14","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"network_interfaces_gps":{"label":"Monitoring \u003e Network Interfaces \u003e GPS","cgi":"/cgi-bin/mpc105.cgi","query":"query=16","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"rtp100_rtp100_variables":{"label":"Monitoring \u003e RTP100 \u003e RTP100 Variables","cgi":"/cgi-bin/rtp.cgi","query":"query=441","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"rtp100_rtp100_files":{"label":"Monitoring \u003e RTP100 \u003e RTP100 Files","cgi":"/cgi-bin/rtp.cgi","query":"query=444","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"memory_nand":{"label":"Monitoring \u003e Memory \u003e NAND","cgi":"/cgi-bin/mpc105.cgi","query":"query=23","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"memory_nor":{"label":"Monitoring \u003e Memory \u003e NOR","cgi":"/cgi-bin/mpc105.cgi","query":"query=24","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"memory_ram":{"label":"Monitoring \u003e Memory \u003e RAM","cgi":"/cgi-bin/mpc105.cgi","query":"query=25","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_rtc":{"label":"Monitoring \u003e Other Devices \u003e RTC","cgi":"/cgi-bin/mpc105.cgi","query":"query=7","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_fpga":{"label":"Monitoring \u003e Other Devices \u003e FPGA","cgi":"/cgi-bin/mpc105.cgi","query":"query=8","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_fram":{"label":"Monitoring \u003e Other Devices \u003e FRAM","cgi":"/cgi-bin/mpc105.cgi","query":"query=9","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_adc":{"label":"Monitoring \u003e Other Devices \u003e ADC","cgi":"/cgi-bin/mpc105.cgi","query":"query=10","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_hdlc":{"label":"Monitoring \u003e Other Devices \u003e HDLC","cgi":"/cgi-bin/mpc105.cgi","query":"query=11","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_mvbcs":{"label":"Monitoring \u003e Other Devices \u003e MVBCS","cgi":"/cgi-bin/mpc105.cgi","query":"query=12","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_modem":{"label":"Monitoring \u003e Other Devices \u003e MODEM","cgi":"/cgi-bin/mpc105.cgi","query":"query=17","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"other_devices_wifi":{"label":"Monitoring \u003e Other Devices \u003e WIFI","cgi":"/cgi-bin/mpc105.cgi","query":"query=18","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}}},"setup":{"meter_settings":{"label":"Setup \u003e Meter \u003e Settings","cgi":"/cgi-bin/rem.cgi","query":"query=105","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"meter_channels_configuration":{"label":"Setup \u003e Meter \u003e Channels Configuration","cgi":"/cgi-bin/rem.cgi","query":"query=100","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"meter_ftp_hosts":{"label":"Setup \u003e Meter \u003e FTP Hosts","cgi":"/cgi-bin/rem.cgi","query":"query=101","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"meter_udp_clients":{"label":"Setup \u003e Meter \u003e UDP Clients","cgi":"/cgi-bin/rem.cgi","query":"query=102","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"meter_messages":{"label":"Setup \u003e Meter \u003e Messages","cgi":"/cgi-bin/rem.cgi","query":"query=103","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"meter_calibration":{"label":"Setup \u003e Meter \u003e Calibration","cgi":"/cgi-bin/rem.cgi","query":"query=7\u0026block_offset=8192\u0026byte_offset=0\u0026data_size=1024\u0026type=DINT\u0026name=energy\u0026memory=remshm\u0026number=2","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"meter_thresholds_protection":{"label":"Setup \u003e Meter \u003e Thresholds Protection","cgi":"/cgi-bin/rem.cgi","query":"query=111","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"rtp100_rtp100_command":{"label":"Setup \u003e RTP100 \u003e RTP100 Command","cgi":"/cgi-bin/rtp.cgi","query":"query=442","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ethernet_interfaces_ethernet_0":{"label":"Setup \u003e Ethernet Interfaces \u003e Ethernet 0","cgi":"/cgi-bin/mpc105.cgi","query":"query=103","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ethernet_interfaces_ethernet_1":{"label":"Setup \u003e Ethernet Interfaces \u003e Ethernet 1","cgi":"/cgi-bin/mpc105.cgi","query":"query=104","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ethernet_interfaces_ethernet_2":{"label":"Setup \u003e Ethernet Interfaces \u003e Ethernet 2","cgi":"/cgi-bin/mpc105.cgi","query":"query=105","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"ethernet_interfaces_switch_ethernet":{"label":"Setup \u003e Ethernet Interfaces \u003e Switch Ethernet","cgi":"/cgi-bin/mpc105.cgi","query":"query=107","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"mobile_interface_mobile_settings":{"label":"Setup \u003e Mobile Interface \u003e Mobile Settings","cgi":"/cgi-bin/mpc105.cgi","query":"query=101","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"wireless_interface_wlan":{"label":"Setup \u003e Wireless Interface \u003e WLAN","cgi":"/cgi-bin/mpc105.cgi","query":"query=106","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"wireless_interface_client_access":{"label":"Setup \u003e Wireless Interface \u003e Client Access","cgi":"/cgi-bin/mpc105.cgi","query":"query=204","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"dhcp_client_settings":{"label":"Setup \u003e DHCP \u003e Client Settings","cgi":"/cgi-bin/mpc105.cgi","query":"query=200","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"dhcp_server_settings":{"label":"Setup \u003e DHCP \u003e Server Settings","cgi":"/cgi-bin/mpc105.cgi","query":"query=208","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"dhcp_address_reservation":{"label":"Setup \u003e DHCP \u003e Address Reservation","cgi":"/cgi-bin/mpc105.cgi","query":"query=209","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"services_gateway_dns":{"label":"Setup \u003e Services \u003e Gateway \u0026 DNS","cgi":"/cgi-bin/mpc105.cgi","query":"query=201","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"services_servers":{"label":"Setup \u003e Services \u003e Servers","cgi":"/cgi-bin/mpc105.cgi","query":"query=202","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"services_ntp_servers":{"label":"Setup \u003e Services \u003e NTP Servers","cgi":"/cgi-bin/mpc105.cgi","query":"query=203","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"services_gps":{"label":"Setup \u003e Services \u003e GPS","cgi":"/cgi-bin/mpc105.cgi","query":"query=205","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"services_port_forwarding":{"label":"Setup \u003e Services \u003e Port Forwarding","cgi":"/cgi-bin/mpc105.cgi","query":"query=207","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"services_proxy_settings":{"label":"Setup \u003e Services \u003e Proxy settings","cgi":"/cgi-bin/mpc105.cgi","query":"query=220","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}}},"advanced":{"rtc_time_settings":{"label":"Advanced \u003e RTC \u003e Time Settings","cgi":"/cgi-bin/mpc105.cgi","query":"query=303","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"rtc_time_zones":{"label":"Advanced \u003e RTC \u003e Time Zones","cgi":"/cgi-bin/mpc105.cgi","query":"query=305","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"configuration_settings":{"label":"Advanced \u003e Configuration \u003e Settings","cgi":"/cgi-bin/rem.cgi","query":"query=113","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"information_device_settings":{"label":"Advanced \u003e Information \u003e Device Settings","cgi":"/cgi-bin/mpc105.cgi","query":"query=302","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}},"information_events":{"label":"Advanced \u003e Information \u003e Events","cgi":"/cgi-bin/mpc105.cgi","query":"query=314","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":[
+	{
+		"type": "head",
+		"column_no":1,
+		"column_name": "ID"
+	},
+	{
+		"type": "head",
+		"column_no":2,
+		"column_name": "DATATIME"
+	},
+	{
+		"type": "head",
+		"column_no":3,
+		"column_name": "CODE"
+	},
+	{
+		"type": "head",
+		"column_no":4,
+		"column_name": "USER"
+	},
+	{
+		"type": "head",
+		"column_no":5,
+		"column_name": "DESCRIPTION"
+	},
+	{
+		"type": "data",
+		"events":
+		[
+		{
+			"ID":"3737",
+			"DATATIME":"2026-10-19 02:27:53",
+			"CODE":"2",
+			"USER":"superadmin",
+			"DESCRIPTION":"Login unauthorized",
+			"TIMET":"1792376873"
+		}
+		]
+	}
+]},"information_version":{"label":"Advanced \u003e Information \u003e Version","cgi":"/cgi-bin/mpc105.cgi","query":"query=301","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}}},"features":{"rtp100":{"label":"RTP100 enabled?","cgi":"/cgi-bin/rem.cgi","query":"query=430","http_status":200,"content_type":"text/html","server":"Boa/0.94.14rc21","body":{
+"reference":"login",
+"tag":"reply",
+"label":"reply",
+"value":"fail",
+"execute":"",
+"cancel":""
+}}}}
