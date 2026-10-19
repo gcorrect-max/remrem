@@ -4926,6 +4926,31 @@ python3 rem102/scripts/build-docs.py
 
 Zbieranie wszystkich pakietów po kolei: `rem102/scripts/collect.sh` (bash, curl, jq) albo `rem102/scripts/collect.ps1` (Windows PowerShell 5.1+, bez dodatkowych narzędzi). Oba zapisują `collected.json`, `samples/<zakładka>/<id>.json` i `collect.log` w `rem102/results/`. `rem102-info.sh` to skrót do `collect.sh` z wynikiem na stdout.
 
+### Login, odczyt i wylogowanie – gotowe skrypty z parametrami
+
+Użytkownik i hasło podaje się w linii poleceń (`User`, `Admin`, `Super Admin` albo poziom `1`, `2`, `3`). Skrypty wykonują: logowanie, odczyt danych urządzenia (`query=302`) i wersji (`query=301`) oraz wylogowanie.
+
+```bash
+./rem102/scripts/rem102-curl.sh "Super Admin" 'hasło' [host]
+```
+
+```powershell
+.\rem102-curl.cmd "Super Admin" 'hasło' [host]
+```
+
+Hasło trafia do `curl` przez stdin lub plik tymczasowy, więc nie widać go na liście procesów. Same wywołania `curl` (poziom 3):
+
+```bash
+LEVEL=3; PASS='hasło'; HOST=192.168.128.1; JAR=$(mktemp)
+printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+rm -f "$JAR"
+```
+
+Wylogowanie (`mpc105j.cgi?query=122`) pochodzi ze skryptów strony i nie było jeszcze uruchomione na urządzeniu.
+
 ### Linux / macOS / Git Bash
 
 ```bash

@@ -4789,6 +4789,18 @@ done; rm -f "$JAR"</code></pre></div>
 <section id="excluded"><h2>Excluded requests</h2><div class="callout">The scripts do <strong>not</strong> send the requests below – they change device state, end the session or are used to upload files.</div>
 <div class="tablewrap"><table><tr><th>Request</th><th>Reason</th></tr><tr><td><code>rem.cgi?query=440</code></td><td>Restore Factory Default – resets the device to factory settings</td></tr><tr><td><code>mpc105.cgi?query=1982</code></td><td>device reboot</td></tr><tr><td><code>mpc105j.cgi?query=122</code></td><td>logout (ends the session)</td></tr><tr><td><code>mpc105.cgi?query=121</code></td><td>change password</td></tr><tr><td><code>rem.cgi?query=402</code></td><td>Export (configuration download action)</td></tr><tr><td><code>rem.cgi?query=401</code>, <code>mpc105.cgi?query=310</code></td><td>configuration Import and Firmware Upgrade (file uploads)</td></tr><tr><td><code>rtp.cgi?query=440</code>, <code>443</code>, <code>445</code></td><td>RTP100 writes and commands</td></tr><tr><td>all <code>set</code>, <code>set1</code>, <code>set2</code> fields</td><td>configuration writes</td></tr></table></div></section>
 <section id="scripts"><h2>Scripts</h2><p>Collecting all packages one by one: <code>rem102/scripts/collect.sh</code> (bash, curl, jq) or <code>rem102/scripts/collect.ps1</code> (Windows PowerShell 5.1+, no extra tools). Both write <code>collected.json</code>, <code>samples/&lt;tab&gt;/&lt;id&gt;.json</code> and <code>collect.log</code> to <code>rem102/results/</code>. <code>rem102-info.sh</code> is a shortcut to <code>collect.sh</code> that prints the result to stdout.</p>
+<h3 class="sub">Login, read and logout – ready-made scripts with parameters</h3>
+<p>The user and the password are given on the command line (<code>User</code>, <code>Admin</code>, <code>Super Admin</code> or the level <code>1</code>, <code>2</code>, <code>3</code>). The scripts log in, read the device data (<code>query=302</code>) and the versions (<code>query=301</code>), and log out.</p>
+<div class="code"><button class="copy" type="button">Copy</button><pre><code>./rem102/scripts/rem102-curl.sh "Super Admin" 'password' [host]</code></pre></div>
+<div class="code"><button class="copy" type="button">Copy</button><pre><code>.\rem102-curl.cmd "Super Admin" 'password' [host]</code></pre></div>
+<p>The password reaches <code>curl</code> through stdin or a temporary file, so it does not show in the process list. The bare <code>curl</code> calls (level 3):</p>
+<div class="code"><button class="copy" type="button">Copy</button><pre><code>LEVEL=3; PASS='password'; HOST=192.168.128.1; JAR=$(mktemp)
+printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+rm -f "$JAR"</code></pre></div>
+<p>The logout (<code>mpc105j.cgi?query=122</code>) comes from the page's scripts and has not been run against the device yet.</p>
 <h3 class="sub">Linux / macOS / Git Bash</h3>
 <div class="code"><button class="copy" type="button">Copy</button><pre><code>REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='password' ./rem102/scripts/collect.sh
 python3 rem102/scripts/build-docs.py</code></pre></div>

@@ -4789,6 +4789,18 @@ done; rm -f "$JAR"</code></pre></div>
 <section id="excluded"><h2>Pominięte zapytania</h2><div class="callout">Poniższych zapytań skrypty <strong>nie</strong> wysyłają – zmieniają stan urządzenia, kończą sesję albo służą do przesyłania plików.</div>
 <div class="tablewrap"><table><tr><th>Zapytanie</th><th>Powód</th></tr><tr><td><code>rem.cgi?query=440</code></td><td>Restore Factory Default – przywraca ustawienia fabryczne</td></tr><tr><td><code>mpc105.cgi?query=1982</code></td><td>restart urządzenia</td></tr><tr><td><code>mpc105j.cgi?query=122</code></td><td>wylogowanie (kończy sesję)</td></tr><tr><td><code>mpc105.cgi?query=121</code></td><td>zmiana hasła</td></tr><tr><td><code>rem.cgi?query=402</code></td><td>Export (akcja pobrania konfiguracji)</td></tr><tr><td><code>rem.cgi?query=401</code>, <code>mpc105.cgi?query=310</code></td><td>Import konfiguracji i Firmware Upgrade (upload plików)</td></tr><tr><td><code>rtp.cgi?query=440</code>, <code>443</code>, <code>445</code></td><td>zapis i komendy RTP100</td></tr><tr><td>wszystkie pola <code>set</code>, <code>set1</code>, <code>set2</code></td><td>zapis konfiguracji</td></tr></table></div></section>
 <section id="scripts"><h2>Skrypty</h2><p>Zbieranie wszystkich pakietów po kolei: <code>rem102/scripts/collect.sh</code> (bash, curl, jq) albo <code>rem102/scripts/collect.ps1</code> (Windows PowerShell 5.1+, bez dodatkowych narzędzi). Oba zapisują <code>collected.json</code>, <code>samples/&lt;zakładka&gt;/&lt;id&gt;.json</code> i <code>collect.log</code> w <code>rem102/results/</code>. <code>rem102-info.sh</code> to skrót do <code>collect.sh</code> z wynikiem na stdout.</p>
+<h3 class="sub">Login, odczyt i wylogowanie – gotowe skrypty z parametrami</h3>
+<p>Użytkownik i hasło podaje się w linii poleceń (<code>User</code>, <code>Admin</code>, <code>Super Admin</code> albo poziom <code>1</code>, <code>2</code>, <code>3</code>). Skrypty wykonują: logowanie, odczyt danych urządzenia (<code>query=302</code>) i wersji (<code>query=301</code>) oraz wylogowanie.</p>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>./rem102/scripts/rem102-curl.sh "Super Admin" 'hasło' [host]</code></pre></div>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>.\rem102-curl.cmd "Super Admin" 'hasło' [host]</code></pre></div>
+<p>Hasło trafia do <code>curl</code> przez stdin lub plik tymczasowy, więc nie widać go na liście procesów. Same wywołania <code>curl</code> (poziom 3):</p>
+<div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>LEVEL=3; PASS='hasło'; HOST=192.168.128.1; JAR=$(mktemp)
+printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+rm -f "$JAR"</code></pre></div>
+<p>Wylogowanie (<code>mpc105j.cgi?query=122</code>) pochodzi ze skryptów strony i nie było jeszcze uruchomione na urządzeniu.</p>
 <h3 class="sub">Linux / macOS / Git Bash</h3>
 <div class="code"><button class="copy" type="button">Kopiuj</button><pre><code>REM_HOST=192.168.128.1 REM_USER="Super Admin" REM_PASS='password' ./rem102/scripts/collect.sh
 python3 rem102/scripts/build-docs.py</code></pre></div>

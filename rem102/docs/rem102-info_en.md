@@ -4926,6 +4926,31 @@ python3 rem102/scripts/build-docs.py
 
 Collecting all packages one by one: `rem102/scripts/collect.sh` (bash, curl, jq) or `rem102/scripts/collect.ps1` (Windows PowerShell 5.1+, no extra tools). Both write `collected.json`, `samples/<tab>/<id>.json` and `collect.log` to `rem102/results/`. `rem102-info.sh` is a shortcut to `collect.sh` that prints the result to stdout.
 
+### Login, read and logout – ready-made scripts with parameters
+
+The user and the password are given on the command line (`User`, `Admin`, `Super Admin` or the level `1`, `2`, `3`). The scripts log in, read the device data (`query=302`) and the versions (`query=301`), and log out.
+
+```bash
+./rem102/scripts/rem102-curl.sh "Super Admin" 'password' [host]
+```
+
+```powershell
+.\rem102-curl.cmd "Super Admin" 'password' [host]
+```
+
+The password reaches `curl` through stdin or a temporary file, so it does not show in the process list. The bare `curl` calls (level 3):
+
+```bash
+LEVEL=3; PASS='password'; HOST=192.168.128.1; JAR=$(mktemp)
+printf '%s' "$PASS" | curl -sS -w '\n' -c "$JAR" -X POST "http://$HOST/cgi-bin/mpc105.cgi" --data "query=120" --data "login=$LEVEL" --data-urlencode "pwd@-"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=302"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105.cgi?query=301"
+curl -sS -b "$JAR" "http://$HOST/cgi-bin/mpc105j.cgi?query=122"
+rm -f "$JAR"
+```
+
+The logout (`mpc105j.cgi?query=122`) comes from the page's scripts and has not been run against the device yet.
+
 ### Linux / macOS / Git Bash
 
 ```bash
